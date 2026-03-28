@@ -14,22 +14,20 @@ import net.sacredlabyrinth.phaed.simpleclans.ClanPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.WorldBorder;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
-import org.bukkit.block.Container;
-import org.bukkit.block.data.BlockData;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.scheduler.BukkitTask;
+import com.absolutgg.absolutevents.utils.ArenaRestorer;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -80,7 +78,6 @@ public final class BattleRoyale extends Evento {
     private final int maxItemsPerChest;
 
     private final Map<Player, WorldBorder> personalBorders = new HashMap<>();
-    private final Map<String, BlockSnapshot> mapSnapshots = new HashMap<>();
 
     private int positionIndex;
 
@@ -108,18 +105,6 @@ public final class BattleRoyale extends Evento {
             this.chance = chance;
             this.minAmount = minAmount;
             this.maxAmount = maxAmount;
-        }
-    }
-
-    private static final class BlockSnapshot {
-        private final Material material;
-        private final BlockData blockData;
-        private final ItemStack[] inventoryContents;
-
-        private BlockSnapshot(Material material, BlockData blockData, ItemStack[] inventoryContents) {
-            this.material = material;
-            this.blockData = blockData;
-            this.inventoryContents = inventoryContents;
         }
     }
 
@@ -151,7 +136,10 @@ public final class BattleRoyale extends Evento {
         this.maxItemsPerChest = Math.max(this.minItemsPerChest, config.getInt("Loot.Max items per chest", 7));
 
         loadLootSystem();
-        loadChestSnapshots();
+
+        if (refillChests) {
+            loadChestSnapshots();
+        }
     }
 
     @Override
@@ -169,9 +157,6 @@ public final class BattleRoyale extends Evento {
 
         this.kills.clear();
         this.personalBorders.clear();
-        this.blocksToRemove.clear();
-
-        captureMapRegion();
 
         for (Player player : getPlayers()) {
             kills.put(player, 0);
@@ -368,9 +353,32 @@ public final class BattleRoyale extends Evento {
         cancelTask(actionbarTask);
 
         clearBorderFromParticipants();
-        restoreMapRegion();
+
+        if (config.contains("arena.world")) {
+            World world = Bukkit.getWorld(config.getString("arena.world"));
+
+            if (world != null) {
+                for (Entity entity : world.getEntities()) {
+                    if (entity.getType() == EntityType.ITEM
+                            || entity.getType() == EntityType.ARROW
+                            || entity.getType() == EntityType.FIREBALL
+                            || entity.getType() == EntityType.SMALL_FIREBALL
+                            || entity.getType() == EntityType.SNOWBALL
+                            || entity.getType() == EntityType.EGG
+                            || entity.getType() == EntityType.TRIDENT) {
+                        entity.remove();
+                    }
+                }
+            }
+        }
+
+        if (config.contains("arena")) {
+            plugin.getLogger().info("Chamando ArenaRestorer...");
+            ArenaRestorer.restore(plugin, config.getConfigurationSection("arena"));
+        }
 
         blocksToRemove.clear();
+        chestSnapshots.clear();
 
         for (ClanPlayer clanPlayer : simpleClansClans) {
             clanPlayer.setFriendlyFire(false);
@@ -387,10 +395,11 @@ public final class BattleRoyale extends Evento {
         personalBorders.clear();
 
         HandlerList.unregisterAll(listener);
+
         this.removePlayers();
     }
 
-    public void eliminate(Player player) {
+        public void eliminate(Player player) {
         eliminate(player, null);
     }
 
@@ -459,10 +468,6 @@ public final class BattleRoyale extends Evento {
         return this.pvpEnabled;
     }
 
-    public boolean removePlayerPlacedBlocks() {
-        return this.removeBlocks;
-    }
-
     public List<Block> getBlocksToRemove() {
         return this.blocksToRemove;
     }
@@ -492,29 +497,6 @@ public final class BattleRoyale extends Evento {
 
     public Location getCenterLocation() {
         return centerLocation;
-    }
-
-    public boolean isInsideMapRegion(Block block) {
-        Cuboid cuboid = getChestCuboid();
-        if (cuboid == null || block == null) {
-            return false;
-        }
-
-        Location location = block.getLocation();
-        Location min = cuboid.getLowerNE();
-        Location max = cuboid.getUpperSW();
-
-        if (location.getWorld() == null || min.getWorld() == null) {
-            return false;
-        }
-
-        if (!location.getWorld().equals(min.getWorld())) {
-            return false;
-        }
-
-        return location.getBlockX() >= min.getBlockX() && location.getBlockX() <= max.getBlockX()
-                && location.getBlockY() >= min.getBlockY() && location.getBlockY() <= max.getBlockY()
-                && location.getBlockZ() >= min.getBlockZ() && location.getBlockZ() <= max.getBlockZ();
     }
 
     private void teleportPlayersToMultipleSpawns() {
@@ -730,7 +712,7 @@ public final class BattleRoyale extends Evento {
                 player.setHealth(newHealth);
 
                 player.playHurtAnimation(0.0F);
-                player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_HURT, 1.0F, 1.0F);
+                player.playSound(player.getLocation(), org.bukkit.Sound.ENTITY_PLAYER_HURT, 1.0F, 1.0F);
             }
         }
     }
@@ -838,8 +820,6 @@ public final class BattleRoyale extends Evento {
     }
 
     private void loadChestSnapshots() {
-        chestSnapshots.clear();
-
         Cuboid cuboid = getChestCuboid();
         if (cuboid == null) {
             return;
@@ -878,90 +858,14 @@ public final class BattleRoyale extends Evento {
             for (Map.Entry<Integer, ItemStack> itemEntry : entry.getValue().entrySet()) {
                 chest.getInventory().setItem(itemEntry.getKey(), itemEntry.getValue());
             }
-
-            chest.update(true, false);
         }
-    }
-
-    private void captureMapRegion() {
-        mapSnapshots.clear();
-
-        Cuboid cuboid = getChestCuboid();
-        if (cuboid == null) {
-            return;
-        }
-
-        for (Block block : cuboid.getBlocks()) {
-            BlockState state = block.getState();
-            ItemStack[] contents = null;
-
-            if (state instanceof Container container) {
-                Inventory inventory = container.getInventory();
-                ItemStack[] original = inventory.getContents();
-                contents = new ItemStack[original.length];
-
-                for (int i = 0; i < original.length; i++) {
-                    if (original[i] != null) {
-                        contents[i] = original[i].clone();
-                    }
-                }
-            }
-
-            mapSnapshots.put(
-                    getBlockKey(block),
-                    new BlockSnapshot(
-                            block.getType(),
-                            block.getBlockData().clone(),
-                            contents
-                    )
-            );
-        }
-    }
-
-    private void restoreMapRegion() {
-        Cuboid cuboid = getChestCuboid();
-        if (cuboid == null) {
-            return;
-        }
-
-        for (Block block : cuboid.getBlocks()) {
-            BlockSnapshot snapshot = mapSnapshots.get(getBlockKey(block));
-            if (snapshot == null) {
-                continue;
-            }
-
-            block.setType(snapshot.material, false);
-            block.setBlockData(snapshot.blockData.clone(), false);
-
-            BlockState state = block.getState();
-            if (state instanceof Container container && snapshot.inventoryContents != null) {
-                Inventory inventory = container.getInventory();
-                inventory.clear();
-
-                ItemStack[] restored = new ItemStack[snapshot.inventoryContents.length];
-                for (int i = 0; i < snapshot.inventoryContents.length; i++) {
-                    if (snapshot.inventoryContents[i] != null) {
-                        restored[i] = snapshot.inventoryContents[i].clone();
-                    }
-                }
-
-                inventory.setContents(restored);
-                state.update(true, false);
-            }
-        }
-
-        restoreChests();
-    }
-
-    private String getBlockKey(Block block) {
-        Location location = block.getLocation();
-        return location.getWorld().getName()
-                + ":" + location.getBlockX()
-                + ":" + location.getBlockY()
-                + ":" + location.getBlockZ();
     }
 
     private Cuboid getChestCuboid() {
+        if (!refillChests) {
+            return null;
+        }
+
         String worldName = config.getString("Locations.Pos1.world");
         World world = worldName == null ? null : Bukkit.getWorld(worldName);
         if (world == null) {
@@ -998,7 +902,6 @@ public final class BattleRoyale extends Evento {
 
             Chest chest = (Chest) block.getState();
             fillChestRandom(chest);
-            chest.update(true, false);
         }
     }
 
@@ -1159,22 +1062,6 @@ public final class BattleRoyale extends Evento {
         }
     }
 
-    private void notifyLeave(Player player) {
-        String message = ColorUtils.colorize(
-                plugin.getConfig()
-                        .getString("Messages.Leave", "&c@player saiu do evento.")
-                        .replace("@player", player.getName())
-        );
-
-        for (Player online : getPlayers()) {
-            online.sendMessage(message);
-        }
-
-        for (Player online : getSpectators()) {
-            online.sendMessage(message);
-        }
-    }
-
     private void cancelTask(BukkitTask task) {
         if (task != null) {
             task.cancel();
@@ -1205,5 +1092,5 @@ public final class BattleRoyale extends Evento {
     @Override
     public YamlConfiguration getConfig() {
         return config;
-    }
+    } 
 }

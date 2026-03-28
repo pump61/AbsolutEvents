@@ -6,8 +6,14 @@ author: _Saynt
 website: ${project.url}
 
 main: com.absolutgg.absolutevents.AbsolutEventsPlugin
-softdepend: [LegendChat, SimpleClans, Vault, Factions, yClans, PlaceholderAPI]
 api-version: '1.21'
+
+softdepend:
+  - SimpleClans
+  - Vault
+  - PlaceholderAPI
+  - WorldEdit
+  - FastAsyncWorldEdit
 
 commands:
   evento:
@@ -19,6 +25,5 @@ commands:
       - events
       - event
       - ev
-      - eventos
     permission: absolutevents.use
     permission-message: "§cSem permissão."
