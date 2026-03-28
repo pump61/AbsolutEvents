@@ -3,8 +3,8 @@ package com.absolutgg.absolutevents.hooks;
 import com.absolutgg.absolutevents.AbsolutEventsPlugin;
 import com.absolutgg.absolutevents.api.Evento;
 import com.absolutgg.absolutevents.api.EventoType;
+import com.absolutgg.absolutevents.utils.ColorUtils;
 import com.absolutgg.absolutevents.utils.EventoConfigFile;
-import com.iridium.iridiumcolorapi.IridiumColorAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -309,9 +309,8 @@ public final class BungeecordHook implements PluginMessageListener {
 
     private static void broadcastConfigMessages(YamlConfiguration config, String path) {
         for (String message : config.getStringList(path)) {
-            Bukkit.broadcastMessage(IridiumColorAPI.process(
-                    message.replace("&", "§")
-                            .replace("@name", config.getString("Evento.Title"))
+            Bukkit.broadcastMessage(ColorUtils.colorize(
+                    message.replace("@name", config.getString("Evento.Title"))
             ));
         }
     }

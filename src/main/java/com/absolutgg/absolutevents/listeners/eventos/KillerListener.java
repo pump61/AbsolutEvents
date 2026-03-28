@@ -3,7 +3,7 @@ package com.absolutgg.absolutevents.listeners.eventos;
 import com.absolutgg.absolutevents.AbsolutEventsPlugin;
 import com.absolutgg.absolutevents.api.events.PlayerLoseEvent;
 import com.absolutgg.absolutevents.eventos.Killer;
-import com.iridium.iridiumcolorapi.IridiumColorAPI;
+import com.absolutgg.absolutevents.utils.ColorUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -59,11 +59,10 @@ public final class KillerListener implements Listener {
             killer.getKills().merge(killerPlayer, 1, Integer::sum);
         }
 
-        dead.sendMessage(IridiumColorAPI.process(
+        dead.sendMessage(ColorUtils.colorize(
                 AbsolutEventsPlugin.getInstance()
                         .getConfig()
                         .getString("Messages.Eliminated", "&cVocê foi eliminado.")
-                        .replace("&", "§")
         ));
 
         killer.remove(dead);

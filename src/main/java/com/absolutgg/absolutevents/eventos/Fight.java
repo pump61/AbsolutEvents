@@ -4,8 +4,8 @@ import com.absolutgg.absolutevents.AbsolutEventsPlugin;
 import com.absolutgg.absolutevents.api.Evento;
 import com.absolutgg.absolutevents.api.events.PlayerLoseEvent;
 import com.absolutgg.absolutevents.listeners.eventos.FightListener;
+import com.absolutgg.absolutevents.utils.ColorUtils;
 import com.cryptomorin.xseries.XItemStack;
-import com.iridium.iridiumcolorapi.IridiumColorAPI;
 import net.sacredlabyrinth.phaed.simpleclans.ClanPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -132,9 +132,8 @@ public final class Fight extends Evento {
         List<String> broadcastMessages = config.getStringList("Messages.Winner");
         for (String s : broadcastMessages) {
             AbsolutEventsPlugin.getInstance().getServer().broadcastMessage(
-                    IridiumColorAPI.process(
-                            s.replace("&", "§")
-                                    .replace("@winner", p.getName())
+                    ColorUtils.colorize(
+                            s.replace("@winner", p.getName())
                                     .replace("@name", config.getString("Evento.Title"))
                     )
             );
@@ -181,22 +180,18 @@ public final class Fight extends Evento {
     @Override
     public void leave(Player p) {
         if (getPlayers().contains(p)) {
+            String leaveMessage = ColorUtils.colorize(
+                    AbsolutEventsPlugin.getInstance().getConfig()
+                            .getString("Messages.Leave", "&c@player saiu do evento.")
+                            .replace("@player", p.getName())
+            );
+
             for (Player player : getPlayers()) {
-                player.sendMessage(IridiumColorAPI.process(
-                        AbsolutEventsPlugin.getInstance().getConfig()
-                                .getString("Messages.Leave", "&c@player saiu do evento.")
-                                .replace("&", "§")
-                                .replace("@player", p.getName())
-                ));
+                player.sendMessage(leaveMessage);
             }
 
             for (Player player : getSpectators()) {
-                player.sendMessage(IridiumColorAPI.process(
-                        AbsolutEventsPlugin.getInstance().getConfig()
-                                .getString("Messages.Leave", "&c@player saiu do evento.")
-                                .replace("&", "§")
-                                .replace("@player", p.getName())
-                ));
+                player.sendMessage(leaveMessage);
             }
 
             if (AbsolutEventsPlugin.getInstance().getSimpleClans() != null) {
@@ -257,9 +252,8 @@ public final class Fight extends Evento {
         List<String> nextMessages = config.getStringList("Messages.Starting fights");
         for (Player player : getPlayers()) {
             for (String s : nextMessages) {
-                player.sendMessage(IridiumColorAPI.process(
-                        s.replace("&", "§")
-                                .replace("@time", String.valueOf(interval))
+                player.sendMessage(ColorUtils.colorize(
+                        s.replace("@time", String.valueOf(interval))
                                 .replace("@name", config.getString("Evento.Title"))
                 ));
             }
@@ -267,9 +261,8 @@ public final class Fight extends Evento {
 
         for (Player player : getSpectators()) {
             for (String s : nextMessages) {
-                player.sendMessage(IridiumColorAPI.process(
-                        s.replace("&", "§")
-                                .replace("@time", String.valueOf(interval))
+                player.sendMessage(ColorUtils.colorize(
+                        s.replace("@time", String.valueOf(interval))
                                 .replace("@name", config.getString("Evento.Title"))
                 ));
             }
@@ -304,9 +297,8 @@ public final class Fight extends Evento {
                     List<String> fightMessages = config.getStringList("Messages.Bracket info");
                     for (Player player : getPlayers()) {
                         for (String s : fightMessages) {
-                            player.sendMessage(IridiumColorAPI.process(
-                                    s.replace("&", "§")
-                                            .replace("@first", fighter1.getName())
+                            player.sendMessage(ColorUtils.colorize(
+                                    s.replace("@first", fighter1.getName())
                                             .replace("@second", fighter2.getName())
                                             .replace("@name", config.getString("Evento.Title"))
                             ));
@@ -315,9 +307,8 @@ public final class Fight extends Evento {
 
                     for (Player player : getSpectators()) {
                         for (String s : fightMessages) {
-                            player.sendMessage(IridiumColorAPI.process(
-                                    s.replace("&", "§")
-                                            .replace("@first", fighter1.getName())
+                            player.sendMessage(ColorUtils.colorize(
+                                    s.replace("@first", fighter1.getName())
                                             .replace("@second", fighter2.getName())
                                             .replace("@name", config.getString("Evento.Title"))
                             ));
@@ -381,9 +372,8 @@ public final class Fight extends Evento {
             List<String> noWinnerMessages = config.getStringList("Messages.Draw");
             for (Player player : getPlayers()) {
                 for (String s : noWinnerMessages) {
-                    player.sendMessage(IridiumColorAPI.process(
-                            s.replace("&", "§")
-                                    .replace("@name", config.getString("Evento.Title"))
+                    player.sendMessage(ColorUtils.colorize(
+                            s.replace("@name", config.getString("Evento.Title"))
                                     .replace("@maxtime", String.valueOf(maxTime))
                     ));
                 }
@@ -391,9 +381,8 @@ public final class Fight extends Evento {
 
             for (Player player : getSpectators()) {
                 for (String s : noWinnerMessages) {
-                    player.sendMessage(IridiumColorAPI.process(
-                            s.replace("&", "§")
-                                    .replace("@name", config.getString("Evento.Title"))
+                    player.sendMessage(ColorUtils.colorize(
+                            s.replace("@name", config.getString("Evento.Title"))
                                     .replace("@maxtime", String.valueOf(maxTime))
                     ));
                 }
@@ -423,9 +412,8 @@ public final class Fight extends Evento {
             if (p == fighter1) {
                 for (Player player : getPlayers()) {
                     for (String s : winnerMessages) {
-                        player.sendMessage(IridiumColorAPI.process(
-                                s.replace("&", "§")
-                                        .replace("@player", fighter2.getName())
+                        player.sendMessage(ColorUtils.colorize(
+                                s.replace("@player", fighter2.getName())
                                         .replace("@winner", fighter2.getName())
                                         .replace("@name", config.getString("Evento.Title"))
                         ));
@@ -434,9 +422,8 @@ public final class Fight extends Evento {
 
                 for (Player player : getSpectators()) {
                     for (String s : winnerMessages) {
-                        player.sendMessage(IridiumColorAPI.process(
-                                s.replace("&", "§")
-                                        .replace("@player", fighter2.getName())
+                        player.sendMessage(ColorUtils.colorize(
+                                s.replace("@player", fighter2.getName())
                                         .replace("@winner", fighter2.getName())
                                         .replace("@name", config.getString("Evento.Title"))
                         ));
@@ -450,9 +437,8 @@ public final class Fight extends Evento {
             } else {
                 for (Player player : getPlayers()) {
                     for (String s : winnerMessages) {
-                        player.sendMessage(IridiumColorAPI.process(
-                                s.replace("&", "§")
-                                        .replace("@player", fighter1.getName())
+                        player.sendMessage(ColorUtils.colorize(
+                                s.replace("@player", fighter1.getName())
                                         .replace("@winner", fighter1.getName())
                                         .replace("@name", config.getString("Evento.Title"))
                         ));
@@ -461,9 +447,8 @@ public final class Fight extends Evento {
 
                 for (Player player : getSpectators()) {
                     for (String s : winnerMessages) {
-                        player.sendMessage(IridiumColorAPI.process(
-                                s.replace("&", "§")
-                                        .replace("@player", fighter1.getName())
+                        player.sendMessage(ColorUtils.colorize(
+                                s.replace("@player", fighter1.getName())
                                         .replace("@winner", fighter1.getName())
                                         .replace("@name", config.getString("Evento.Title"))
                         ));
@@ -475,12 +460,11 @@ public final class Fight extends Evento {
                 fighter1.teleport(entrance, PlayerTeleportEvent.TeleportCause.PLUGIN);
             }
 
-            p.sendMessage(
+            p.sendMessage(ColorUtils.colorize(
                     AbsolutEventsPlugin.getInstance()
                             .getConfig()
                             .getString("Messages.Eliminated", "&cVocê foi eliminado.")
-                            .replace("&", "§")
-            );
+            ));
 
             remove(p);
 

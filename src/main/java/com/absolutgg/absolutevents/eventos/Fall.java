@@ -85,12 +85,10 @@ public final class Fall extends Evento {
         for (Player player : getPlayers()) {
             player.sendTitle(
                     ColorUtils.colorize(
-                            title.replace("&", "§")
-                                    .replace("@name", config.getString("Evento.Title"))
+                            title.replace("@name", config.getString("Evento.Title"))
                     ),
                     ColorUtils.colorize(
-                            subtitle.replace("&", "§")
-                                    .replace("@time", String.valueOf(time))
+                            subtitle.replace("@time", String.valueOf(time))
                                     .replace("@name", config.getString("Evento.Title"))
                     ),
                     config.getInt("Title.FadeIn", 10),
@@ -161,8 +159,7 @@ public final class Fall extends Evento {
                         );
 
                         player.sendActionBar(ColorUtils.colorize(
-                                actionbar.replace("&", "§")
-                                        .replace("@time", countdown + "s")
+                                actionbar.replace("@time", countdown + "s")
                                         .replace("@players", String.valueOf(getPlayers().size()))
                         ));
 
@@ -182,8 +179,8 @@ public final class Fall extends Evento {
                             String subtitle = config.getString("Title.Final.Subtitle", "&fSegure por mais alguns segundos!");
 
                             player.sendTitle(
-                                    ColorUtils.colorize(title.replace("&", "§")),
-                                    ColorUtils.colorize(subtitle.replace("&", "§")),
+                                    ColorUtils.colorize(title),
+                                    ColorUtils.colorize(subtitle),
                                     config.getInt("Title.FadeIn", 10),
                                     20,
                                     config.getInt("Title.FadeOut", 10)
@@ -209,13 +206,11 @@ public final class Fall extends Evento {
                 AbsolutEventsPlugin.getInstance()
                         .getConfig()
                         .getString("Messages.Eliminated", "&cVocê foi eliminado.")
-                        .replace("&", "§")
         ));
 
         for (String message : config.getStringList("Messages.Player eliminated")) {
             sendToEvent(ColorUtils.colorize(
-                    message.replace("&", "§")
-                            .replace("@player", player.getName())
+                    message.replace("@player", player.getName())
                             .replace("@name", config.getString("Evento.Title"))
             ));
         }
@@ -253,8 +248,7 @@ public final class Fall extends Evento {
 
         for (String message : config.getStringList("Messages.Winner")) {
             Bukkit.broadcastMessage(ColorUtils.colorize(
-                    message.replace("&", "§")
-                            .replace("@winner", String.join(", ", winners))
+                    message.replace("@winner", String.join(", ", winners))
                             .replace("@name", config.getString("Evento.Title"))
             ));
         }
@@ -271,8 +265,7 @@ public final class Fall extends Evento {
 
         for (String message : config.getStringList("Messages.No winner")) {
             Bukkit.broadcastMessage(ColorUtils.colorize(
-                    message.replace("&", "§")
-                            .replace("@name", config.getString("Evento.Title"))
+                    message.replace("@name", config.getString("Evento.Title"))
             ));
         }
 

@@ -2,7 +2,7 @@ package com.absolutgg.absolutevents.listeners.eventos;
 
 import com.absolutgg.absolutevents.AbsolutEventsPlugin;
 import com.absolutgg.absolutevents.eventos.Frog;
-import com.iridium.iridiumcolorapi.IridiumColorAPI;
+import com.absolutgg.absolutevents.utils.ColorUtils;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -49,11 +49,10 @@ public final class FrogListener implements Listener {
         Material blockType = event.getTo().getBlock().getType();
 
         if (blockType == Material.WATER) {
-            player.sendMessage(IridiumColorAPI.process(
+            player.sendMessage(ColorUtils.colorize(
                     AbsolutEventsPlugin.getInstance()
                             .getConfig()
                             .getString("Messages.Eliminated", "&cVocê foi eliminado.")
-                            .replace("&", "§")
             ));
 
             frog.leave(player);

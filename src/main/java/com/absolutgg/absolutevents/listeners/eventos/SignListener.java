@@ -3,7 +3,7 @@ package com.absolutgg.absolutevents.listeners.eventos;
 import com.absolutgg.absolutevents.AbsolutEventsPlugin;
 import com.absolutgg.absolutevents.api.events.PlayerLoseEvent;
 import com.absolutgg.absolutevents.eventos.Sign;
-import com.iridium.iridiumcolorapi.IridiumColorAPI;
+import com.absolutgg.absolutevents.utils.ColorUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
@@ -13,7 +13,6 @@ import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -85,10 +84,9 @@ public final class SignListener implements Listener {
         checkpoints.put(player.getUniqueId(), matchedCheckpoint.clone());
         lastActivatedCheckpoint.put(player.getUniqueId(), matchedCheckpoint.clone());
 
-        player.sendMessage(IridiumColorAPI.process(
+        player.sendMessage(ColorUtils.colorize(
                 signEvent.getConfig()
                         .getString("Messages.Checkpoint saved", "&aCheckpoint salvo!")
-                        .replace("&", "§")
                         .replace("@name", signEvent.getConfig().getString("Evento.Title"))
         ));
 
@@ -124,10 +122,9 @@ public final class SignListener implements Listener {
         event.setCancelled(true);
 
         if (signEvent.isBackOnCooldown(player)) {
-            player.sendMessage(IridiumColorAPI.process(
+            player.sendMessage(ColorUtils.colorize(
                     signEvent.getConfig()
                             .getString("Messages.Back cooldown", "&cAguarde @time para usar novamente.")
-                            .replace("&", "§")
                             .replace("@time", signEvent.getBackRemainingSeconds(player) + "s")
                             .replace("@name", signEvent.getConfig().getString("Evento.Title"))
             ));
@@ -206,7 +203,7 @@ public final class SignListener implements Listener {
         EntityDamageEvent.DamageCause cause = event.getCause();
 
         switch (cause) {
-            case CONTACT:      // 🌵 Cacto
+            case CONTACT:
             case LAVA:
             case FIRE:
             case FIRE_TICK:
@@ -234,7 +231,6 @@ public final class SignListener implements Listener {
                 break;
 
             default:
-                // outros danos são ignorados mas cancelados
                 event.setCancelled(true);
                 break;
         }
@@ -280,7 +276,6 @@ public final class SignListener implements Listener {
     private void returnToCheckpointOrStart(Player player, Sign signEvent) {
         Location destination = checkpoints.get(player.getUniqueId());
 
-        // limpa o fogo imediatamente
         player.setFireTicks(0);
         player.setVisualFire(false);
 
@@ -293,7 +288,6 @@ public final class SignListener implements Listener {
             player.teleport(teleport);
             signEvent.giveBackItem(player);
 
-            // limpa de novo 1 tick depois pra remover a animação visual
             Bukkit.getScheduler().runTaskLater(AbsolutEventsPlugin.getInstance(), () -> {
                 if (!player.isOnline()) {
                     return;
@@ -302,10 +296,9 @@ public final class SignListener implements Listener {
                 player.setVisualFire(false);
             }, 1L);
 
-            player.sendMessage(IridiumColorAPI.process(
+            player.sendMessage(ColorUtils.colorize(
                     signEvent.getConfig()
                             .getString("Messages.Checkpoint back", "&eVocê voltou ao checkpoint.")
-                            .replace("&", "§")
                             .replace("@name", signEvent.getConfig().getString("Evento.Title"))
             ));
             return;
@@ -340,10 +333,9 @@ public final class SignListener implements Listener {
             player.setVisualFire(false);
         }, 1L);
 
-        player.sendMessage(IridiumColorAPI.process(
+        player.sendMessage(ColorUtils.colorize(
                 signEvent.getConfig()
                         .getString("Messages.Back", "&eVocê voltou ao início.")
-                        .replace("&", "§")
                         .replace("@name", signEvent.getConfig().getString("Evento.Title"))
         ));
     }
@@ -398,7 +390,7 @@ public final class SignListener implements Listener {
                 section.getDouble("x"),
                 section.getDouble("y"),
                 section.getDouble("z")
-        );
+            );
 
         return isNearBlock(loc, saved, 1, 2, 1);
     }

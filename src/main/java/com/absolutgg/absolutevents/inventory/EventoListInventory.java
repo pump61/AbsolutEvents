@@ -2,6 +2,7 @@ package com.absolutgg.absolutevents.inventory;
 
 import com.absolutgg.absolutevents.inventory.utils.SimpleItemParser;
 import com.absolutgg.absolutevents.manager.InventoryManager;
+import com.absolutgg.absolutevents.utils.ColorUtils;
 import com.absolutgg.absolutevents.utils.MenuConfigFile;
 import com.henryfabio.minecraft.inventoryapi.editor.InventoryEditor;
 import com.henryfabio.minecraft.inventoryapi.inventory.impl.paged.PagedInventory;
@@ -32,9 +33,10 @@ public final class EventoListInventory extends PagedInventory {
     protected void configureViewer(PagedViewer viewer) {
         ViewerConfigurationImpl.Paged configuration = viewer.getConfiguration();
         configuration.titleInventory(
-                config.getString("Menu.Name", "&8Eventos")
-                        .replace("@jogador", viewer.getName())
-                        .replace("&", "§")
+                ColorUtils.colorize(
+                        config.getString("Menu.Name", "&8Eventos")
+                                .replace("@jogador", viewer.getName())
+                )
         );
         configuration.inventorySize(config.getInt("Menu.Size", 27));
         configuration.nextPageSlot(config.getInt("Menu.Next page slot", 26));

@@ -3,8 +3,8 @@ package com.absolutgg.absolutevents.listeners.eventos;
 import com.absolutgg.absolutevents.AbsolutEventsPlugin;
 import com.absolutgg.absolutevents.api.events.PlayerLoseEvent;
 import com.absolutgg.absolutevents.eventos.TNTRun;
+import com.absolutgg.absolutevents.utils.ColorUtils;
 import com.cryptomorin.xseries.XMaterial;
-import com.iridium.iridiumcolorapi.IridiumColorAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -27,19 +27,13 @@ public final class TNTRunListener implements Listener {
     @EventHandler
     public void onMove(PlayerMoveEvent event) {
         TNTRun tntRun = getEvento();
-        if (tntRun == null) {
-            return;
-        }
+        if (tntRun == null) return;
 
         Player player = event.getPlayer();
 
-        if (!tntRun.getPlayers().contains(player)) {
-            return;
-        }
+        if (!tntRun.getPlayers().contains(player)) return;
 
-        if (!tntRun.isTntRunHappening() || !tntRun.isHappening() || event.getTo() == null) {
-            return;
-        }
+        if (!tntRun.isTntRunHappening() || !tntRun.isHappening() || event.getTo() == null) return;
 
         Location from = event.getFrom();
         Location to = event.getTo();
@@ -57,9 +51,7 @@ public final class TNTRunListener implements Listener {
 
             if (below.getType() == XMaterial.TNT.parseMaterial()) {
                 tntRun.getScheduler().runTaskLater(AbsolutEventsPlugin.getInstance(), () -> {
-                    if (!tntRun.isHappening()) {
-                        return;
-                    }
+                    if (!tntRun.isHappening()) return;
 
                     if (fromBlockUnder.getType() != Material.AIR) {
                         fromBlockUnder.setType(Material.AIR, false);
@@ -85,14 +77,12 @@ public final class TNTRunListener implements Listener {
     }
 
     private void eliminate(Player player, TNTRun tntRun) {
-        if (!tntRun.getPlayers().contains(player)) {
-            return;
-        }
+        if (!tntRun.getPlayers().contains(player)) return;
 
-        player.sendMessage(IridiumColorAPI.process(
+        // ✅ CORREÇÃO HEX
+        player.sendMessage(ColorUtils.colorize(
                 AbsolutEventsPlugin.getInstance().getConfig()
                         .getString("Messages.Eliminated", "&cVocê foi eliminado.")
-                        .replace("&", "§")
         ));
 
         tntRun.remove(player);
@@ -113,13 +103,9 @@ public final class TNTRunListener implements Listener {
     @EventHandler
     public void onDrop(PlayerDropItemEvent event) {
         TNTRun tntRun = getEvento();
-        if (tntRun == null) {
-            return;
-        }
+        if (tntRun == null) return;
 
-        if (!tntRun.getPlayers().contains(event.getPlayer())) {
-            return;
-        }
+        if (!tntRun.getPlayers().contains(event.getPlayer())) return;
 
         event.setCancelled(true);
     }
@@ -127,13 +113,9 @@ public final class TNTRunListener implements Listener {
     @EventHandler
     public void onDamage(EntityDamageByEntityEvent event) {
         TNTRun tntRun = getEvento();
-        if (tntRun == null) {
-            return;
-        }
+        if (tntRun == null) return;
 
-        if (!(event.getEntity() instanceof Player attacked) || !(event.getDamager() instanceof Player damager)) {
-            return;
-        }
+        if (!(event.getEntity() instanceof Player attacked) || !(event.getDamager() instanceof Player damager)) return;
 
         if (tntRun.getPlayers().contains(attacked) && tntRun.getPlayers().contains(damager)) {
             event.setCancelled(true);
@@ -143,13 +125,9 @@ public final class TNTRunListener implements Listener {
     @EventHandler
     public void onFallDamage(EntityDamageEvent event) {
         TNTRun tntRun = getEvento();
-        if (tntRun == null) {
-            return;
-        }
+        if (tntRun == null) return;
 
-        if (!(event.getEntity() instanceof Player player)) {
-            return;
-        }
+        if (!(event.getEntity() instanceof Player player)) return;
 
         if (tntRun.getPlayers().contains(player) && event.getCause() == EntityDamageEvent.DamageCause.FALL) {
             event.setCancelled(true);
@@ -159,13 +137,9 @@ public final class TNTRunListener implements Listener {
     @EventHandler
     public void onExplosion(EntityExplodeEvent event) {
         TNTRun tntRun = getEvento();
-        if (tntRun == null) {
-            return;
-        }
+        if (tntRun == null) return;
 
-        if (event.getEntityType() != EntityType.TNT) {
-            return;
-        }
+        if (event.getEntityType() != EntityType.TNT) return;
 
         if (tntRun.getCuboid().isIn(event.getLocation())) {
             event.setCancelled(true);

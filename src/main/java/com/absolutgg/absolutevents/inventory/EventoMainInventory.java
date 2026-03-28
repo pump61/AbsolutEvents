@@ -3,6 +3,7 @@ package com.absolutgg.absolutevents.inventory;
 import com.absolutgg.absolutevents.AbsolutEventsPlugin;
 import com.absolutgg.absolutevents.inventory.utils.SimpleItemParser;
 import com.absolutgg.absolutevents.manager.InventoryManager;
+import com.absolutgg.absolutevents.utils.ColorUtils;
 import com.absolutgg.absolutevents.utils.EventoConfigFile;
 import com.absolutgg.absolutevents.utils.MenuConfigFile;
 import com.henryfabio.minecraft.inventoryapi.editor.InventoryEditor;
@@ -35,9 +36,10 @@ public final class EventoMainInventory extends SimpleInventory {
     protected void configureViewer(SimpleViewer viewer) {
         ViewerConfiguration configuration = viewer.getConfiguration();
         configuration.titleInventory(
-                config.getString("Menu.Name", "&8Eventos")
-                        .replace("@jogador", viewer.getName())
-                        .replace("&", "§")
+                ColorUtils.colorize(
+                        config.getString("Menu.Name", "&8Eventos")
+                                .replace("@jogador", viewer.getName())
+                )
         );
         configuration.inventorySize(config.getInt("Menu.Size", 27));
     }
@@ -97,16 +99,17 @@ public final class EventoMainInventory extends SimpleInventory {
 
                             hasWinOrParticipation = true;
                             lore.add(
-                                    config.getString("Eventos.Format", "&7@evento_name: @evento_wins / @evento_participations")
-                                            .replace("@evento_name", separated[1])
-                                            .replace("@evento_wins", String.valueOf(wins))
-                                            .replace("@evento_participations", String.valueOf(participations))
-                                            .replace("&", "§")
+                                    ColorUtils.colorize(
+                                            config.getString("Eventos.Format", "&7@evento_name: @evento_wins / @evento_participations")
+                                                    .replace("@evento_name", separated[1])
+                                                    .replace("@evento_wins", String.valueOf(wins))
+                                                    .replace("@evento_participations", String.valueOf(participations))
+                                    )
                             );
                         }
 
                         if (!hasWinOrParticipation) {
-                            lore.add(config.getString("Eventos.Empty", "&7Nenhum dado.").replace("&", "§"));
+                            lore.add(ColorUtils.colorize(config.getString("Eventos.Empty", "&7Nenhum dado.")));
                         }
 
                         if (config.getBoolean("Eventos.New line")) {

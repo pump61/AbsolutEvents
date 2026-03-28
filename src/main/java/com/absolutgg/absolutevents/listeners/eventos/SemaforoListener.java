@@ -3,6 +3,7 @@ package com.absolutgg.absolutevents.listeners.eventos;
 import com.absolutgg.absolutevents.AbsolutEventsPlugin;
 import com.absolutgg.absolutevents.api.events.PlayerLoseEvent;
 import com.absolutgg.absolutevents.eventos.Semaforo;
+import com.absolutgg.absolutevents.utils.ColorUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
@@ -55,12 +56,12 @@ public final class SemaforoListener implements Listener {
             return;
         }
 
-        if (!sign.getLine(0).equals(victory.get(0).replace("&", "§"))) {
+        if (!sign.getLine(0).equals(ColorUtils.colorize(victory.get(0)))) {
             return;
         }
 
         for (int i = 1; i < 4; i++) {
-            if (!sign.getLine(i).equals(victory.get(i).replace("&", "§"))) {
+            if (!sign.getLine(i).equals(ColorUtils.colorize(victory.get(i)))) {
                 return;
             }
         }

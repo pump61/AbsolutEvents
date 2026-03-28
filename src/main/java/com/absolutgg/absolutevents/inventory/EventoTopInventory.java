@@ -1,6 +1,7 @@
 package com.absolutgg.absolutevents.inventory;
 
 import com.absolutgg.absolutevents.AbsolutEventsPlugin;
+import com.absolutgg.absolutevents.utils.ColorUtils;
 import com.absolutgg.absolutevents.utils.MenuConfigFile;
 import com.cryptomorin.xseries.XMaterial;
 import com.henryfabio.minecraft.inventoryapi.editor.InventoryEditor;
@@ -47,16 +48,18 @@ public final class EventoTopInventory extends PagedInventory {
         AtomicInteger currentFilter = new AtomicInteger(playerFilter.getOrDefault(viewer.getName(), -1));
         if (currentFilter.get() == -1) {
             configuration.titleInventory(
-                    config.getString("Filter.Names.Wins", "&8Top Vitórias")
-                            .replace("@jogador", viewer.getName())
-                            .replace("&", "§")
+                    ColorUtils.colorize(
+                            config.getString("Filter.Names.Wins", "&8Top Vitórias")
+                                    .replace("@jogador", viewer.getName())
+                    )
             );
         }
         if (currentFilter.get() == 0) {
             configuration.titleInventory(
-                    config.getString("Filter.Names.Participations", "&8Top Participações")
-                            .replace("@jogador", viewer.getName())
-                            .replace("&", "§")
+                    ColorUtils.colorize(
+                            config.getString("Filter.Names.Participations", "&8Top Participações")
+                                    .replace("@jogador", viewer.getName())
+                    )
             );
         }
     }
@@ -84,9 +87,10 @@ public final class EventoTopInventory extends PagedInventory {
 
                 meta.setOwner(player.getName());
                 meta.setDisplayName(
-                        config.getString("Menu.Items.Player.Name", "&e@top_player")
-                                .replace("@top_player", player.getName())
-                                .replace("&", "§")
+                        ColorUtils.colorize(
+                                config.getString("Menu.Items.Player.Name", "&e@top_player")
+                                        .replace("@top_player", player.getName())
+                        )
                 );
                 meta.setLore(AbsolutEventsPlugin.getInstance().getCacheManager().getTopWinsMenuItems().get(player));
                 item.setItemMeta(meta);
@@ -113,9 +117,10 @@ public final class EventoTopInventory extends PagedInventory {
 
                 meta.setOwner(player.getName());
                 meta.setDisplayName(
-                        config.getString("Menu.Items.Player.Name", "&e@top_player")
-                                .replace("@top_player", player.getName())
-                                .replace("&", "§")
+                        ColorUtils.colorize(
+                                config.getString("Menu.Items.Player.Name", "&e@top_player")
+                                        .replace("@top_player", player.getName())
+                        )
                 );
                 meta.setLore(AbsolutEventsPlugin.getInstance().getCacheManager().getTopParticipationsMenuItems().get(player));
                 item.setItemMeta(meta);
@@ -146,13 +151,13 @@ public final class EventoTopInventory extends PagedInventory {
             return;
         }
 
-        meta.setDisplayName("§6Filtro de ranking");
-        lore.add("§7Selecione qual ranking você quer ver.");
+        meta.setDisplayName(ColorUtils.colorize("§6Filtro de ranking"));
+        lore.add(ColorUtils.colorize("§7Selecione qual ranking você quer ver."));
         lore.add("");
         lore.add(getFilterFormatting(currentFilter.get(), -1) + " Vitórias");
         lore.add(getFilterFormatting(currentFilter.get(), 0) + " Participações");
         lore.add("");
-        lore.add("§aClique para mudar o filtro!");
+        lore.add(ColorUtils.colorize("§aClique para mudar o filtro!"));
 
         meta.setLore(lore);
         item.setItemMeta(meta);

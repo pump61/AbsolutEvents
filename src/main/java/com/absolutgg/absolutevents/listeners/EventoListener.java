@@ -7,9 +7,9 @@ import com.absolutgg.absolutevents.eventos.Guerra;
 import com.absolutgg.absolutevents.eventos.Nexus;
 import com.absolutgg.absolutevents.hooks.BungeecordHook;
 import com.absolutgg.absolutevents.manager.InventorySerializer;
+import com.absolutgg.absolutevents.utils.ColorUtils;
 import com.absolutgg.absolutevents.utils.EventoConfigFile;
 import com.absolutgg.absolutevents.utils.QuitCache;
-import com.iridium.iridiumcolorapi.IridiumColorAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -66,12 +66,11 @@ public final class EventoListener implements Listener {
                 .anyMatch(cmd -> cmd.equals(command));
 
         if (!allowed) {
-            player.sendMessage(
+            player.sendMessage(ColorUtils.colorize(
                     AbsolutEventsPlugin.getInstance()
                             .getConfig()
                             .getString("Messages.Blocked command", "&cVocê não pode usar este comando.")
-                            .replace("&", "§")
-            );
+            ));
             event.setCancelled(true);
         }
     }
@@ -107,9 +106,8 @@ public final class EventoListener implements Listener {
 
             if (!evento.isOpen() && evento.getPlayers().isEmpty()) {
                 for (String message : evento.getConfig().getStringList("Messages.No winner")) {
-                    Bukkit.broadcastMessage(IridiumColorAPI.process(
-                            message.replace("&", "§")
-                                    .replace("@name", evento.getConfig().getString("Evento.Title"))
+                    Bukkit.broadcastMessage(ColorUtils.colorize(
+                            message.replace("@name", evento.getConfig().getString("Evento.Title"))
                     ));
                 }
                 evento.stop();
@@ -252,7 +250,6 @@ public final class EventoListener implements Listener {
             return;
         }
 
-        // Libera movimentação de inventário para eventos que precisam funcionar como o inventário normal
         if (evento instanceof Nexus
                 || evento instanceof BattleRoyale
                 || evento instanceof Guerra) {
@@ -397,19 +394,17 @@ public final class EventoListener implements Listener {
             EventoConfigFile.save(settings);
             EventoCommand.getSetupList().put(player, settings);
 
-            player.sendMessage(IridiumColorAPI.process(
+            player.sendMessage(ColorUtils.colorize(
                     AbsolutEventsPlugin.getInstance()
                             .getConfig()
                             .getString("Messages.Saved", "&aPosição salva.")
-                            .replace("&", "§")
                             .replace("@pos", pos)
             ));
         } catch (IOException exception) {
-            player.sendMessage(IridiumColorAPI.process(
+            player.sendMessage(ColorUtils.colorize(
                     AbsolutEventsPlugin.getInstance()
                             .getConfig()
                             .getString("Messages.Error", "&cOcorreu um erro.")
-                            .replace("&", "§")
             ));
             exception.printStackTrace();
         }

@@ -18,11 +18,11 @@ import org.bukkit.scheduler.BukkitTask;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
-import java.util.List;
 
 public final class Frog extends Evento {
 
@@ -165,7 +165,7 @@ public final class Frog extends Evento {
         for (String message : config.getStringList("Messages.Winner")) {
             AbsolutEventsPlugin.getInstance().getServer().broadcastMessage(
                     ColorUtils.colorize(
-                            message.replace("&", "§")
+                            message
                                     .replace("@winner", player.getName())
                                     .replace("@name", config.getString("Evento.Title"))
                     )
@@ -305,8 +305,7 @@ public final class Frog extends Evento {
             for (String message : config.getStringList("Messages.Wool")) {
                 player.sendMessage(
                         ColorUtils.colorize(
-                                message.replace("&", "§")
-                                        .replace("@name", config.getString("Evento.Title"))
+                                message.replace("@name", config.getString("Evento.Title"))
                         )
                 );
             }
@@ -316,8 +315,7 @@ public final class Frog extends Evento {
             for (String message : config.getStringList("Messages.Wool")) {
                 player.sendMessage(
                         ColorUtils.colorize(
-                                message.replace("&", "§")
-                                        .replace("@name", config.getString("Evento.Title"))
+                                message.replace("@name", config.getString("Evento.Title"))
                         )
                 );
             }
@@ -361,7 +359,7 @@ public final class Frog extends Evento {
                     message = message.replace("@time", String.valueOf(Math.max(remaining[0], 0)))
                             .replace("@name", config.getString("Evento.Title", "Frog"));
 
-                    String parsed = ColorUtils.colorize(message.replace("&", "§"));
+                    String parsed = ColorUtils.colorize(message);
 
                     for (Player player : getPlayers()) {
                         player.sendActionBar(parsed);
@@ -395,7 +393,7 @@ public final class Frog extends Evento {
                     String message = config.getString("Actionbar.Final.Message", "&c[@name] &fPise na lã vermelha para vencer!");
                     message = message.replace("@name", config.getString("Evento.Title", "Frog"));
 
-                    String parsed = ColorUtils.colorize(message.replace("&", "§"));
+                    String parsed = ColorUtils.colorize(message);
 
                     for (Player player : getPlayers()) {
                         player.sendActionBar(parsed);
@@ -418,10 +416,9 @@ public final class Frog extends Evento {
         String title = config.getString("Title.Remove.Title", "&cATENÇÃO!");
         String subtitle = config.getString("Title.Remove.Subtitle", "&fA cor &c@color &fvai cair!");
 
-        title = ColorUtils.colorize(title.replace("&", "§"));
+        title = ColorUtils.colorize(title);
         subtitle = ColorUtils.colorize(
-                subtitle.replace("&", "§")
-                        .replace("@color", colorName)
+                subtitle.replace("@color", colorName)
         );
 
         for (Player player : getPlayers()) {
@@ -441,8 +438,8 @@ public final class Frog extends Evento {
         String title = config.getString("Title.Final.Title", "&cCORRA!");
         String subtitle = config.getString("Title.Final.Subtitle", "&fPise na lã vermelha para vencer!");
 
-        title = ColorUtils.colorize(title.replace("&", "§"));
-        subtitle = ColorUtils.colorize(subtitle.replace("&", "§"));
+        title = ColorUtils.colorize(title);
+        subtitle = ColorUtils.colorize(subtitle);
 
         for (Player player : getPlayers()) {
             player.sendTitle(title, subtitle, fadeIn, stay, fadeOut);

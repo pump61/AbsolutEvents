@@ -4,9 +4,9 @@ import com.absolutgg.absolutevents.AbsolutEventsPlugin;
 import com.absolutgg.absolutevents.api.Evento;
 import com.absolutgg.absolutevents.api.events.PlayerLoseEvent;
 import com.absolutgg.absolutevents.listeners.eventos.MorteSubitaListener;
+import com.absolutgg.absolutevents.utils.ColorUtils;
 import com.cryptomorin.xseries.XEnchantment;
 import com.cryptomorin.xseries.XMaterial;
-import com.iridium.iridiumcolorapi.IridiumColorAPI;
 import net.sacredlabyrinth.phaed.simpleclans.ClanPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
@@ -152,9 +152,8 @@ public final class MorteSubita extends Evento {
 
     private void sendTeamMessage(Player player, String teamName) {
         for (String message : config.getStringList("Messages.Team")) {
-            player.sendMessage(IridiumColorAPI.process(
-                    message.replace("&", "§")
-                            .replace("@name", config.getString("Evento.Title"))
+            player.sendMessage(ColorUtils.colorize(
+                    message.replace("@name", config.getString("Evento.Title"))
                             .replace("@team", teamName)
                             .replace("@time", String.valueOf(startTime))
             ));
@@ -184,8 +183,9 @@ public final class MorteSubita extends Evento {
             pvpEnabled = true;
 
             for (String message : config.getStringList("Messages.Enabled")) {
-                sendToEvent(message.replace("&", "§")
-                        .replace("@name", config.getString("Evento.Title")));
+                sendToEvent(
+                        message.replace("@name", config.getString("Evento.Title"))
+                );
             }
         }, startTime * 20L);
     }
@@ -197,10 +197,9 @@ public final class MorteSubita extends Evento {
             return;
         }
 
-        String leaveMessage = IridiumColorAPI.process(
+        String leaveMessage = ColorUtils.colorize(
                 plugin.getConfig()
                         .getString("Messages.Leave", "&c@player saiu do evento.")
-                        .replace("&", "§")
                         .replace("@player", player.getName())
         );
 
@@ -268,9 +267,8 @@ public final class MorteSubita extends Evento {
         victim.setFoodLevel(20);
 
         for (String message : config.getStringList("Messages.Eliminado")) {
-            victim.sendMessage(IridiumColorAPI.process(
-                    message.replace("&", "§")
-                            .replace("@name", config.getString("Evento.Title"))
+            victim.sendMessage(ColorUtils.colorize(
+                    message.replace("@name", config.getString("Evento.Title"))
                             .replace("@killer", killer.getName())
             ));
         }
@@ -318,22 +316,19 @@ public final class MorteSubita extends Evento {
         }
 
         for (String message : config.getStringList("Messages.Winner")) {
-            plugin.getServer().broadcastMessage(IridiumColorAPI.process(
-                    message.replace("&", "§")
-                            .replace("@team", teamName)
+            plugin.getServer().broadcastMessage(ColorUtils.colorize(
+                    message.replace("@team", teamName)
                             .replace("@winner", String.join(", ", winnerNames))
                             .replace("@name", config.getString("Evento.Title"))
             ));
         }
 
-        // Marca os vencedores para o Evento não considerar eles como perdedores
         setWinners(new HashSet<>(winners));
 
         List<Player> rewardTargets = new ArrayList<>(winners);
 
         stop();
 
-        // Entrega as recompensas alguns ticks depois, para passar por qualquer limpeza tardia
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
             for (Player player : rewardTargets) {
                 if (!player.isOnline()) {
@@ -412,7 +407,7 @@ public final class MorteSubita extends Evento {
     }
 
     private void sendToEvent(String message) {
-        String parsed = IridiumColorAPI.process(message);
+        String parsed = ColorUtils.colorize(message);
 
         for (Player player : getPlayers()) {
             player.sendMessage(parsed);
@@ -437,5 +432,10 @@ public final class MorteSubita extends Evento {
 
     public boolean isPvpEnabled() {
         return pvpEnabled;
+    }
+
+    @Override
+    public YamlConfiguration getConfig() {
+        return config;
     }
 }

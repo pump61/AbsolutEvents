@@ -1,5 +1,6 @@
 package com.absolutgg.absolutevents.inventory.utils;
 
+import com.absolutgg.absolutevents.utils.ColorUtils;
 import com.cryptomorin.xseries.XEnchantment;
 import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.Bukkit;
@@ -43,13 +44,13 @@ public final class SimpleItemParser {
 
         String name = section.getString("Name");
         if (name != null) {
-            meta.setDisplayName(applyPlaceholders(name, placeholders).replace("&", "§"));
+            meta.setDisplayName(ColorUtils.colorize(applyPlaceholders(name, placeholders)));
         }
 
         if (section.contains("Lore")) {
             List<String> lore = new ArrayList<>();
             for (String line : section.getStringList("Lore")) {
-                lore.add(applyPlaceholders(line, placeholders).replace("&", "§"));
+                lore.add(ColorUtils.colorize(applyPlaceholders(line, placeholders)));
             }
             meta.setLore(lore);
         }
