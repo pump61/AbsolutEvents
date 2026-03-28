@@ -38,8 +38,6 @@ import java.util.stream.Collectors;
 
 public final class AbsolutEventsPlugin extends JavaPlugin {
 
-    private static AbsolutEventsPlugin instance;
-
     private ConnectionManager connectionManager;
 
     private final EventosManager eventosManager = new EventosManager();
@@ -56,7 +54,6 @@ public final class AbsolutEventsPlugin extends JavaPlugin {
 
     @Override
     public void onLoad() {
-        instance = this;
         reloaded = false;
     }
 
@@ -150,10 +147,6 @@ public final class AbsolutEventsPlugin extends JavaPlugin {
         saveDefaultConfig();
 
         try {
-            // Não atualizar automaticamente o config.yml principal.
-            // Isso preserva estruturas customizadas como Broadcast.Global.
-            // ConfigUpdater.update(this, "config.yml", configFile, Collections.singletonList("none"));
-
             ConfigUpdater.update(this, "menus/main.yml", mainMenuFile, Collections.singletonList("none"));
             ConfigUpdater.update(
                     this,
@@ -442,7 +435,7 @@ public final class AbsolutEventsPlugin extends JavaPlugin {
     }
 
     public static AbsolutEventsPlugin getInstance() {
-        return instance;
+        return JavaPlugin.getPlugin(AbsolutEventsPlugin.class);
     }
 
     public ConnectionManager getConnectionManager() {
