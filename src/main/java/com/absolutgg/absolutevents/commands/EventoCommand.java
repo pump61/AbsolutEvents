@@ -5,6 +5,8 @@ import com.absolutgg.absolutevents.api.EventoType;
 import com.absolutgg.absolutevents.hooks.BungeecordHook;
 import com.absolutgg.absolutevents.manager.InventoryManager;
 import com.absolutgg.absolutevents.manager.InventorySerializer;
+import com.absolutgg.absolutevents.manager.UpdateChecker;
+import com.absolutgg.absolutevents.manager.UpdateDownloader;
 import com.absolutgg.absolutevents.utils.ColorUtils;
 import com.absolutgg.absolutevents.utils.EventoConfigFile;
 import com.absolutgg.absolutevents.utils.NumberFormatter;
@@ -52,7 +54,8 @@ public final class EventoCommand implements CommandExecutor, TabCompleter {
             "setup",
             "reload",
             "backup",
-            "backupinfo"
+            "backupinfo",
+            "update"
     );
 
     private static final List<String> SETUP_ACTIONS = Arrays.asList(
@@ -151,6 +154,9 @@ public final class EventoCommand implements CommandExecutor, TabCompleter {
 
             case "backupinfo":
                 return handleBackupInfo(sender, args);
+
+            case "update":
+                return handleUpdate(sender, args);
 
             default:
                 return handleChatEventCommand(sender, args);
@@ -754,6 +760,37 @@ public final class EventoCommand implements CommandExecutor, TabCompleter {
         }
 
         sender.sendMessage(color("&aPosição &f" + displayName + " &asalva no evento &f" + settings.getString("Evento.Title")));
+        return true;
+    }
+
+    private boolean handleUpdate(CommandSender sender, String[] args) {
+        if (!sender.hasPermission("absolutevents.admin")) {
+            sender.sendMessage(color(message("Messages.No permission")));
+            return true;
+        }
+
+        if (args.length >= 2 && args[1].equalsIgnoreCase("confirm")) {
+            UpdateDownloader.downloadLatestRelease(sender);
+            return true;
+        }
+
+        sender.sendMessage("§e[AbsolutEvents] Verificando updates no GitHub...");
+
+        UpdateChecker.getUpdateInfoAsync(true).thenAccept(info -> {
+            if (info == null) {
+                sender.sendMessage("§c[AbsolutEvents] Não foi possível verificar atualizações.");
+                return;
+            }
+
+            UpdateChecker.sendUpdateInfo(sender, info);
+        }).exceptionally(throwable -> {
+            sender.sendMessage("§c[AbsolutEvents] Ocorreu um erro ao verificar atualizações.");
+            AbsolutEventsPlugin.getInstance().getLogger().warning(
+                    "Falha ao executar /evento update: " + throwable.getMessage()
+            );
+            return null;
+        });
+
         return true;
     }
 
@@ -1368,6 +1405,12 @@ public final class EventoCommand implements CommandExecutor, TabCompleter {
                     }
 
                     return filter(SETUP_ACTIONS, args[1]);
+
+                case "update":
+                    if (!admin) {
+                        return Collections.emptyList();
+                    }
+                    return filter(Collections.singletonList("confirm"), args[1]);
 
                 default:
                     return Collections.emptyList();
