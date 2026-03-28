@@ -108,7 +108,7 @@ Bungeecord:
 # UPDATE CHECKER
 # =====================================================
 
-UpdateChecker: false
+UpdateChecker: true
 
 # =====================================================
 # FORMATAÇÃO DE DINHEIRO
