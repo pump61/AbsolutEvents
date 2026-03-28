@@ -18,6 +18,7 @@ import com.absolutgg.absolutevents.utils.MenuConfigFile;
 import com.absolutgg.absolutevents.utils.QuitCache;
 import net.milkbowl.vault.economy.Economy;
 import net.sacredlabyrinth.phaed.simpleclans.SimpleClans;
+import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Player;
@@ -97,6 +98,8 @@ public final class AbsolutEventsPlugin extends JavaPlugin {
         registerBungeeChannelIfEnabled();
         registerCommands();
 
+        setupMetrics();
+
         logInfo("Plugin iniciado com sucesso!");
     }
 
@@ -129,6 +132,21 @@ public final class AbsolutEventsPlugin extends JavaPlugin {
         }
 
         logInfo("Plugin desativado com sucesso!");
+    }
+
+    private void setupMetrics() {
+        int pluginId = 30438;
+        Metrics metrics = new Metrics(this, pluginId);
+
+        metrics.addCustomChart(new Metrics.SimplePie("update_checker", () ->
+                getConfig().getBoolean("UpdateChecker") ? "enabled" : "disabled"
+        ));
+
+        metrics.addCustomChart(new Metrics.SimplePie("bungeecord", () ->
+                getConfig().getBoolean("Bungeecord.Enabled") ? "enabled" : "disabled"
+        ));
+
+        metrics.addCustomChart(new Metrics.SimplePie("database_type", () -> "sqlite"));
     }
 
     private void setupConfigFiles() {
