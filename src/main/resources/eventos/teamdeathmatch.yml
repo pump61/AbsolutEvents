@@ -1,0 +1,80 @@
+Evento:
+  Title: "Team Deathmatch"
+  Type: "teamdeathmatch"
+  Calls: 5
+  Calls interval: 15
+  Mininum players: 2
+  Eliminate on quit: true
+  Empty inventory: true
+  Permission: "absolutevents.evento"
+  Count participation: true
+  Count victory: true
+  Blue: "Time Azul"
+  Red: "Time Vermelho"
+  Enable PvP: 10
+  Points: 1
+  Max points: 30
+  Dead time: 5
+  Invincibility: 5
+  Hearts added: 4
+
+Messages:
+  Broadcast:
+    - ""
+    - "&3[@name] &bIniciando evento &f@name"
+    - "&3[@name] &bPara participar, digite &f/evento"
+    - "&3[@name] &bPrêmio: &2$&f@money &b+ &6[TDM]"
+    - "&3[@name] &bJogadores no evento: &f@players"
+    - "&3[@name] &bChamadas restantes: &f@broadcasts"
+    - ""
+  Start:
+    - ""
+    - "&3[@name] &bIniciando evento..."
+    - ""
+  Winner:
+    - ""
+    - "&3[@name] &bO evento &f@name &bfoi finalizado!"
+    - "&3[@name] &bO vencedor foi &f@winner&b!"
+    - ""
+  No winner:
+    - ""
+    - "&3[@name] &bO evento &f@name &bfoi finalizado!"
+    - "&3[@name] &bNão houveram vencedores."
+    - ""
+  No players:
+    - ""
+    - "&3[@name] &bEvento cancelado."
+    - "&3[@name] &bA quantidade mínima de jogadores não foi atingida."
+    - ""
+  Cancelled:
+    - ""
+    - "&3[@name] &bO evento foi cancelado manualmente."
+    - ""
+  Team:
+    - ""
+    - "&3[@name] &bVocê faz parte do &f@team&b."
+    - "&3[@name] &bAtivando PvP em &f@time &bsegundos."
+    - ""
+  Enabled:
+    - "&3[@name] &bPvP ativado! Boa sorte á todos."
+  Eliminated:
+    - "&3[@name] @player &bfoi morto!"
+    - "&3[@name] &bPontuação: @blueteam&b á @redteam&b."
+  Killed:
+    - "&3[@name] &bVocê foi morto! Aguarde &f@time&b segundos para voltar a jogar."
+  Win:
+    - "&3[@name] &bCom @points &bpontos, o @team &bvenceu!"
+
+Rewards:
+  Money: 1000
+  Commands:
+    - "give @winner diamond 1"
+
+Locations:
+  Lobby: []
+  Entrance: []
+  Spectator: []
+  Exit: []
+  Pos1: []
+  Pos2: []
+  Server: null

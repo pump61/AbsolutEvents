@@ -1,0 +1,132 @@
+Evento:
+  Title: Fight
+  Type: fight
+  Calls: 10
+  Calls interval: 10
+  Mininum players: 2
+  Eliminate on quit: true
+  Empty inventory: true
+  Permission: absolutevents.evento
+  Count participation: false
+  Count victory: false
+  Time: 5
+  Fight time: 120
+
+Kit:
+  Normal:
+    Armor:
+      Helmet: {}
+      Chestplate: {}
+      Leggings: {}
+      Boots: {}
+    Inventory: {}
+
+  Last fight:
+    Armor:
+      Helmet: {}
+      Chestplate: {}
+      Leggings: {}
+      Boots: {}
+    Inventory: {}
+
+Messages:
+  Broadcast:
+    - ''
+    - '&eEvento &f@name &eaberto! Digite &f/evento'
+    - '&eJogadores: &f@players &7| &eChamadas restantes: &f@broadcasts'
+    - '&ePrêmio: &a$@money'
+    - ''
+
+  Start:
+    - ''
+    - '&e[@name] &fO evento iniciou!'
+    - ''
+
+  Winner:
+    - ''
+    - '&e[@name] &fO vencedor foi &a@winner'
+    - ''
+
+  No winner:
+    - ''
+    - '&e[@name] &cO evento terminou sem vencedores.'
+    - ''
+
+  No players:
+    - ''
+    - '&e[@name] &cEvento cancelado por falta de jogadores.'
+    - ''
+
+  Cancelled:
+    - ''
+    - '&e[@name] &cEvento cancelado.'
+    - ''
+
+  Starting fights:
+    - ''
+    - '&e[@name] &fA próxima luta começa em &e@time &fsegundos.'
+    - ''
+
+  Bracket info:
+    - '&e[@name] &f@first &eVS &f@second'
+
+  Fight winner:
+    - '&e[@name] &f@winner &evenceu a luta!'
+
+  Draw:
+    - '&e[@name] &cEmpate!'
+
+Rewards:
+  Money: 0
+  Commands: []
+
+Locations:
+  Lobby:
+    world: world
+    x: 0
+    y: 0
+    z: 0
+    yaw: 0
+    pitch: 0
+
+  Entrance:
+    world: world
+    x: 0
+    y: 0
+    z: 0
+    yaw: 0
+    pitch: 0
+
+  Spectator:
+    world: world
+    x: 0
+    y: 0
+    z: 0
+    yaw: 0
+    pitch: 0
+
+  Exit:
+    world: world
+    x: 0
+    y: 0
+    z: 0
+    yaw: 0
+    pitch: 0
+
+  Pos1:
+    world: world
+    x: 0
+    y: 0
+    z: 0
+    yaw: 0
+    pitch: 0
+
+  Pos2:
+    world: world
+    x: 0
+    y: 0
+    z: 0
+    yaw: 0
+    pitch: 0
+
+  Server: null

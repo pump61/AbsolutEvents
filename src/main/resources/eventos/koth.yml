@@ -1,0 +1,134 @@
+Evento:
+  Title: The King of The Hill
+  Type: koth
+  Calls: 10
+  Calls interval: 15
+  Mininum players: 2
+  Eliminate on quit: true
+  Empty inventory: true
+  Permission: absolutevents.evento
+  Count participation: false
+  Count victory: false
+  Start time: 10
+  Hearts added: 20
+  Dead time: 5
+  Invincibility time: 5
+  Increment dead time: 5
+  Domination time: 25
+  Time away: 5
+
+BossBar:
+  Idle: "&6KOTH &7- Aguardando captura"
+  Capturing: "&6KOTH &7- &e@player &fcapturando"
+  Contested: "&6KOTH &7- &cÁrea em disputa"
+
+Title:
+  Enabled: true
+  FadeIn: 5
+  Stay: 30
+  FadeOut: 5
+
+  Capturing:
+    Title: '&6CAPTURA'
+    Subtitle: '&f@player está dominando a área'
+
+  Contested:
+    Title: '&cEM DISPUTA'
+    Subtitle: '&fHá mais de um jogador na zona'
+
+Messages:
+
+  Broadcast:
+    - ''
+    - '&6Evento &f@name &6digite &f/evento'
+    - '&6Jogadores no evento: &a@players'
+    - ''
+
+  Start:
+    - ''
+    - '&6[@name] Iniciando evento...'
+    - ''
+
+  Winner:
+    - ''
+    - '&6[@name] O vencedor foi &f@winner'
+    - ''
+
+  In the zone:
+    - '&6Você entrou na zona de dominação.'
+
+  Capturing:
+    - '&e@player está capturando a área.'
+
+  Contested:
+    - '&cÁrea em disputa!'
+
+  Away from the zone:
+    - '&cVocê saiu da zona.'
+
+  Time dead:
+    - '&cVocê ficará @time segundos morto.'
+
+Rewards:
+  Money: 0
+  Commands: []
+
+Locations:
+
+  Lobby:
+    world: ''
+    x: 0
+    y: 0
+    z: 0
+    Yaw: 0
+    Pitch: 0
+
+  Entrance:
+    world: ''
+    x: 0
+    y: 0
+    z: 0
+    Yaw: 0
+    Pitch: 0
+
+  Spectator:
+    world: ''
+    x: 0
+    y: 0
+    z: 0
+    Yaw: 0
+    Pitch: 0
+
+  Exit:
+    world: ''
+    x: 0
+    y: 0
+    z: 0
+    Yaw: 0
+    Pitch: 0
+
+  Pos1:
+    world: ''
+    x: 0
+    y: 0
+    z: 0
+
+  Pos2:
+    world: ''
+    x: 0
+    y: 0
+    z: 0
+
+  Pos3:
+    world: ''
+    x: 0
+    y: 0
+    z: 0
+
+  Pos4:
+    world: ''
+    x: 0
+    y: 0
+    z: 0
+
+  Server: 'null'

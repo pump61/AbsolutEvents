@@ -1,0 +1,64 @@
+Evento:
+  Title: "Sumo"
+  Type: "sumo"
+  Calls: 5
+  Calls interval: 15
+  Mininum players: 2
+  Eliminate on quit: true
+  Empty inventory: true
+  Permission: "absolutevents.evento"
+  Count participation: false
+  Count victory: false
+  Countdown: 5
+
+Messages:
+  Broadcast:
+    - ""
+    - "&e[@name] &fEvento iniciado!"
+    - "&eDigite &f/evento &epara participar!"
+    - ""
+
+  Start:
+    - ""
+    - "&e[@name] &fIniciando evento..."
+    - ""
+
+  Countdown:
+    - "&e[@name] &fPvP liberado em &a@time &fsegundos..."
+
+  PvP enabled:
+    - "&a[@name] &fPvP liberado! Lutem!"
+
+  Winner:
+    - ""
+    - "&e[@name] &fO vencedor foi &a@winner&f!"
+    - ""
+
+  No winner:
+    - ""
+    - "&e[@name] &fEvento finalizado sem vencedor."
+    - ""
+
+  No players:
+    - ""
+    - "&e[@name] &fEvento cancelado por falta de jogadores."
+    - ""
+
+  Cancelled:
+    - ""
+    - "&e[@name] &fEvento cancelado."
+    - ""
+
+Rewards:
+  Commands: []
+  Money: 0
+
+Locations:
+  Lobby: []
+  Entrance: []
+  Spectator: []
+  Exit: []
+  Server: null
+
+Itens:
+  Enabled: false

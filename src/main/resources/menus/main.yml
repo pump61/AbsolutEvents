@@ -1,0 +1,67 @@
+Menu:
+  Name: 'Eventos - Início:'
+  Size: 27
+  Items:
+    Profile:
+      Enabled: true
+      Slot: 11
+      Name: '§x§0§0§9§1§F§FSuas estatísticas:'
+      Material: PLAYER_HEAD
+      Custom head: false
+      Head data: '@player'
+      Lore:
+      - ''
+      - '&7Vitórias: &f@wins &7(&f#@wins_position&7)'
+      - '&7Participações: &f@participations &7(&f#@participations_position&7)'
+      - ''
+      - '&7Vitórias e Participações por evento:'
+    Eventos:
+      Enabled: true
+      Slot: 15
+      Name: §x§0§0§9§1§F§FEventos
+      Material: GOLDEN_BOOTS
+      Glow: true
+      Lore:
+      - '&7Veja a lista de eventos do servidor.'
+    Top:
+      Enabled: false
+      Slot: 15
+      Name: §x§0§0§9§1§F§FTOP Jogadores
+      Material: END_CRYSTAL
+      Custom head: true
+      Head data: e34a592a79397a8df3997c43091694fc2fb76c883a76cce89f0227e5c9f1dfe
+      Lore:
+      - '&7Clique para ver os jogadores com mais vitórias.'
+
+Eventos:
+  Enabled: true
+  Format: ' &8- &7@evento_name: &f@evento_wins &7| &f@evento_participations'
+  New line: true
+  Only with wins: true
+  Empty: '  &8Nenhuma'
+  List:
+  - 'parkour:Parkour'
+  - 'campominado:Campo Minado'
+  - 'spleef:Spleef'
+  - 'corrida:Corrida'
+  - 'semaforo:Semáforo'
+  - 'batataquente:Batata Quente'
+  - 'frog:Frog'
+  - 'fight:Figt'
+  - 'killer:Killer'
+  - 'sumo:Sumô'
+  - 'astronauta:Astronauta'
+  - 'paintball:Paintball'
+  - 'hunter:Hunter'
+  - 'quiz:Quiz'
+  - 'anvil:Anvil'
+  - 'loteria:Loteria'
+  - 'bolao:Bolão'
+  - 'gladiador:Gladiador'
+  - 'matematica:Matemática'
+  - 'palavra:Palavra'
+  - 'fastclick:FastClick'
+    # Lista de eventos que serão mostrados na lore. A ordem será a mesma dessa lista.
+    # Formato: nome_do_arquivo_de_configuração:Nome na lore.
+    # Os eventos em chat não contam participação.
+    # Os seguintes eventos não podem ser colocados, já que não contam nem vitórias ou participações: VOTACAO

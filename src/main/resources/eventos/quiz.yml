@@ -1,0 +1,129 @@
+Evento:
+  Title: Quiz
+  Type: quiz
+  Calls: 5
+  Calls interval: 15
+  Mininum players: 2
+  Eliminate on quit: true
+  Empty inventory: false
+  Permission: absolutevents.evento
+  Count participation: true
+  Count victory: true
+  Time: 10
+  Interval: 5
+  Max questions: 50
+  First question delay: 5
+
+Title:
+  Enabled: true
+  FadeIn: 10
+  Stay: 30
+  FadeOut: 10
+
+  Question:
+    Title: '&e&lQUIZ'
+    Subtitle: '&f@question'
+
+  Answer:
+    Title: '&a&lRESPOSTA CORRETA'
+    Subtitle: '&f@answer'
+
+  First question:
+    Title: '&6&lPRIMEIRA PERGUNTA'
+    Subtitle: '&fComeçará em @time segundos'
+
+  Next round:
+    Title: '&b&lPRÓXIMA RODADA'
+    Subtitle: '&fPróxima pergunta em @time segundos'
+
+Messages:
+  Broadcast:
+    - ''
+    - '&3[@name] &bIniciando evento &f@name'
+    - '&3[@name] &bPara participar, digite &f/evento'
+    - '&3[@name] &bPrêmio: &2$&f@money &b+ &d[Quiz]'
+    - '&3[@name] &bJogadores no evento: &f@players'
+    - '&3[@name] &bChamadas restantes: &f@broadcasts'
+    - ''
+
+  Start:
+    - ''
+    - '&3[@name] &bIniciando evento...'
+    - ''
+
+  Winner:
+    - ''
+    - '&3[@name] &bO evento &f@name &bfoi finalizado!'
+    - '&3[@name] &bO vencedor foi &f@winner&b!'
+    - ''
+
+  No winner:
+    - ''
+    - '&3[@name] &bO evento &f@name &bfoi finalizado!'
+    - '&3[@name] &bNão houveram vencedores.'
+    - ''
+
+  No players:
+    - ''
+    - '&3[@name] &bEvento cancelado.'
+    - '&3[@name] &bA quantidade mínima de jogadores não foi atingida.'
+    - ''
+
+  Cancelled:
+    - ''
+    - '&3[@name] &bO evento foi cancelado manualmente.'
+    - ''
+
+  Question:
+    - '&3[@name] &bPergunta @currentquestion: &f@question'
+
+  Countdown actionbar: '&eResponda em &f@time &esegundos &8| &aVerde = Verdadeiro &8| &cVermelho = Falso'
+
+  Answer true: 'VERDADEIRO'
+  Answer false: 'FALSO'
+  Answer free: 'SEM RESPOSTA DEFINIDA'
+
+  Player correct: '&aVocê acertou!'
+  Player wrong: '&cVocê errou!'
+
+  Result correct:
+    - '&aAcertaram: &f@players'
+
+  Result wrong:
+    - '&cErraram e foram eliminados: &f@players'
+
+  No one: 'Ninguém'
+
+  First question:
+    - '&3[@name] &bA primeira pergunta começará em &f@time &bsegundos.'
+
+  Next question:
+    - '&3[@name] &bPróxima pergunta em &f@time &bsegundos.'
+
+Questions:
+  - "Pergunta 1?-true"
+  - "Pergunta 2?-false"
+
+Rewards:
+  Money: 0
+  Commands: []
+
+Locations:
+  Lobby: []
+  Entrance: []
+  Spectator: []
+  Exit: []
+
+  Pos1: []
+  Pos2: []
+
+  Pos3: []
+  Pos4: []
+
+  Pos5: []
+  Pos6: []
+
+  Server: 'null'
+
+Itens:
+  Inventory: ''

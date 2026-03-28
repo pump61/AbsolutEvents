@@ -1,0 +1,75 @@
+Evento:
+  # Configurações do evento.
+  Title: TNT Run # O nome do evento. Será usado na placeholder @name.
+  Type: tntrun # O tipo do evento. Não modifique!
+  Calls: 5 # Quantas chamadas o evento terá.
+  Calls interval: 15 # O intervalo (em segundos) entre as chamadas.
+  Mininum players: 1 # O mínimo de jogadores para iniciar o evento.
+  Eliminate on quit: true # Este evento possui camarote?
+  Empty inventory: true # Esse evento requer que você esteja com o inventário vazio?
+  Permission: aeventos.evento # A permissão necessária para participar do evento.
+  Count participation: false
+  Count victory: false
+  Start: 10 # Tempo até começar o evento
+  Delay: 5 # Unidade: Ticks. Delay até o bloco cair desde o momento em que um player pisa nele
+
+  # Blocos sobre os quais se um player pisar sumirão caso haja um bloco de tnt abaixo
+  Trigger blocks:
+    - SAND
+    - STONE
+
+# Mensagens
+Messages:
+  Broadcast:
+    - ''
+    - '&eEvento &f@name &eaberto! Digite &f/evento'
+    - '&eJogadores no evento: &a@players &eChamadas restantes: &a@broadcasts'
+    - ''
+
+  Start:
+    - ''
+    - '&e[@name] &fIniciando evento...'
+    - ''
+
+  Winner:
+    - ''
+    - '&e[@name] &fO evento &f@name &efoi finalizado!'
+    - '&e[@name] &fO vencedor foi &a@winner&e!'
+    - ''
+
+  No winner:
+    - ''
+    - '&e[@name] &fO evento &f@name &efoi finalizado!'
+    - '&e[@name] &fNão houveram vencedores.'
+    - ''
+
+  No players:
+    - ''
+    - '&e[@name] &fEvento cancelado.'
+    - '&e[@name] &fA quantidade mínima de jogadores não foi atingida.'
+    - ''
+
+  Cancelled:
+    - ''
+    - '&e[@name] &fO evento foi cancelado manualmente.'
+    - ''
+
+  Start evento:
+    - ''
+    - '&e[@name] &eOs blocos começarão a cair em &f@time &esegundos!'
+    - ''
+
+# Recompensas. Elas serão dadas ao vencedor.
+Rewards:
+  Commands: []
+  Money: 0
+
+# Localizações. Você configurará essa seção usando o comando /evento setup tntrun
+Locations:
+  Lobby: []
+  Entrance: []
+  Spectator: []
+  Exit: []
+  Pos1: []
+  Pos2: []
+  Server: 'null'

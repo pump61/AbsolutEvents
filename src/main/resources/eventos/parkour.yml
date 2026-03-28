@@ -1,0 +1,122 @@
+Evento:
+  Title: Parkour
+  Type: sign
+  Calls: 10
+  Calls interval: 15
+  Mininum players: 2
+  Eliminate on quit: true
+  Empty inventory: true
+  Permission: absolutevents.evento
+  Count participation: false
+  Count victory: false
+  Return on damage: true
+  Back item cooldown: 5
+  Back item material: SLIME_BALL
+  Back item slot: 8
+  Back item sound: entity.enderman.teleport
+
+Messages:
+  Broadcast:
+    - ''
+    - '&6Evento &f@name &6digite &f/evento'
+    - '&6Jogadores no evento: &f@players &6Chamadas restantes: &f@broadcasts'
+    - ''
+
+  Start:
+    - ''
+    - '&6[@name] &eIniciando evento...'
+    - ''
+
+  Winner:
+    - ''
+    - '&6[@name] &eO evento &f@name &efoi finalizado!'
+    - '&6[@name] &eO vencedor foi &f@winner&e!'
+    - '&6[@name] &eTempo: &f@time'
+    - '&6[@name] &eRecorde: &f@best'
+    - ''
+
+  No winner:
+    - ''
+    - '&6[@name] &eO evento &f@name &efoi finalizado!'
+    - '&6[@name] &eNão houveram vencedores.'
+    - ''
+
+  No players:
+    - ''
+    - '&6[@name] &eEvento cancelado.'
+    - '&6[@name] &eA quantidade mínima de jogadores não foi atingida.'
+    - ''
+
+  Cancelled:
+    - ''
+    - '&6[@name] &eO evento foi cancelado manualmente.'
+    - ''
+
+  Sign:
+    - '&e&l[Parkour]'
+    - '&eClique aqui'
+    - '&epara ganhar o'
+    - '&eevento.'
+
+  Checkpoint:
+    - '&a&l[Checkpoint]'
+    - '&2Clique aqui'
+    - '&2para salvar o'
+    - '&2checkpoint.'
+
+  Checkpoint saved: '&6[@name] &eCheckpoint salvo com sucesso!'
+  Checkpoint back: '&6[@name] &eVocê voltou ao checkpoint.'
+  Back: '&6[@name] &eVocê voltou ao início.'
+  Back item: '&aVoltar ao Checkpoint'
+  Back cooldown: '&cAguarde @time para usar novamente.'
+  Actionbar: '&fTempo: &a@time &8| &fRecorde: &e@best &8| &fCheckpoint: &b@cooldown'
+
+Rewards:
+  Commands: []
+  Money: 0
+
+Locations:
+  Lobby:
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
+
+  Entrance:
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
+
+  Spectator:
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
+
+  Exit:
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
+
+  Server: 'null'
+
+Checkpoints: {}
+
+Finish:
+  world: world
+  x: 0
+  y: 0
+  z: 0
+
+Itens:
+  Inventory: ''

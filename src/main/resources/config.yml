@@ -1,0 +1,284 @@
+#
+#       _____                _
+#      |  ___|              | |
+#      | |____   _____ _ __ | |_ ___
+#      |  __\ \ / / _ \ '_ \| __/ __|
+#      | |___\ V /  __/ | | | |_\__ \
+#      \____/ \_/ \___|_| |_|\__|___/
+#
+# AbsolutEvents - configuração principal
+#
+
+# =====================================================
+# DATABASE
+# =====================================================
+
+MySQL:
+  Enabled: false
+  Host: localhost
+  Username: root
+  Password: pass
+  Database: absolutevents
+  Port: 3306
+
+# =====================================================
+# COMANDOS PERMITIDOS DURANTE EVENTOS
+# =====================================================
+
+Allowed commands:
+- '/g'
+- '/l'
+- '/tell'
+- '/evento'
+- '/event'
+- '/events'
+- '/ev'
+
+Admin permission: absolutevents.admin
+
+# =====================================================
+# AUTO START DE EVENTOS
+# =====================================================
+
+AutoStart:
+  Enabled: true
+
+  Times:
+  - 'parkour-20:30'
+  - 'sunday-campominado-18:00'
+    # formatos aceitos:
+    # evento-horario
+    # dia-evento-horario
+
+# =====================================================
+# CONFIGURAÇÕES GERAIS
+# =====================================================
+
+Enable GUI: true
+Show commands: true
+Save inventory: true
+Spectator gamemode: false
+
+# Hook atualmente usado
+Hook: simpleclans
+
+# =====================================================
+# BROADCAST GLOBAL DOS EVENTOS
+# =====================================================
+
+Broadcast:
+  Mode: GLOBAL
+  Global:
+    - ''
+    - '&#ff69f0Evento &f@name &#ff69f0Clique @join_button &#ff69f0para participar!'
+    - '&#ff69f0Prêmio: @reward'
+    - '&#ff69f0Jogadores: &#0088ff@players &#ff69f0Restantes: &#0088ff@broadcasts'
+    - ''
+
+# =====================================================
+# FORMATAÇÃO GLOBAL DE MENSAGENS
+# =====================================================
+
+MessageFormat:
+  Enabled: true
+  ConfigMessagesMode: GLOBAL
+  BaseColor: '&#ff69f0'
+  ValueColor: '&#0088ff'
+  IgnorePaths:
+  - 'messages.join button.text'
+  - 'messages.join button.hover'
+  - 'messages.prefix'
+
+# =====================================================
+# BUNGEECORD
+# =====================================================
+
+Bungeecord:
+  Enabled: false
+  Default: rankup
+
+  Servers:
+  - 'rankup'
+  - 'factions'
+
+  Send to default: false
+  Commands on default: false
+
+# =====================================================
+# UPDATE CHECKER
+# =====================================================
+
+UpdateChecker: false
+
+# =====================================================
+# FORMATAÇÃO DE DINHEIRO
+# =====================================================
+
+Formatter:
+  Type: letter
+
+  Letters:
+  - ''
+  - 'K'
+  - 'M'
+  - 'B'
+  - 'T'
+  - 'Q'
+  - 'QQ'
+  - 'S'
+  - 'SS'
+  - 'O'
+  - 'N'
+  - 'D'
+
+# =====================================================
+# CONVERSOR DE PLUGINS ANTIGOS
+# =====================================================
+
+Conversor:
+  Enabled: false
+  Plugin: yeventos
+
+  MySQL:
+    Enabled: false
+    Host: localhost
+    Username: root
+    Password: pass
+    Database: heventos
+    Port: 3306
+
+  yEventos:
+    parkour: parkour
+    campominado: campominado
+    spleef: spleef
+    corrida: corrida
+    semaforo: semaforo
+    batataquente: batataquente
+    frog: frog
+    fight: fight
+    killer: killer
+    sumo: sumo
+    astronauta: astronauta
+    paintball: paintball
+    votacao: votacao
+    hunter: hunter
+    quiz: quiz
+    anvil: anvil
+    loteria: loteria
+    bolao: bolao
+    gladiador: gladiador
+    matematica: matematica
+    palavra: palavra
+    fastclick: fastclick
+    nexus: nexus
+    sorteio: sorteio
+    thor: thor
+    battleroyale: battleroyale
+
+# =====================================================
+# MENSAGENS
+# =====================================================
+
+Messages:
+  Prefix: '&#ff69f0[Evento] '
+
+  Join Button:
+    Text: '&aaqui'
+    Hover:
+    - '&7Clique para participar do evento'
+    Command: /evento
+
+  No event: '&#ff69f0Não está ocorrendo nenhum evento no momento!'
+  No spectator: '&#ff69f0Não é possível assistir esse evento.'
+  Closed: '&#ff69f0O evento está fechado! Para assistir digite &f/evento assistir &#ff69f0ou
+  &f/evento spectate'
+  Already joined: '&#ff69f0Você já está no evento!'
+  Already spectator: '&#ff69f0Você já está no modo espectador!'
+  Not joined: '&#ff69f0Você não está participando desse evento!'
+  Empty inventory: '&#ff69f0Você precisa estar com o inventário vazio para participar!'
+  Blocked command: '&#ff69f0Você não pode usar esse comando durante o evento!'
+
+  Joined: '&f@player &#ff69f0entrou no evento!'
+  Leave: '&f@player &#ff69f0saiu do evento!'
+  Died: '&f@player &#ff69f0morreu! &f@players &#ff69f0jogadores restantes.'
+  Eliminated: '&#ff69f0Você foi eliminado.'
+  Disconnected: '&f@player &#ff69f0desconectou! &f@players &#ff69f0jogadores restantes.'
+
+  Not allowed: '&#ff69f0Você não tem permissão para participar desse evento.'
+  No permission: '&#ff69f0Você não tem permissão para fazer isso.'
+  Console: '&#ff69f0Apenas jogadores podem usar este comando.'
+  Already happening: '&#ff69f0Já está acontecendo um evento.'
+  Invalid event: '&#ff69f0Evento inválido.'
+
+  Missing arguments: '&#ff69f0Uso correto: &f/evento <args>'
+  Reloaded: '&#ff69f0Configurações recarregadas com sucesso!'
+  Unknown command: '&#ff69f0Comando desconhecido. Digite &f/evento ajuda &#ff69f0ou &f/evento help'
+
+  Configuration already exists: '&#ff69f0Este arquivo de configuração já existe!'
+  Configuration created: '&#ff69f0Arquivo de configuração &f@file &#ff69f0criado com sucesso!'
+
+  Saved: '&#ff69f0Posição &f@position &#ff69f0definida com sucesso!'
+  Saved kit: '&#ff69f0Itens definidos com sucesso!'
+
+  Exit setup: '&#ff69f0Você saiu das configurações do evento &f@event&#ff69f0.'
+  Not configurated: '&#ff69f0Este evento não está configurado. Utilize &f/evento setup <event>'
+
+  Error: '&#ff69f0Ocorreu um erro ao salvar a posição.'
+
+  Give axe: '&#ff69f0Clique com botão esquerdo para definir pos1 e direito para definir pos2.'
+
+  Not needed: '&#ff69f0Você não precisa do machado para esse evento.'
+  Not needed kit: '&#ff69f0Você não precisa definir kit nesse evento.'
+
+  Multiple kits: '&#ff69f0Configure usando &f/evento setup kit normal &#ff69f0e &f/evento setup kit
+  last'
+
+  Not enough alternatives: '&#ff69f0Número mínimo de alternativas maior que o total disponível.'
+
+  Unknown argument: '&#ff69f0Argumento inválido.'
+
+  Missing dependency: '&#ff69f0Este evento precisa do plugin &f@dependency&#ff69f0.'
+
+  Require empty inventory: '&#ff69f0Ative a opção ''Evento.Empty inventory'' no config do evento.'
+
+  Offline: '&#ff69f0O jogador está offline ou não existe.'
+  Player not joined: '&#ff69f0O jogador não está no evento.'
+  Player kicked: '&#ff69f0Jogador expulso com sucesso.'
+  Kicked: '&#ff69f0Você foi expulso do evento.'
+
+  Max players: '&cMáximo de jogadores atingido.'
+
+  Default:
+  - '&#ff69f0Lista de Comandos:'
+  - '&f/evento &#ff69f0- Entrar no evento'
+  - '&f/evento assistir &7ou &f/evento spectate &#ff69f0- Entrar no camarote'
+  - '&f/evento sair &7ou &f/evento leave &#ff69f0- Sair do evento'
+  - '&f/evento ajuda &7ou &f/evento help &#ff69f0- Lista de comandos'
+
+  DefaultAdmin:
+  - '&#ff69f0Lista de Comandos:'
+  - '&f/evento &#ff69f0- Entrar no evento'
+  - '&f/evento assistir &7ou &f/evento spectate &#ff69f0- Entrar no camarote'
+  - '&f/evento sair &7ou &f/evento leave &#ff69f0- Sair do evento'
+  - '&f/evento ajuda &7ou &f/evento help &#ff69f0- Lista de comandos'
+  - '&c/evento iniciar <event> &7ou &f/evento start <event> &c- Inicia evento'
+  - '&c/evento parar &7ou &f/evento stop &c- Cancela evento'
+  - '&c/evento forcestart &c- Força início do evento'
+  - '&c/evento kick <player> &c- Expulsa jogador'
+  - '&c/evento setup <event> &c- Configura evento'
+  - '&c/evento criarconfig <event> &7ou &f/evento createconfig <event> &c- Cria config'
+  - '&c/evento reload &c- Recarrega configs'
+
+  Setup:
+  - '&4[Evento] &cConfigurando evento &f@event'
+  - '&c/evento setup entrada &7ou &f/evento setup entrance &c- Definir entrada'
+  - '&c/evento setup espera &7ou &f/evento setup lobby &c- Definir espera'
+  - '&c/evento setup saida &7ou &f/evento setup exit &c- Definir saída'
+  - '&c/evento setup camarote &7ou &f/evento setup spectator &c- Definir camarote'
+  - '&c/evento setup pos &c- Receber machado'
+  - '&c/evento setup pos1 &c- Definir pos1'
+  - '&c/evento setup pos2 &c- Definir pos2'
+  - '&c/evento setup pos3 &c- Definir pos3'
+  - '&c/evento setup pos4 &c- Definir pos4'
+  - '&c/evento setup kit &c- Definir kit'
+  - '&c/evento setup sair &7ou &f/evento setup quit &c- Sair da configuração'

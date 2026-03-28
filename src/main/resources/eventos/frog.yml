@@ -1,0 +1,94 @@
+Evento:
+  # Configurações do evento.
+  Title: "Frog" # O nome do evento. Será usado na placeholder @name.
+  Type: "frog" # O tipo do evento. Não modifique!
+  Calls: 5 # Quantas chamadas o evento terá.
+  Calls interval: 15 # O intervalo (em segundos) entre as chamadas.
+  Mininum players: 2 # O mínimo de jogadores para iniciar o evento.
+  Eliminate on quit: true # Este evento possui camarote?
+  Empty inventory: true # Esse evento requer que você esteja com o inventário vazio?
+  Permission: "absolutevents.evento" # A permissão necessária para participar do evento.
+  Count participation: true # Esse evento contará participação?
+  Count victory: true # Esse evento contará vitória?
+  Start: 5 # O tempo em segundos antes de começar.
+  Time: 4 # O tempo em segundos que o nível terá.
+  Snow: 2 # Tempo em segundos que a neve ficará.
+
+Actionbar:
+  Enabled: true
+  Waiting:
+    Message: "&e[@name] &fPróxima remoção em &e@time"
+  Final:
+    Message: "&c[@name] &fPise na lã vermelha para vencer!"
+
+Title:
+  Enabled: false
+  FadeIn: 5
+  Stay: 20
+  FadeOut: 5
+  Remove:
+    Title: "&cATENÇÃO!"
+    Subtitle: "&fA cor &c@color &fvai cair!"
+  Final:
+    Title: "&cCORRA!"
+    Subtitle: "&fPise na lã vermelha para vencer!"
+
+# Mensagens
+Messages:
+  Broadcast:
+    - ""
+    - "&3[@name] &bIniciando evento &f@name"
+    - "&3[@name] &bPara participar, digite &f/evento"
+    - "&3[@name] &bPrêmio: &2$&f@money"
+    - "&3[@name] &bJogadores no evento: &f@players"
+    - "&3[@name] &bChamadas restantes: &f@broadcasts"
+    - ""
+
+  Start:
+    - ""
+    - "&3[@name] &bIniciando evento..."
+    - ""
+
+  Winner:
+    - ""
+    - "&3[@name] &bO evento &f@name &bfoi finalizado!"
+    - "&3[@name] &bO vencedor foi &f@winner&b!"
+    - ""
+
+  No winner:
+    - ""
+    - "&3[@name] &bO evento &f@name &bfoi finalizado!"
+    - "&3[@name] &bNão houveram vencedores."
+    - ""
+
+  No players:
+    - ""
+    - "&3[@name] &bEvento cancelado."
+    - "&3[@name] &bA quantidade mínima de jogadores não foi atingida."
+    - ""
+
+  Cancelled:
+    - ""
+    - "&3[@name] &bO evento foi cancelado manualmente."
+    - ""
+
+  Wool:
+    - ""
+    - "&3[@name] &bSuba em cima da lã vermelha para vencer!"
+    - ""
+
+# Recompensas. Elas serão dadas ao(s) vencedor(es).
+Rewards:
+  Money: 1000 # A quantidade de dinheiro que o jogador ganhará ao vencer o evento. (Requer Vault)
+  Commands: # Lista de comandos que serão executados no(s) vencedor(es).
+    - "give @winner diamond 1"
+
+# Localizações. Você configurará essa seção usando o comando /evento setup frog
+Locations:
+  Lobby: []
+  Entrance: []
+  Spectator: []
+  Exit: []
+  Pos1: []
+  Pos2: []
+  Server: null # Coloque aqui o nome do servidor do Bungeecord que o evento deve ocorrer.

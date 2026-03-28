@@ -1,0 +1,345 @@
+Menu:
+  Name: "Lista de Eventos:"
+  Size: 45
+  Previous page slot: 39
+  Next page slot: 41
+  Empty page slot: 22
+  Item page limit: 21
+  Items:
+    Back:
+      Enabled: true
+      Slot: 40
+      Name: "§x§0§0§9§1§F§FVoltar"
+      Material: PLAYER_HEAD
+      Custom head: true # Caso seja uma cabeça com textura customizada, coloque true.
+      Head data: "bd69e06e5dadfd84e5f3d1c21063f2553b2fa945ee1d4d7152fdc5425bc12a9" # Caso seja uma cabeça com textura, coloque o ID da textura. Se for de um jogador, então coloque o seu nome.
+    Eventos:
+      # Você não precisa especificar o slot, já que ele será calculado de forma automática.
+      # A ordem de aparição dos eventos será a mesma do que aparecem aqui.
+      parkour: # Nome do arquivo de configuração do evento.
+        Allow filter: true # Permite que os jogadores vejam o TOP desse evento.
+        Name: "§x§0§0§9§1§F§FParkour"
+        Material: GOLD_BOOTS
+        Lore:
+          - "&7O evento Parkour funciona como"
+          - "&7uma corrida em obstáculos, os"
+          - "&7jogadores terão que passar por"
+          - "&7todo o trajeto para chegar ao final."
+          - "&7O primeiro jogador que chegar ao"
+          - "&7final do percurso, vence."
+          - ""
+      campominado: # Nome do arquivo de configuração do evento.
+        Allow filter: true # Permite que os jogadores vejam o TOP desse evento.
+        Name: "§x§0§0§9§1§F§FCampo Minado"
+        Material: GLASS
+        Lore:
+          - "&7Os jogadores deverão atravessar"
+          - "&7o piso de vidros sem cair o número"
+          - "&7de buracos aumentará no decorrer"
+          - "&7das rodadas."
+          - ""
+      spleef: # Nome do arquivo de configuração do evento.
+        Allow filter: true # Permite que os jogadores vejam o TOP desse evento.
+        Name: "§x§0§0§9§1§F§FSpleef"
+        Material: DIAMOND_SHOVEL
+        Lore:
+          - "&7O objetivo é derrubar todos do"
+          - "&7chão de neve e não cair. O último"
+          - "&7a ficar na neve será o vencedor."
+          - ""
+      corrida: # Nome do arquivo de configuração do evento.
+        Allow filter: true # Permite que os jogadores vejam o TOP desse evento.
+        Name: "§x§0§0§9§1§F§FCorrida"
+        Material: DIAMOND_BOOTS
+        Lore:
+          - "&7Conclua o percurso definido mais"
+          - "&7rápido que os outros competidores."
+          - ""
+      semaforo: # Nome do arquivo de configuração do evento.
+        Allow filter: true # Permite que os jogadores vejam o TOP desse evento.
+        Name: "§x§0§0§9§1§F§FSemáforo"
+        Material: LIME_TERRACOTTA
+        Lore:
+          - "&7Os jogadores recebem um inventário"
+          - "&7com blocos que representam cores do"
+          - "&7semáforo: verde (corra à vontade),"
+          - "&7amarelo (atenção) e vermelho (pare)."
+          - "&7Vence quem chegar ao final primeiro!"
+          - ""
+      batataquente: # Nome do arquivo de configuração do evento.
+        Allow filter: true # Permite que os jogadores vejam o TOP desse evento.
+        Name: "§x§0§0§9§1§F§FBatata Quente"
+        Material: POTATO
+        Lore:
+          - "&7Funciona como um pega-pega. Um"
+          - "&7jogador aleatório ganhará uma"
+          - "&7batata e terá que passá-la antes"
+          - "&7do tempo acabar."
+          - ""
+      frog: # Nome do arquivo de configuração do evento.
+        Allow filter: true # Permite que os jogadores vejam o TOP desse evento.
+        Name: "§x§0§0§9§1§F§FFrog"
+        Material: RED_WOOL
+        Lore:
+          - "&7Todos serão teleportados para uma"
+          - "&7plataforma com blocos de várias cores."
+          - "&7A cada rodada, blocos de uma cor"
+          - "&7aleatória viram neve e desaparecem."
+          - "&7O objetivo é ficar nos blocos que"
+          - "&7ainda não viraram neve. No final,"
+          - "&7todos os blocos viram neve, exceto"
+          - "&7um que vira lã vermelha. O primeiro"
+          - "&7jogador que pular nela será o vencedor."
+          - ""
+      fight: # Nome do arquivo de configuração do evento.
+        Allow filter: true # Permite que os jogadores vejam o TOP desse evento.
+        Name: "§x§0§0§9§1§F§FFight"
+        Material: IRON_SWORD
+        Lore:
+          - "&7O evento Fight será dividido em duelos."
+          - "&7Dois jogadores lutarão entre si, e o"
+          - "&7vencedor da última luta será o ganhador."
+          - ""
+      fightsumo: # Nome do arquivo de configuração do evento.
+        Allow filter: true # Permite que os jogadores vejam o TOP desse evento.
+        Name: "§x§0§0§9§1§F§FFight Sumô"
+        Material: STICK
+        Lore:
+          - "&7O evento Fight Sumô será dividido em duelos."
+          - "&7Dois jogadores lutarão entre si para derrubar"
+          - "&7o outro da plataforma ovencedor da última"
+          - "luta será o ganhador."
+          - ""
+      killer: # Nome do arquivo de configuração do evento.
+        Allow filter: true # Permite que os jogadores vejam o TOP desse evento.
+        Name: "§x§0§0§9§1§F§FKiller"
+        Material: GOLDEN_AXE
+        Lore:
+          - "&7Os jogadores são colocados em uma"
+          - "&7arena com armaduras e espadas. Eles"
+          - "&7devem derrotar os inimigos, e o último"
+          - "&7jogador de pé será o vencedor."
+          - ""
+      sumo: # Nome do arquivo de configuração do evento.
+        Allow filter: true # Permite que os jogadores vejam o TOP desse evento.
+        Name: "§x§0§0§9§1§F§FSumô"
+        Material: STICK
+        Glow: true
+        Lore:
+          - "&7Vários jogadores ganham varas de"
+          - "&7repulsão e devem derrubar uns aos"
+          - "&7outros na água. O último jogador"
+          - "&7que permanecer na plataforma será"
+          - "&7o vencedor do evento."
+          - ""
+      paintball: # Nome do arquivo de configuração do evento.
+        Allow filter: true # Permite que os jogadores vejam o TOP desse evento.
+        Name: "§x§0§0§9§1§F§FPaintball"
+        Material: BOW
+        Lore:
+          - "&7Os jogadores recebem arcos e devem"
+          - "&7acertar o time inimigo. Quem for"
+          - "&7atingido é eliminado. Vence a equipe"
+          - "&7com sobreviventes ao final do evento."
+          - ""
+      hunter: # Nome do arquivo de configuração do evento.
+        Allow filter: true # Permite que os jogadores vejam o TOP desse evento.
+        Name: "§x§0§0§9§1§F§FHunter"
+        Material: BOW
+        Glow: true
+        Lore:
+          - "&7É um confronto entre equipes com arco a equipe"
+          - "&7que fizer a quantidade pontos vence."
+          - ""
+      preguerra: # Nome do arquivo de configuração do evento.
+        Allow filter: true # Permite que os jogadores vejam o TOP desse evento.
+        Name: "§x§0§0§9§1§F§FPre Guerra de Clãs"
+        Material: DIAMOND_SWORD
+        Lore:
+          - "&7Pre confronto entre clãs para que"
+          - "&7os jogadores fiquem preparados para"
+          - "&7a guerra santa."
+          - "&7Vence os jogadores ainda vivos do clã"
+          - "&7vencedor."
+      guerrasanta: # Nome do arquivo de configuração do evento.
+        Allow filter: true # Permite que os jogadores vejam o TOP desse evento.
+        Name: "§x§0§0§9§1§F§FGuerra Santa de Clãs"
+        Material: DIAMOND_SWORD
+        Lore:
+          - "&7Principal confronto entre clãs."
+          - "&7Vence os jogadores ainda vivos do clã"
+          - "&7vencedor."
+      arqueiro: # Nome do arquivo de configuração do evento.
+        Allow filter: true # Permite que os jogadores vejam o TOP desse evento.
+        Name: "§x§0§0§9§1§F§FArqueiro"
+        Material: BOW
+        Lore:
+          - "&7Os jogadores são teleportados para"
+          - "&7uma arena e devem lutar utilizando"
+          - "&7apenas arcos. A cada disparo, a"
+          - "&7precisão e estratégia serão cruciais"
+          - "&7para a vitória. O último jogador vivo"
+          - "&7será o vencedor do evento."
+          - ""
+      blockparty: # Nome do arquivo de configuração do evento.
+        Allow filter: true # Permite que os jogadores vejam o TOP desse evento.
+        Name: "§x§0§0§9§1§F§FBlockparty"
+        Material: ORANGE_CONCRETE
+        Lore:
+          - "&7Os jogadores são colocados em uma"
+          - "&7plataforma colorida. No início de cada"
+          - "&7rodada, um bloco aparecerá na mão,"
+          - "&7indicando a cor onde devem ficar."
+          - "&7Com o passar das rodadas, o tempo"
+          - "&7para encontrar o bloco diminui."
+          - "&7Os últimos jogadores vivos vencem!"
+          - ""
+      boomgame: # Nome do arquivo de configuração do evento.
+        Allow filter: true # Permite que os jogadores vejam o TOP desse evento.
+        Name: "§x§0§0§9§1§F§FBoomBox"
+        Material: FIRE_CHARGE
+        Lore:
+          - "&7Os jogadores são colocados em uma"
+          - "&7plataforma e recebem itens explosivos,"
+          - "&7como TNTs e bolas de fogo."
+          - "&7O objetivo é destruir o chão e fazer"
+          - "&7os adversários caírem. Apenas quem"
+          - "&7permanecer de pé até o final vence!"
+          - ""
+      corridaarmada: # Nome do arquivo de configuração do evento.
+        Allow filter: true # Permite que os jogadores vejam o TOP desse evento.
+        Name: "§x§0§0§9§1§F§FCorrida Armada"
+        Material: GOLD_SWORD
+        Lore:
+          - "&7Os jogadores começam com equipamentos"
+          - "&7fortes e devem eliminar adversários"
+          - "&7para avançar de nível. A cada abate,"
+          - "&7as armas pioram até chegarem à madeira."
+          - "&7O primeiro a conseguir uma eliminação"
+          - "&7usando a espada de madeira vence!"
+          - ""
+      corridamaismortal: # Nome do arquivo de configuração do evento.
+        Allow filter: true # Permite que os jogadores vejam o TOP desse evento.
+        Name: "§x§0§0§9§1§F§FCorrida Mortal e Infernal"
+        Material: DIAMOND_BOOTS          
+        Lore:
+          - "&7Uma corrida desafiadora repleta de"
+          - "&7obstáculos mortais. Apenas os mais"
+          - "&7rápidos e habilidosos conseguirão"
+          - "&7chegar ao fim do percurso."
+          - "&7O primeiro a tocar na placa vence!"
+          - ""
+      corridamortal: # Nome do arquivo de configuração do evento.
+        Allow filter: true # Permite que os jogadores vejam o TOP desse evento.
+        Name: "§x§0§0§9§1§F§FCorrida Mortal"
+        Material: IRON_BOOTS          
+        Lore:
+          - "&7Uma corrida mediana repleta de"
+          - "&7obstáculos mortais. Apenas os mais"
+          - "&7rápidos e habilidosos conseguirão"
+          - "&7chegar ao fim do percurso."
+          - "&7O primeiro a tocar na placa vence!"
+          - ""
+      folhas: # Nome do arquivo de configuração do evento.
+        Allow filter: true # Permite que os jogadores vejam o TOP desse evento.
+        Name: "§x§0§0§9§1§F§FFolhas"
+        Material: OAK_LEAVES
+        Lore:
+          - "&7Os jogadores são colocados em uma"
+          - "&7plataforma onde folhas começam a"
+          - "&7cair aleatoriamente. A cada queda, a"
+          - "&7plataforma fica mais instável."
+          - "&7O último jogador que permanecer na"
+          - "&7plataforma será o vencedor!"
+          - ""
+      fujadoademiro: # Nome do arquivo de configuração do evento.
+        Allow filter: true # Permite que os jogadores vejam o TOP desse evento.
+        Name: "§x§0§0§9§1§F§FFuja do Ademiro"
+        Material: TOTEM_OF_UNDYING
+        Lore:
+          - "&7Os jogadores devem se esconder em"
+          - "&7um mapa criado pelo administrador."
+          - "&7Enquanto isso, o administrador fará de"
+          - "&7tudo para eliminá-los. O último jogador"
+          - "&7a sobreviver será o vencedor!"
+          - ""
+      koth: # Nome do arquivo de configuração do evento.
+        Allow filter: true # Permite que os jogadores vejam o TOP desse evento.
+        Name: "§x§0§0§9§1§F§FKing of the Hill"
+        Material: GOLD_BLOCK
+        Lore:
+          - "&7Os jogadores devem ficar em cima da"
+          - "&7área principal no meio do mapa até"
+          - "&7o tempo acabar. O tempo é travado"
+          - "&7se houver mais de 2 jogadores na"
+          - "&7plataforma. A cada eliminação, o"
+          - "&7tempo de espera aumenta. Vence quem"
+          - "&7ficar mais tempo em cima da plataforma."
+          - ""
+      labirinto: # Nome do arquivo de configuração do evento.
+        Allow filter: true # Permite que os jogadores vejam o TOP desse evento.
+        Name: "§x§0§0§9§1§F§FLabirito"
+        Material: GOLD_BLOCK
+        Lore:
+          - "&7Os jogadores devem correr contra o"
+          - "&7tempo para chegar ao final do labirinto."
+          - "&7O primeiro jogador a chegar no fim"
+          - "&7será o vencedor!"
+          - ""
+      mortesubita: # Nome do arquivo de configuração do evento.
+        Allow filter: true # Permite que os jogadores vejam o TOP desse evento.
+        Name: "§x§0§0§9§1§F§FMorte Súbita"
+        Material: GOLD_SWORD
+        Lore:
+          - "&7É um PVP onde cada jogador tem apenas"
+          - "&7uma vida. Morreu, perdeu! O time que"
+          - "&7sobrar com mais jogadores vivos vence."
+          - ""
+      rainbowrun: # Nome do arquivo de configuração do evento.
+        Allow filter: true # Permite que os jogadores vejam o TOP desse evento.
+        Name: "§x§0§0§9§1§F§FRainbow Run"
+        Material: BLACK_CONCRETE
+        Lore:
+          - "&7Os jogadores recebem um bloco da"
+          - "&7cor em que devem deixar um rastro"
+          - "&7no chão. O objetivo é pintar a maior"
+          - "&7quantidade de blocos possível. Vence"
+          - "&7o jogador que pintar mais blocos."
+          - ""
+      skypvp: # Nome do arquivo de configuração do evento.
+        Allow filter: true # Permite que os jogadores vejam o TOP desse evento.
+        Name: "§x§0§0§9§1§F§FSky PVP"
+        Material: DIAMOND_AXE
+        Lore:
+          - "&7Um PVP em uma ilha flutuante. O objetivo"
+          - "&7é ser o último jogador ou equipe sobrevivente"
+          - "&7na arena. Vence quem permanecer vivo até o final."
+          - ""
+      tdm: # Nome do arquivo de configuração do evento.
+        Allow filter: true # Permite que os jogadores vejam o TOP desse evento.
+        Name: "§x§0§0§9§1§F§FTeam Deathmatch"
+        Material: DIAMOND_SWORD
+        Lore:
+          - "&7Um Team Deathmatch onde as equipes competem"
+          - "&7para alcançar uma pontuação específica."
+          - "&7O time que fizer a pontuação necessária vence!"
+          - ""
+      tntrun: # Nome do arquivo de configuração do evento.
+        Allow filter: true # Permite que os jogadores vejam o TOP desse evento.
+        Name: "§x§0§0§9§1§F§FTNT Run"
+        Material: TNT
+        Lore:
+          - "&7Os jogadores começam em uma plataforma e"
+          - "&7à medida que a partida avança, os blocos"
+          - "&7desaparecem por onde os jogadores andam."
+          - "&7São 3 plataformas. Vence o último jogador"
+          - "&7que permanecer vivo."
+          - ""
+      torneio: # Nome do arquivo de configuração do evento.
+        Allow filter: true # Permite que os jogadores vejam o TOP desse evento.
+        Name: "§x§0§0§9§1§F§FTorneio"
+        Material: DIAMOND_SWORD
+        Lore:
+          - "&7Um PVP similar ao Fight, mas com grandes"
+          - "&7premiações. Mostre suas habilidades e vença!"
+          - ""

@@ -1,0 +1,95 @@
+Evento:
+  # Configurações do evento.
+  Title: "Corrida Armada" # O nome do evento. Será usado na placeholder @name.
+  Type: "corridaarmada" # O tipo do evento. Não modifique!
+  Calls: 5 # Quantas chamadas o evento terá.
+  Calls interval: 15 # O intervalo (em segundos) entre as chamadas.
+  Mininum players: 2 # O mínimo de jogadores para iniciar o evento.
+  Eliminate on quit: true # Este evento possui camarote?
+  Empty inventory: true # Esse evento requer que você esteja com o inventário vazio?
+  Permission: "absolutevents.evento" # A permissão necessária para participar do evento.
+  Count participation: true # Esse evento contará participação?
+  Count victory: true # Esse evento contará vitória?
+  Time: 10 # Tempo em segundos antes do PvP ser ativado.
+  Hearts added: 4 # 1 = meio coração. Corações adicionados a um jogador quando matar outro jogador.
+  Invincibility: 5 # Tempo em segundos que um jogador será invencível depois de ser respawnado.
+  Dead time: 3 # Quanto tempo, em segundos, um jogador morto deve esperar para poder voltar a jogar?
+
+Actionbar:
+  Enabled: true
+  Message: "&#FDD500Seu nível: &f@level &#FDD500| Líder: &f@leader &#FDD500| Posição: &f@position"
+
+# Mensagens
+Messages:
+  Broadcast:
+    - ""
+    - "&3[@name] &bIniciando evento &f@name"
+    - "&3[@name] &bPara participar, digite &f/evento"
+    - "&3[@name] &bPrêmio: &2$&f@money &b+ &5[Corrida Armada]"
+    - "&3[@name] &bJogadores no evento: &f@players"
+    - "&3[@name] &bChamadas restantes: &f@broadcasts"
+    - ""
+
+  Start:
+    - ""
+    - "&3[@name] &bIniciando evento..."
+    - ""
+
+  Winner:
+    - ""
+    - "&3[@name] &bO evento &f@name &bfoi finalizado!"
+    - "&3[@name] &bO vencedor foi &f@winner&b!"
+    - ""
+
+  No winner:
+    - ""
+    - "&3[@name] &bO evento &f@name &bfoi finalizado!"
+    - "&3[@name] &bNão houveram vencedores."
+    - ""
+
+  No players:
+    - ""
+    - "&3[@name] &bEvento cancelado."
+    - "&3[@name] &bA quantidade mínima de jogadores não foi atingida."
+    - ""
+
+  Cancelled:
+    - ""
+    - "&3[@name] &bO evento foi cancelado manualmente."
+    - ""
+
+  Next level:
+    - ""
+    - "&3[@name] &bVocê subiu para o nível @level!"
+    - ""
+
+  Leader:
+    - ""
+    - "&3[@name] &f@player &bestá liderando no nível @level!"
+    - ""
+
+  Enabling:
+    - "&3[@name] &bO PvP será ativado em &f@time &bsegundos!"
+
+  Enabled:
+    - ""
+    - "&3[@name] &bO PvP foi ativado. Boa sorte á todos!"
+    - ""
+
+# Recompensas. Elas serão dadas ao vencedor.
+Rewards:
+  Money: 1000 # A quantidade de dinheiro que o jogador ganhará ao vencer o evento. (Requer Vault)
+  Commands: # Lista de comandos que serão executados no vencedor.
+    - "give @winner diamond 1"
+
+# Localizações. Você configurará essa seção usando o comando /evento setup corridaarmada
+Locations:
+  Lobby: [] # Local onde o jogador ficará enquanto o evento estiver aberto.
+  Entrance: [] # Local para onde os jogadores serão enviados quando o evento começar.
+  Spectator: [] # Local do camarote.
+  Exit: [] # Local para onde o jogador será enviado ao sair do evento.
+  Pos1: [] # Posição de respawn aleatória 1.
+  Pos2: [] # Posição de respawn aleatória 2.
+  Pos3: [] # Posição de respawn aleatória 3.
+  Pos4: [] # Posição de respawn aleatória 4.
+  Server: null # Coloque aqui o nome do servidor do Bungeecord que o evento deve ocorrer.

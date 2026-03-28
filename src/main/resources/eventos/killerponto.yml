@@ -1,0 +1,100 @@
+Evento:
+  Title: "Killer Deathmatch"
+  Type: "killerponto"
+  Calls: 5
+  Calls interval: 15
+  Mininum players: 2
+  Eliminate on quit: true
+  Empty inventory: true
+  Permission: "absolutevents.evento"
+  Count participation: true
+  Count victory: true
+  Time: 15
+  Hearts added: 4
+  Points: 1
+  Invincibility: 5
+  Dead time: 2
+  Max points: 0
+
+Actionbar:
+  Enabled: true
+  Message: "&aVivos: &f@alive &8| &6Líder: &f@leader &7(@leaderpoints) &8| &ePontos: &f@points/@maxpoints"
+  Message spectator: "&aVivos: &f@alive &8| &6Líder: &f@leader &7(@leaderpoints) &8| &eMeta: &f@maxpoints"
+
+TopKills:
+  Enabled: true
+  Format:
+    - ""
+    - "&eTop abates do evento:"
+    - "&f1. @top1 &7- &f@kills1"
+    - "&f2. @top2 &7- &f@kills2"
+    - "&f3. @top3 &7- &f@kills3"
+    - ""
+
+Messages:
+  Broadcast:
+    - ""
+    - "&3[@name] &bIniciando evento &f@name"
+    - "&3[@name] &bPara participar, digite &f/evento"
+    - "&3[@name] &bPrêmio: &2$&f@money &b+ &5[Killer]"
+    - "&3[@name] &bJogadores no evento: &f@players"
+    - "&3[@name] &bChamadas restantes: &f@broadcasts"
+    - ""
+
+  Start:
+    - ""
+    - "&3[@name] &bIniciando evento..."
+    - ""
+
+  Winner:
+    - ""
+    - "&3[@name] &bO evento &f@name &bfoi finalizado!"
+    - "&3[@name] &bO vencedor foi &f@winner&b!"
+    - ""
+
+  No winner:
+    - ""
+    - "&3[@name] &bO evento &f@name &bfoi finalizado!"
+    - "&3[@name] &bNão houveram vencedores."
+    - ""
+
+  No players:
+    - ""
+    - "&3[@name] &bEvento cancelado."
+    - "&3[@name] &bA quantidade mínima de jogadores não foi atingida."
+    - ""
+
+  Cancelled:
+    - ""
+    - "&3[@name] &bO evento foi cancelado manualmente."
+    - ""
+
+  Enabling:
+    - "&3[@name] &bO PvP será ativado em &f@time &bsegundos!"
+
+  Enabled:
+    - ""
+    - "&3[@name] &bO PvP foi ativado. Boa sorte á todos!"
+    - ""
+
+  Killed:
+    - ""
+    - "&3[@name] &bO jogador &f@victim &bfoi morto por &c@killer&b!"
+    - "&3[@name] &b@killer: &f@points &bpontos!"
+    - ""
+
+Rewards:
+  Money: 1000
+  Commands:
+    - "give @winner diamond 1"
+
+Locations:
+  Lobby: []
+  Entrance: []
+  Spectator: []
+  Exit: []
+  Pos1: []
+  Pos2: []
+  Pos3: []
+  Pos4: []
+  Server: null

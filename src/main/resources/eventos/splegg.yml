@@ -1,0 +1,69 @@
+Evento:
+  Title: "Splegg"
+  Type: "splegg"
+  Calls: 5
+  Calls interval: 15
+  Mininum players: 2
+  Eliminate on quit: true
+  Empty inventory: true
+  Permission: "absolutevents.evento"
+  Count participation: false
+  Count victory: false
+  Delay: 5
+  Kick: false
+  Kick time: 20
+  Breakable materials:
+    - SNOW_BLOCK
+
+Messages:
+  Broadcast:
+    - ""
+    - "&e[@name] &fEvento iniciado!"
+    - "&eDigite &f/evento &epara participar!"
+    - ""
+
+  Start:
+    - ""
+    - "&e[@name] &fIniciando evento..."
+    - ""
+
+  Winner:
+    - ""
+    - "&e[@name] &fO vencedor foi &a@winner&f!"
+    - ""
+
+  No winner:
+    - ""
+    - "&e[@name] &fEvento finalizado sem vencedor."
+    - ""
+
+  No players:
+    - ""
+    - "&e[@name] &fEvento cancelado por falta de jogadores."
+    - ""
+
+  Cancelled:
+    - ""
+    - "&e[@name] &fEvento cancelado."
+    - ""
+
+  Enabling breaking:
+    - "&e[@name] &fAtivando quebra em &a@time &fsegundos..."
+
+  Breaking allowed:
+    - "&e[@name] &fAgora vocês podem quebrar!"
+
+Rewards:
+  Commands: []
+  Money: 0
+
+Locations:
+  Lobby: []
+  Entrance: []
+  Spectator: []
+  Exit: []
+
+  Pos1: []
+  Pos2: []
+
+  Server: null

@@ -1,0 +1,203 @@
+Evento:
+  # Configurações gerais do evento.
+  Title: Montaria # Nome do evento. Será usado na placeholder @name.
+  Type: montaria # Tipo do evento. Não modifique.
+  Calls: 10 # Quantidade de chamadas automáticas do evento.
+  Calls interval: 15 # Intervalo em segundos entre cada chamada.
+  Mininum players: 1 # Quantidade mínima de jogadores para iniciar.
+  Eliminate on quit: true # Define se o evento terá modo espectador.
+  Empty inventory: true # Define se o jogador precisa estar com inventário vazio para entrar.
+  Permission: absolutevents.evento # Permissão necessária para participar.
+  Count participation: true # Define se contará participação no sistema do plugin.
+  Count victory: true # Define se contará vitória no sistema do plugin.
+  Countdown: 5 # Tempo da contagem regressiva antes da corrida começar.
+  Jump: 0.9 # Força do pulo de todos os cavalos.
+  Speed: 0.3 # Velocidade base de todos os cavalos.
+
+Boost:
+  # Configuração dos blocos de impulso da corrida.
+  Block: MAGENTA_GLAZED_TERRACOTTA # Bloco que ativa o boost quando o cavalo pisa nele.
+  Amplifier: 2 # Intensidade do impulso.
+  Duration: 40 # Mantido para compatibilidade/configuração futura.
+  Cooldown: 2 # Tempo em segundos para o mesmo jogador poder ativar outro boost novamente.
+
+Race:
+  # Configurações específicas da corrida.
+  Require checkpoints: false # Se true, o jogador só vence se passar por todos os checkpoints antes da chegada.
+
+  StartPos1:
+    # Primeiro ponto da linha de largada.
+    # Junto com o StartPos2, define onde os cavalos e jogadores serão distribuídos.
+    world: ''
+    x: 0
+    y: 0
+    z: 0
+    Yaw: 0
+    Pitch: 0
+
+  StartPos2:
+    # Segundo ponto da linha de largada.
+    # Junto com o StartPos1, forma a linha onde os jogadores serão posicionados.
+    world: ''
+    x: 0
+    y: 0
+    z: 0
+    Yaw: 0
+    Pitch: 0
+
+  FinishPos1:
+    # Primeiro ponto da região de chegada.
+    # Junto com o FinishPos2, forma a área final da corrida.
+    world: ''
+    x: 0
+    y: 0
+    z: 0
+
+  FinishPos2:
+    # Segundo ponto da região de chegada.
+    # Junto com o FinishPos1, forma a área final da corrida.
+    world: ''
+    x: 0
+    y: 0
+    z: 0
+
+Messages:
+  # Mensagens do evento.
+
+  Broadcast:
+    # Mensagens enviadas nas chamadas automáticas antes do evento começar.
+    - ''
+    - '&#FDD500Evento &f@name &#FDD500apenas &averificados, &#FDD500digite &f/evento'
+    - '&#FDD500Prêmio: &a$&f100.000 &a+&f20 PDC &a+&f300 PDL &f+ &#FFC003[&#FFC403V&#FFC802a&#FFCC02c&#FFD001a&#FFD401l&#FFD801o&#FFDC00]'
+    - '&#FDD500Jogadores no evento: &a@players &#FDD500Chamadas restantes: &a@broadcasts'
+    - ''
+
+  Start:
+    # Mensagens enviadas quando o evento realmente inicia.
+    - ''
+    - '&f[@name] &#FDD500Iniciando evento...'
+    - ''
+
+  Winner:
+    # Mensagens enviadas quando alguém vence a corrida.
+    - ''
+    - '&f[@name] &#FDD500O evento &f@name &#FDD500foi finalizado!'
+    - '&f[@name] &#FDD500O vencedor foi &f@winner&b!'
+    - ''
+
+  No winner:
+    # Mensagens enviadas se o evento terminar sem vencedor.
+    - ''
+    - '&f[@name] &#FDD500O evento &f@name &#FDD500foi finalizado!'
+    - '&f[@name] &#FDD500Não houveram vencedores.'
+    - ''
+
+  No players:
+    # Mensagens enviadas se não houver jogadores suficientes para iniciar.
+    - ''
+    - '&f[@name] &#FDD500Evento cancelado.'
+    - '&f[@name] &#FDD500A quantidade mínima de jogadores não foi atingida.'
+    - ''
+
+  Cancelled:
+    # Mensagens enviadas quando o evento é cancelado manualmente.
+    - ''
+    - '&f[@name] &#FDD500O evento foi cancelado manualmente.'
+    - ''
+
+  Eliminated:
+    # Mensagem enviada quando um jogador perde a corrida.
+    - '&f[@name] &#FDD500Perdeu.'
+
+  Boost:
+    # Mensagem enviada quando o jogador ativa um bloco de boost.
+    - '&6[@name] &eBoost ativado!'
+
+  Checkpoint:
+    # Mensagem enviada ao jogador quando ele passa em um checkpoint.
+    # Placeholder disponível: @checkpoint
+    - '&6[@name] &aCheckpoint @checkpoint alcançado!'
+
+Rewards:
+  # Recompensas entregues ao vencedor.
+  Money: 1000 # Quantia em dinheiro dada ao vencedor pelo Vault/economia.
+  Commands:
+    # Lista de comandos executados no vencedor. Use @winner para o nome do jogador.
+    - lp user @winner permission settemp menutags.montaria true 7d
+    - alonsoleagues addpoints @winner 300
+    - liga givepoints @winner 20
+    - eco give @winner 200000
+
+Locations:
+  # Localizações padrão do evento.
+
+  Lobby:
+    # Local para onde o jogador vai ao entrar no evento antes dele começar.
+    world: Horse
+    x: -4.457415126134529
+    y: -13.0
+    z: -12.566841135707868
+    Yaw: 0.74765015
+    Pitch: -0.6000431
+
+  Entrance:
+    # Localização base do evento.
+    # Mantida por compatibilidade com o sistema base do plugin.
+    # A corrida em si usa Race.StartPos1 e Race.StartPos2.
+    world: Horse
+    x: 30.527036358055557
+    y: -12.0
+    z: 515.4738411962504
+    Yaw: 88.951294
+    Pitch: 4.0499353
+
+  Spectator:
+    # Localização para onde os espectadores irão.
+    world: Horse
+    x: 4.956746729313381
+    y: -1.0
+    z: 514.4818196327124
+    Yaw: -89.69165
+    Pitch: 9.900425
+
+  Exit:
+    # Localização para onde os jogadores irão ao sair/finalizar o evento.
+    world: world
+    x: -1081.5
+    y: 72.0
+    z: 187.5
+    Yaw: 0.28278583
+    Pitch: 4.0679574
+
+  Server: 'null' # Usado apenas se houver integração Bungeecord/proxy entre servidores.
+
+Checkpoints:
+  # Lista de checkpoints opcionais da corrida.
+  # Só serão obrigatórios se Race.Require checkpoints estiver como true.
+  #
+  # Exemplo:
+  #
+  # cp1:
+  #   Pos1:
+  #     world: Horse
+  #     x: 0
+  #     y: 0
+  #     z: 0
+  #   Pos2:
+  #     world: Horse
+  #     x: 5
+  #     y: 5
+  #     z: 5
+  #
+  # cp2:
+  #   Pos1:
+  #     world: Horse
+  #     x: 10
+  #     y: 0
+  #     z: 10
+  #   Pos2:
+  #     world: Horse
+  #     x: 15
+  #     y: 5
+  #     z: 15
+  {}

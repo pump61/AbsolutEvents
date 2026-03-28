@@ -1,0 +1,82 @@
+Evento:
+  Title: "Morte Súbita"
+  Type: "mortesubita"
+  Calls: 5
+  Calls interval: 15
+  Mininum players: 2
+  Eliminate on quit: true
+  Empty inventory: true
+  Permission: "absolutevents.evento"
+  Count participation: true
+  Count victory: true
+  Blue: "Time Azul"
+  Red: "Time Vermelho"
+  Enable PvP: 10
+  Hearts added: 4
+
+Messages:
+  Broadcast:
+    - ""
+    - "&3[@name] &bIniciando evento &f@name"
+    - "&3[@name] &bPara participar, digite &f/evento"
+    - "&3[@name] &bPrêmio: &2$&f@money &b+ &6[Morte Súbita]"
+    - "&3[@name] &bJogadores no evento: &f@players"
+    - "&3[@name] &bChamadas restantes: &f@broadcasts"
+    - ""
+
+  Start:
+    - ""
+    - "&3[@name] &bIniciando evento..."
+    - ""
+
+  Winner:
+    - ""
+    - "&3[@name] &bO evento &f@name &bfoi finalizado!"
+    - "&3[@name] &bA equipe vencedora foi: @team!"
+    - "&3[@name] &bJogadores vencedores: &f@winner&b!"
+    - ""
+
+  No winner:
+    - ""
+    - "&3[@name] &bO evento &f@name &bfoi finalizado!"
+    - "&3[@name] &bNão houveram vencedores."
+    - ""
+
+  No players:
+    - ""
+    - "&3[@name] &bEvento cancelado."
+    - "&3[@name] &bA quantidade mínima de jogadores não foi atingida."
+    - ""
+
+  Cancelled:
+    - ""
+    - "&3[@name] &bO evento foi cancelado manualmente."
+    - ""
+
+  Eliminado:
+    - ""
+    - "&3[@name] &bVocê foi eliminado por @killer!"
+    - ""
+
+  Team:
+    - ""
+    - "&3[@name] &bVocê faz parte do &f@team&b."
+    - "&3[@name] &bAtivando PvP em &f@time &bsegundos."
+    - ""
+
+  Enabled:
+    - "&3[@name] &bPvP ativado! Boa sorte a todos."
+
+Rewards:
+  Money: 1000
+  Commands:
+    - "give @winner diamond 1"
+
+Locations:
+  Lobby: []
+  Entrance: []
+  Spectator: []
+  Exit: []
+  Pos1: []
+  Pos2: []
+  Server: null

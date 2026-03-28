@@ -1,0 +1,24 @@
+name: AbsolutEvents
+version: ${project.version}
+description: Plugin de eventos do servidor.
+
+author: _Saynt
+website: ${project.url}
+
+main: com.absolutgg.absolutevents.AbsolutEventsPlugin
+softdepend: [LegendChat, SimpleClans, Vault, Factions, yClans, PlaceholderAPI]
+api-version: '1.21'
+
+commands:
+  evento:
+    description: Sistema de eventos do servidor
+    usage: /evento
+    aliases:
+      - eventos
+      - evento
+      - events
+      - event
+      - ev
+      - eventos
+    permission: absolutevents.use
+    permission-message: "§cSem permissão."

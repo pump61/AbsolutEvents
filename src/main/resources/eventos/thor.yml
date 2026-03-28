@@ -1,0 +1,131 @@
+Evento:
+  Title: Thor
+  Type: thor
+  Calls: 5
+  Calls interval: 15
+  Mininum players: 2
+  Eliminate on quit: true
+  Empty inventory: true
+  Permission: absolutevents.evento
+  Count participation: true
+  Count victory: true
+
+  Time: 10
+  Delay: 5
+
+  Warning ticks: 30
+  Strikes per wave: 1
+  Strike radius: 2.5
+
+  # evita repetir raio no mesmo lugar
+  Recent strike memory: 15
+
+  Final phase:
+    Enabled: true
+    At players: 3
+    Interval: 2
+    Strikes: 4
+
+  # 🔥 PROGRESSÃO (ESSA PARTE É O MAIS IMPORTANTE)
+  Stages:
+    - Time: 0
+      Interval: 5
+      Strikes: 1
+
+    - Time: 20
+      Interval: 4
+      Strikes: 2
+
+    - Time: 40
+      Interval: 3
+      Strikes: 3
+
+    - Time: 60
+      Interval: 2
+      Strikes: 4
+
+    - Time: 90
+      Interval: 1
+      Strikes: 6
+
+# =========================
+# MENSAGENS
+# =========================
+Messages:
+  Broadcast:
+    - ""
+    - "&3[@name] &bIniciando evento &f@name"
+    - "&3[@name] &bDigite &f/evento &bpara participar"
+    - "&3[@name] &bJogadores: &f@players"
+    - "&3[@name] &bChamadas restantes: &f@broadcasts"
+    - ""
+
+  Start:
+    - ""
+    - "&3[@name] &bIniciando evento..."
+    - ""
+
+  Starting:
+    - "&5[@name] &dOs raios começarão em &f@time &dsegundos"
+
+  Enabled:
+    - "&5[@name] &d⚡ Os raios começaram! CORRA! ⚡"
+
+  Winner:
+    - ""
+    - "&5[@name] &dO vencedor foi &f@winner"
+    - ""
+
+  No winner:
+    - ""
+    - "&5[@name] &dNinguém sobreviveu..."
+    - ""
+
+  No players:
+    - ""
+    - "&5[@name] &dEvento cancelado (sem jogadores)"
+    - ""
+
+  Cancelled:
+    - ""
+    - "&5[@name] &dEvento cancelado"
+    - ""
+
+  Eliminated: "&cVocê foi eliminado pelo raio!"
+
+  Struck:
+    - "&5[@name] &f@player &cfoi fulminado ⚡"
+
+  Actionbar starting: "&5Começa em: &f@time"
+  Actionbar running: "&5Raios em: &f@time &8| &fVivos: &5@players"
+
+# =========================
+# RECOMPENSAS
+# =========================
+Rewards:
+  Money: 1000
+  Commands:
+    - "give @winner diamond 1"
+
+# =========================
+# LOCALIZAÇÕES
+# =========================
+Locations:
+  Lobby: []
+  Entrance: []
+  Spectator: []
+  Exit: []
+
+  Pos1:
+    world: pve
+    x: 0
+    y: 100
+    z: 0
+
+  Pos2:
+    world: pve
+    x: 50
+    y: 100
+    z: 50
+
+  Server: null

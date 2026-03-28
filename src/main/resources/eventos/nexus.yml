@@ -1,0 +1,168 @@
+Evento:
+  # Configurações do evento.
+  Title: Nexus
+  Type: nexus
+  Calls: 5
+  Calls interval: 15
+  Mininum players: 2
+  Eliminate on quit: true
+  Empty inventory: true
+  Permission: absolutevents.evento
+  Count participation: true
+  Count victory: true
+  Blue: Azul
+  Red: Vermelho
+  Enable PvP: 10
+  Respawn time: 5
+  Invincibility: 5
+  Health: 1000
+  Damage: 5
+  Nexus name: '&d&lNEXUS &f- @team_color&l@team_uppercase &f(&aHP: &f@health&f)'
+  Map name: SeuMapa
+
+Towers:
+  Enabled: true
+  Health: 250
+  Damage: 6
+  Range: 22
+  Attack interval: 40
+  Projectile damage: 15
+  Melee damage: 5
+  Name: '&6&lTORRE &f- @team_color@team &f#@id &f(&cHP: &f@health&f)'
+
+Title:
+  Enabled: true
+  FadeIn: 10
+  Stay: 50
+  FadeOut: 10
+
+  Welcome:
+    Title: '&bBoas-vindas a'
+    Subtitle: '&f@map'
+
+  Tower destroyed:
+    Title: '&cTORRE DESTRUÍDA'
+    Subtitle: '&f@team - Torre @tower'
+
+  Nexus unlocked:
+    Title: '&4NEXUS LIBERADO'
+    Subtitle: '&fO Nexus da equipe @team agora pode ser destruído!'
+
+Itens:
+  Inventory:
+    '0':
+      material: WOODEN_SWORD
+    '1':
+      material: WOODEN_AXE
+    '2':
+      material: BOW
+      enchants:
+        ARROW_INFINITE: 1
+    '3':
+      material: COOKED_BEEF
+      amount: 64
+    '8':
+      material: SHIELD
+    '10':
+      material: ARROW
+
+Messages:
+  Broadcast:
+    - ''
+    - '&eEvento &f@name &edigite &f/evento'
+    - '&eJogadores no evento: &a@players &eChamadas restantes: &a@broadcasts'
+    - ''
+
+  Start:
+    - ''
+    - '&3[@name] &bIniciando evento...'
+    - ''
+
+  Winner:
+    - ''
+    - '&3[@name] &bO evento &f@name &bfoi finalizado!'
+    - '&3[@name] &bO vencedor foi &f@winner&b!'
+    - ''
+
+  No winner:
+    - ''
+    - '&3[@name] &bO evento &f@name &bfoi finalizado!'
+    - '&3[@name] &bNão houveram vencedores.'
+    - ''
+
+  No players:
+    - ''
+    - '&3[@name] &bEvento cancelado.'
+    - '&3[@name] &bA quantidade mínima de jogadores não foi atingida.'
+    - ''
+
+  Cancelled:
+    - ''
+    - '&3[@name] &bO evento foi cancelado manualmente.'
+    - ''
+
+  Team:
+    - ''
+    - '&3[@name] &bVocê faz parte do &f@team&b.'
+    - '&3[@name] &bAtivando PvP em &f@time &bsegundos.'
+    - ''
+
+  Enabled:
+    - '&3[@name] &bPvP ativado! Boa sorte a todos.'
+
+  Died:
+    - '&3[@name] &bVocê morreu. Aguarde &f@time &bsegundos para voltar a jogar.'
+
+  Kill:
+    - '&3[@name] &f@killer &beliminou &f@victim'
+
+  Killstreak:
+    3:
+      - '&6[@name] &f@player &eestá DOMINANDO!'
+    5:
+      - '&c[@name] &f@player &cESTÁ ENFURECIDO!'
+    7:
+      - '&4[@name] &f@player &4IMPARÁVEL!'
+    10:
+      - '&5[@name] &f@player &5DESTRUIDOR!'
+
+  Tower kill:
+    - '&c[@name] &f@player &efoi eliminado pela TORRE!'
+
+  Same hit:
+    - '&3[@name] &bVocê não pode bater na estrutura do seu time!'
+
+  Destroyed:
+    - '&3[@name] &bO Nexus do time @team1 &bfoi destruído. @team2 &bvenceu!'
+
+  Tower destroyed:
+    - '&3[@name] &bA torre @tower da equipe @team foi destruída por &f@player&b!'
+
+  Nexus unlocked:
+    - '&3[@name] &bAs torres da equipe @team foram destruídas!'
+    - '&3[@name] &bO Nexus agora pode ser atacado!'
+
+  Nexus protected:
+    - '&3[@name] &bO Nexus da equipe @team ainda está protegido pelas torres!'
+
+  Upgrade:
+    - '&3[@name] &bSeus equipamentos evoluíram! &f(Nível @level)'
+
+Rewards:
+  Money: 0
+  Commands: []
+
+Locations:
+  Lobby: []
+  Entrance: []
+  Spectator: []
+  Exit: []
+  Pos1: []
+  Pos2: []
+  Pos3: []
+  Pos4: []
+  Tower1: []
+  Tower2: []
+  Tower3: []
+  Tower4: []
+  Server: 'null'

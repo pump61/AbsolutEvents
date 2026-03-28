@@ -1,0 +1,182 @@
+Evento:
+  Title: "Torneio"
+  Type: "torneio"
+  Calls: 5
+  Calls interval: 15
+  Mininum players: 2
+  Eliminate on quit: true
+  Empty inventory: true
+  Permission: "absolutevents.evento"
+  Count participation: false
+  Count victory: false
+  Start time: 5
+  Time: 5
+  Fight time: 90
+
+Kit:
+  Normal:
+    Armor:
+      Helmet: {}
+      Chestplate: {}
+      Leggings: {}
+      Boots: {}
+    Inventory:
+      '0':
+        material: WOODEN_SWORD
+
+  Last fight:
+    Armor:
+      Helmet:
+        material: IRON_HELMET
+      Chestplate:
+        material: IRON_CHESTPLATE
+      Leggings:
+        material: IRON_LEGGINGS
+      Boots:
+        material: IRON_BOOTS
+    Inventory:
+      '0':
+        material: IRON_SWORD
+
+Messages:
+  Broadcast:
+    - ""
+    - "&3[@name] &bIniciando evento &f@name"
+    - "&3[@name] &bPara participar, digite &f/evento"
+    - "&3[@name] &bPrêmio: &2$&f@money &b+ &5[Fight]"
+    - "&3[@name] &bJogadores no evento: &f@players"
+    - "&3[@name] &bChamadas restantes: &f@broadcasts"
+    - ""
+
+  Start:
+    - ""
+    - "&3[@name] &bIniciando evento..."
+    - ""
+
+  Winner:
+    - ""
+    - "&3[@name] &bO evento &f@name &bfoi finalizado!"
+    - "&3[@name] &bO vencedor foi &f@winner&b!"
+    - ""
+
+  No winner:
+    - ""
+    - "&3[@name] &bO evento &f@name &bfoi finalizado!"
+    - "&3[@name] &bNão houveram vencedores."
+    - ""
+
+  No players:
+    - ""
+    - "&3[@name] &bEvento cancelado."
+    - "&3[@name] &bA quantidade mínima de jogadores não foi atingida."
+    - ""
+
+  Cancelled:
+    - ""
+    - "&3[@name] &bO evento foi cancelado manualmente."
+    - ""
+
+  Starting fights:
+    - ""
+    - "&3[@name] &bAs lutas começarão em @time segundos!"
+    - ""
+
+  Odd number:
+    - ""
+    - "&3[@name] &bComo o número de players é ímpar"
+    - "&3[@name] &bo jogador &f@player &bpassou para o próximo round!"
+    - ""
+
+  Bracket info:
+    - "&3[@name] &c@first &fvs &b@second"
+
+  Fight cancelled:
+    - ""
+    - "&3[@name] &bComo os jogadores &f@first &be &f@second"
+    - "&3[@name] &bfugiram da luta, sua luta foi cancelada."
+    - ""
+
+  Players leaves:
+    - ""
+    - "&3[@name] &bO jogador &f@player &bsaiu do evento."
+    - "&3[@name] &bentão o jogador &f@adversary &bpassou para a próxima fase."
+    - ""
+
+  Fighter leaves the fight:
+    - ""
+    - "&3[@name] &bO jogador &f@player &bvence por WO"
+    - "&3[@name] &bjá que seu adversário fugiu durante a luta!"
+    - ""
+
+  Fight winner:
+    - ""
+    - "&3[@name] &bO jogador &f@player &bvenceu a luta!"
+    - ""
+
+  Draw:
+    - ""
+    - "&3[@name] &bA luta superou os @maxtime segundos"
+    - "&3[@name] &bportanto ambos lutadores perderam!"
+    - ""
+
+  Last fight:
+    - ""
+    - "&3[@name] &bA grande luta final iniciará em &f10 &bsegundos."
+    - "&3[@name] &b@fighter1 &cvs &b@fighter2."
+    - ""
+
+Rewards:
+  Money: 1000
+  Commands:
+    - "give @winner diamond 1"
+
+Locations:
+  Lobby:
+    world: world
+    x: 0.5
+    y: 80.0
+    z: 0.5
+    Yaw: 0.0
+    Pitch: 0.0
+
+  Entrance:
+    world: world
+    x: 10.5
+    y: 80.0
+    z: 10.5
+    Yaw: 0.0
+    Pitch: 0.0
+
+  Spectator:
+    world: world
+    x: 10.5
+    y: 90.0
+    z: 10.5
+    Yaw: 0.0
+    Pitch: 0.0
+
+  Exit:
+    world: world
+    x: 0.5
+    y: 80.0
+    z: 0.5
+    Yaw: 0.0
+    Pitch: 0.0
+
+  Pos1:
+    world: world
+    x: 20.5
+    y: 80.0
+    z: 20.5
+    Yaw: 0.0
+    Pitch: 0.0
+
+  Pos2:
+    world: world
+    x: 30.5
+    y: 80.0
+    z: 20.5
+    Yaw: 180.0
+    Pitch: 0.0
+
+  Server: null

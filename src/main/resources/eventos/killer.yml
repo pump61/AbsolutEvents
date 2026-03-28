@@ -1,0 +1,98 @@
+Evento:
+  # Configurações do evento.
+  Title: "Killer" # O nome do evento. Será usado na placeholder @name.
+  Type: "killer" # O tipo do evento. Não modifique!
+  Calls: 5 # Quantas chamadas o evento terá.
+  Calls interval: 15 # O intervalo (em segundos) entre as chamadas.
+  Mininum players: 2 # O mínimo de jogadores para iniciar o evento.
+  Eliminate on quit: true # Este evento possui camarote?
+  Empty inventory: false # Esse evento requer que você esteja com o inventário vazio?
+  Permission: "absolutevents.evento" # A permissão necessária para participar do evento.
+  Count participation: true # Esse evento contará participação?
+  Count victory: true # Esse evento contará vitória?
+  Time: 30 # Tempo em segundos antes do PvP ser ativado.
+  Pickup time: 20 # Tempo em segundos que o vencedor terá para pegar os drops.
+
+Itens:
+  # Itens definidos do evento. Você pode defini-los automaticamente com o comando /evento setup kit
+  Enabled: false # Caso esteja ativado, o evento será com os itens setados abaixo. Lembre-se de ativar a opção "Empty inventory"!
+  Helmet: {}
+  Chestplate: {}
+  Leggings: {}
+  Boots: {}
+  Inventory: {}
+
+Actionbar:
+  Enabled: true
+  Enabling: "&ePvP ativo em &f@time &esegundos!"
+  Message: "&aVivos: &f@alive &8| &aKills: &f@kills"
+
+Top kills:
+  Enabled: true
+  Format:
+    - ""
+    - "&eTop abates do evento:"
+    - "&f1. @top1 &7- &f@kills1"
+    - "&f2. @top2 &7- &f@kills2"
+    - "&f3. @top3 &7- &f@kills3"
+    - ""
+
+Messages:
+  Broadcast:
+    - ""
+    - "&3[@name] &bIniciando evento &f@name"
+    - "&3[@name] &bPara participar, digite &f/evento"
+    - "&3[@name] &bPrêmio: &2$&f@money &b+ &5[Killer]"
+    - "&3[@name] &bJogadores no evento: &f@players"
+    - "&3[@name] &bChamadas restantes: &f@broadcasts"
+    - ""
+
+  Start:
+    - ""
+    - "&3[@name] &bIniciando evento..."
+    - ""
+
+  Winner:
+    - ""
+    - "&3[@name] &bO evento &f@name &bfoi finalizado!"
+    - "&3[@name] &bO vencedor foi &f@winner&b!"
+    - ""
+
+  No winner:
+    - ""
+    - "&3[@name] &bO evento &f@name &bfoi finalizado!"
+    - "&3[@name] &bNão houveram vencedores."
+    - ""
+
+  No players:
+    - ""
+    - "&3[@name] &bEvento cancelado."
+    - "&3[@name] &bA quantidade mínima de jogadores não foi atingida."
+    - ""
+
+  Cancelled:
+    - ""
+    - "&3[@name] &bO evento foi cancelado manualmente."
+    - ""
+
+  Enabling:
+    - "&3[@name] &bO PvP será ativado em &f@time &bsegundos!"
+
+  Enabled:
+    - ""
+    - "&3[@name] &bO PvP foi ativado. Boa sorte á todos!"
+    - ""
+
+  Pickup:
+    - "&3[@name] &bVocê tem &f@time &bsegundos para pegar os drops."
+
+Rewards:
+  Money: 1000 # A quantidade de dinheiro que o jogador ganhará ao vencer o evento. (Requer Vault)
+  Commands: []
+
+Locations:
+  Lobby: []
+  Entrance: []
+  Spectator: []
+  Exit: []
+  Server: null

@@ -1,0 +1,118 @@
+Evento:
+  Title: Rainbow Run
+  Type: rainbowrun
+  Calls: 10
+  Calls interval: 15
+  Mininum players: 2
+  Eliminate on quit: true
+  Empty inventory: true
+  Permission: absolutevents.evento
+  Count participation: false
+  Count victory: false
+  Start: 10
+  Max time: 2
+
+Messages:
+  Broadcast:
+    - ''
+    - 'Evento @name iniciado! Digite /evento para participar.'
+    - 'Jogadores no evento: @players'
+    - ''
+
+  Start:
+    - ''
+    - '[@name] Iniciando evento...'
+    - ''
+
+  Winner:
+    - ''
+    - '[@name] O evento terminou!'
+    - 'Vencedor: @winner'
+    - 'Blocos pintados: @blocks'
+    - 'Top 3:'
+    - '@top1'
+    - '@top2'
+    - '@top3'
+    - ''
+
+  No winner:
+    - ''
+    - '[@name] O evento terminou!'
+    - 'Não houve vencedor.'
+    - 'Top 3:'
+    - '@top1'
+    - '@top2'
+    - '@top3'
+    - ''
+
+  No players:
+    - ''
+    - '[@name] Evento cancelado.'
+    - 'Jogadores insuficientes.'
+    - ''
+
+  Cancelled:
+    - ''
+    - '[@name] Evento cancelado manualmente.'
+    - ''
+
+  Start evento:
+    - ''
+    - '[@name] O evento começará em @time segundos!'
+    - ''
+
+  Actionbar: "&fBlocos: &a@blocks &8| &fPosição: &b@position &8| &fTempo Restante: &e@time"
+
+Rewards:
+  Money: 0
+  Commands: []
+
+Locations:
+  Lobby:
+    world: world
+    x: 0
+    y: 0
+    z: 0
+    Yaw: 0
+    Pitch: 0
+
+  Entrance:
+    world: world
+    x: 0
+    y: 0
+    z: 0
+    Yaw: 0
+    Pitch: 0
+
+  Spectator:
+    world: world
+    x: 0
+    y: 0
+    z: 0
+    Yaw: 0
+    Pitch: 0
+
+  Exit:
+    world: world
+    x: 0
+    y: 0
+    z: 0
+    Yaw: 0
+    Pitch: 0
+
+  Pos1:
+    world: world
+    x: 0
+    y: 0
+    z: 0
+
+  Pos2:
+    world: world
+    x: 0
+    y: 0
+    z: 0
+
+  Server: 'null'
+
+Itens:
+  Inventory: ''

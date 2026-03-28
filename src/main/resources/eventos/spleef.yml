@@ -1,0 +1,88 @@
+Evento:
+  Title: "Spleef"
+  Type: "spleef"
+  Calls: 5
+  Calls interval: 15
+  Mininum players: 2
+  Eliminate on quit: true
+  Empty inventory: true
+  Permission: "absolutevents.evento"
+  Count participation: true
+  Count victory: true
+  Delay: 5
+  Kick: true
+  Kick time: 20
+
+Itens:
+  Helmet: {}
+  Chestplate: {}
+  Leggings: {}
+  Boots: {}
+  Inventory:
+    '0':
+      material: STONE_SHOVEL
+      damage: 0
+    '1':
+      material: SNOWBALL
+      amount: 15
+      damage: 0
+
+Messages:
+  Broadcast:
+    - ""
+    - "&3[@name] &bIniciando evento &f@name"
+    - "&3[@name] &bPara participar, digite &f/evento"
+    - "&3[@name] &bPrêmio: &2$&f@money &b+ &3[Spleef]"
+    - "&3[@name] &bJogadores no evento: &f@players"
+    - "&3[@name] &bChamadas restantes: &f@broadcasts"
+    - ""
+
+  Start:
+    - ""
+    - "&3[@name] &bIniciando evento..."
+    - ""
+
+  Winner:
+    - ""
+    - "&3[@name] &bO evento &f@name &bfoi finalizado!"
+    - "&3[@name] &bO vencedor foi &f@winner&b!"
+    - ""
+
+  No winner:
+    - ""
+    - "&3[@name] &bO evento &f@name &bfoi finalizado!"
+    - "&3[@name] &bNão houveram vencedores."
+    - ""
+
+  No players:
+    - ""
+    - "&3[@name] &bEvento cancelado."
+    - "&3[@name] &bA quantidade mínima de jogadores não foi atingida."
+    - ""
+
+  Cancelled:
+    - ""
+    - "&3[@name] &bO evento foi cancelado manualmente."
+    - ""
+
+  Enabling breaking:
+    - "&3[@name] &bAtivando quebra de blocos em &f@time&b segundos..."
+
+  Breaking allowed:
+    - "&3[@name] &bAgora vocês podem quebrar blocos!"
+
+  Kick: "&3[@name] &bComo você está parado, você será eliminado do evento em &f@time &bsegundos."
+
+Rewards:
+  Money: 1000
+  Commands:
+    - "give @winner diamond 1"
+
+Locations:
+  Lobby: []
+  Entrance: []
+  Spectator: []
+  Exit: []
+  Pos1: []
+  Pos2: []
+  Server: null

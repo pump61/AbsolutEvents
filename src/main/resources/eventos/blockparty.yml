@@ -1,0 +1,88 @@
+# Ao configurar esse evento, você deve construir previamente o solo da área da maneira desejada
+# usando o padrão que quiser dentro da área entre Pos1 e Pos2.
+Evento:
+  # Configurações do evento.
+  Title: "Block Party" # O nome do evento. Será usado na placeholder @name.
+  Type: "blockparty" # O tipo do evento. Não modifique!
+  Calls: 5 # Quantas chamadas o evento terá.
+  Calls interval: 15 # O intervalo (em segundos) entre as chamadas.
+  Mininum players: 2 # O mínimo de jogadores para iniciar o evento.
+  Block custom name: "&bVá até esse bloco!" # Nome do bloco que ficará na mão dos jogadores. Use "" para não mostrar nome.
+  Eliminate on quit: true # Este evento possui camarote?
+  Empty inventory: true # Esse evento requer que você esteja com o inventário vazio?
+  Permission: "absolutevents.evento" # A permissão necessária para participar do evento.
+  Count participation: true # Esse evento contará participação?
+  Count victory: true # Esse evento contará vitória?
+  Last player wins: true # Se sobrar somente um jogador ele deve ser o vencedor?
+  Max level: 20 # Caso haja mais de 1 jogador restante, todos ganharão ao chegar nesse nível.
+  Start: 10 # O tempo em segundos antes do primeiro nível começar.
+  Time reduction: 1 # Unidade: 1 = 0,5 segundos | Tempo reduzido a cada nível.
+  Time minimo: 1 # Menor tempo em segundos para encontrar o bloco.
+  Delay: 2 # Delay em segundos entre os níveis.
+  Time: 10 # O tempo inicial em segundos que o nível terá.
+
+# Mensagens
+Messages:
+  Broadcast:
+    - ""
+    - "&3[@name] &bIniciando evento &f@name"
+    - "&3[@name] &bPara participar, digite &f/evento"
+    - "&3[@name] &bPrêmio: &2$&f@money"
+    - "&3[@name] &bJogadores no evento: &f@players"
+    - "&3[@name] &bChamadas restantes: &f@broadcasts"
+    - ""
+
+  Start:
+    - ""
+    - "&3[@name] &bIniciando evento..."
+    - ""
+
+  Winner:
+    - ""
+    - "&3[@name] &bO evento &f@name &bfoi finalizado!"
+    - "&3[@name] &bO vencedor foi &f@winner&b!"
+    - ""
+
+  No winner:
+    - ""
+    - "&3[@name] &bO evento &f@name &bfoi finalizado!"
+    - "&3[@name] &bNão houveram vencedores."
+    - ""
+
+  No players:
+    - ""
+    - "&3[@name] &bEvento cancelado."
+    - "&3[@name] &bA quantidade mínima de jogadores não foi atingida."
+    - ""
+
+  Cancelled:
+    - ""
+    - "&3[@name] &bO evento foi cancelado manualmente."
+    - ""
+
+  Inicio:
+    - ""
+    - "&3[@name] &bAtenção! O primeiro nível começará em &f@time&b segundos..."
+    - ""
+
+  Next level:
+    - ""
+    - "&3[@name] &bNível &f@nivel..."
+    - "&3[@name] &f@time &bsegundos para ir até o bloco selecionado!"
+    - ""
+
+# Recompensas. Elas serão dadas ao(s) vencedor(es).
+Rewards:
+  Money: 1000 # A quantidade de dinheiro que o jogador ganhará ao vencer o evento. (Requer Vault)
+  Commands: # Lista de comandos que serão executados no(s) vencedor(es).
+    - "give @winner diamond 1"
+
+# Localizações. Você configurará essa seção usando o comando /evento setup blockparty
+Locations:
+  Lobby: [] # Local onde o jogador ficará enquanto o evento estiver aberto.
+  Entrance: [] # Local para onde os jogadores serão enviados ao iniciar o evento.
+  Spectator: [] # Local do camarote.
+  Exit: [] # Local para onde o jogador será enviado ao sair do evento.
+  Pos1: [] # Primeiro canto da área do chão do evento.
+  Pos2: [] # Segundo canto da área do chão do evento.
+  Server: null # Coloque aqui o nome do servidor do Bungeecord que o evento deve ocorrer.
