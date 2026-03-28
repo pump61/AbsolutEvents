@@ -8,6 +8,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
@@ -49,6 +50,45 @@ public final class CorridaArmadaListener implements Listener {
         }
     }
 
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onEnvironmentalDamage(EntityDamageEvent event) {
+        CorridaArmada corridaArmada = getEvento();
+        if (corridaArmada == null) {
+            return;
+        }
+
+        if (!(event.getEntity() instanceof Player player)) {
+            return;
+        }
+
+        if (!corridaArmada.getPlayers().contains(player)) {
+            return;
+        }
+
+        if (corridaArmada.getDeadPlayers().contains(player) || corridaArmada.getInvinciblePlayers().contains(player)) {
+            event.setCancelled(true);
+            player.setFireTicks(0);
+            player.setVisualFire(false);
+            return;
+        }
+
+        switch (event.getCause()) {
+            case LAVA:
+            case FIRE:
+            case FIRE_TICK:
+            case HOT_FLOOR:
+            case VOID:
+                event.setCancelled(true);
+                player.setFireTicks(0);
+                player.setVisualFire(false);
+                corridaArmada.eliminate(player, null);
+                break;
+
+            default:
+                break;
+        }
+    }
+
     @EventHandler
     public void onDeath(PlayerDeathEvent event) {
         CorridaArmada corridaArmada = getEvento();
@@ -75,6 +115,9 @@ public final class CorridaArmadaListener implements Listener {
         event.getDrops().clear();
         event.setDroppedExp(0);
         event.setKeepLevel(true);
+
+        victim.setFireTicks(0);
+        victim.setVisualFire(false);
 
         corridaArmada.eliminate(victim, killer);
     }

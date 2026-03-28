@@ -206,8 +206,7 @@ public final class Hunter extends Evento {
 
             for (String message : config.getStringList("Messages.Enabled")) {
                 sendToEvent(
-                        message.replace("&", "§")
-                                .replace("@name", config.getString("Evento.Title"))
+                        message.replace("@name", config.getString("Evento.Title"))
                 );
             }
 
@@ -264,7 +263,6 @@ public final class Hunter extends Evento {
             String leaveMessage = ColorUtils.colorize(
                     plugin.getConfig()
                             .getString("Messages.Leave", "&c@player saiu do evento.")
-                            .replace("&", "§")
                             .replace("@player", player.getName())
             );
 
@@ -341,8 +339,7 @@ public final class Hunter extends Evento {
 
         for (String message : config.getStringList("Messages.Eliminated")) {
             sendToEvent(
-                    message.replace("&", "§")
-                            .replace("@name", config.getString("Evento.Title"))
+                    message.replace("@name", config.getString("Evento.Title"))
                             .replace("@player", victim.getName())
                             .replace("@killer", killer.getName())
                             .replace("@blueteam", "§9" + bluePoints)
@@ -352,8 +349,7 @@ public final class Hunter extends Evento {
 
         for (String message : config.getStringList("Messages.Capturated")) {
             victim.sendMessage(ColorUtils.colorize(
-                    message.replace("&", "§")
-                            .replace("@name", config.getString("Evento.Title"))
+                    message.replace("@name", config.getString("Evento.Title"))
                             .replace("@time", String.valueOf(captureTime))
             ));
         }
@@ -413,8 +409,7 @@ public final class Hunter extends Evento {
 
         for (String message : config.getStringList("Messages.Win")) {
             sendToEvent(
-                    message.replace("&", "§")
-                            .replace("@name", config.getString("Evento.Title"))
+                    message.replace("@name", config.getString("Evento.Title"))
                             .replace("@team", winnerTeam)
                             .replace("@points", String.valueOf(winnerPoints))
             );
@@ -436,8 +431,7 @@ public final class Hunter extends Evento {
 
         for (String message : config.getStringList("Messages.Winner")) {
             Bukkit.broadcastMessage(ColorUtils.colorize(
-                    message.replace("&", "§")
-                            .replace("@name", config.getString("Evento.Title"))
+                    message.replace("@name", config.getString("Evento.Title"))
                             .replace("@winner", String.join(", ", winnerNames))
             ));
         }
@@ -462,8 +456,7 @@ public final class Hunter extends Evento {
             );
 
             String parsed = ColorUtils.colorize(
-                    format.replace("&", "§")
-                            .replace("@blueteam", String.valueOf(bluePoints))
+                    format.replace("@blueteam", String.valueOf(bluePoints))
                             .replace("@redteam", String.valueOf(redPoints))
                             .replace("@maxpoints", String.valueOf(maxPoints))
             );
@@ -632,8 +625,7 @@ public final class Hunter extends Evento {
 
         for (String line : format) {
             Bukkit.broadcastMessage(ColorUtils.colorize(
-                    line.replace("&", "§")
-                            .replace("@top1", top1)
+                    line.replace("@top1", top1)
                             .replace("@top2", top2)
                             .replace("@top3", top3)
                             .replace("@kills1", kills1)
@@ -646,8 +638,7 @@ public final class Hunter extends Evento {
     private void sendTeamMessage(Player player, String teamName) {
         for (String message : config.getStringList("Messages.Team")) {
             player.sendMessage(ColorUtils.colorize(
-                    message.replace("&", "§")
-                            .replace("@name", config.getString("Evento.Title"))
+                    message.replace("@name", config.getString("Evento.Title"))
                             .replace("@team", teamName)
                             .replace("@time", String.valueOf(startTime))
             ));

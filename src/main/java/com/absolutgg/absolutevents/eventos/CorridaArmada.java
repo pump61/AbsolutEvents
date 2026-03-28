@@ -24,6 +24,7 @@ import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitTask;
+import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -107,6 +108,7 @@ public final class CorridaArmada extends Evento {
         Collections.shuffle(shuffled);
 
         for (Player player : shuffled) {
+            resetPlayerState(player);
             setArmor(player);
 
             if (!respawnLocations.isEmpty()) {
@@ -120,13 +122,10 @@ public final class CorridaArmada extends Evento {
         startActionbar();
 
         for (String message : config.getStringList("Messages.Enabling")) {
-            broadcastToEvent(
-                    ColorUtils.colorize(
-                            message.replace("&", "§")
-                                    .replace("@time", String.valueOf(startTime))
-                                    .replace("@name", config.getString("Evento.Title"))
-                    )
-            );
+            broadcastToEvent(ColorUtils.colorize(
+                    message.replace("@time", String.valueOf(startTime))
+                            .replace("@name", config.getString("Evento.Title"))
+            ));
         }
 
         Bukkit.getScheduler().runTaskLater(
@@ -139,12 +138,9 @@ public final class CorridaArmada extends Evento {
                     this.pvpEnabled = true;
 
                     for (String message : config.getStringList("Messages.Enabled")) {
-                        broadcastToEvent(
-                                ColorUtils.colorize(
-                                        message.replace("&", "§")
-                                                .replace("@name", config.getString("Evento.Title"))
-                                )
-                        );
+                        broadcastToEvent(ColorUtils.colorize(
+                                message.replace("@name", config.getString("Evento.Title"))
+                        ));
                     }
                 },
                 startTime * 20L
@@ -157,7 +153,6 @@ public final class CorridaArmada extends Evento {
             String leaveMessage = ColorUtils.colorize(
                     AbsolutEventsPlugin.getInstance().getConfig()
                             .getString("Messages.Leave", "&c@player saiu do evento.")
-                            .replace("&", "§")
                             .replace("@player", player.getName())
             );
 
@@ -203,8 +198,7 @@ public final class CorridaArmada extends Evento {
         for (String message : config.getStringList("Messages.Winner")) {
             AbsolutEventsPlugin.getInstance().getServer().broadcastMessage(
                     ColorUtils.colorize(
-                            message.replace("&", "§")
-                                    .replace("@winner", player.getName())
+                            message.replace("@winner", player.getName())
                                     .replace("@name", config.getString("Evento.Title"))
                     )
             );
@@ -226,6 +220,7 @@ public final class CorridaArmada extends Evento {
             clearPlayer(player);
             player.removePotionEffect(PotionEffectType.BLINDNESS);
             player.removePotionEffect(PotionEffectType.SLOWNESS);
+            resetPlayerState(player);
         }
 
         playerLevel.clear();
@@ -262,8 +257,7 @@ public final class CorridaArmada extends Evento {
             for (String message : config.getStringList("Messages.Next level")) {
                 killer.sendMessage(
                         ColorUtils.colorize(
-                                message.replace("&", "§")
-                                        .replace("@name", config.getString("Evento.Title"))
+                                message.replace("@name", config.getString("Evento.Title"))
                                         .replace("@level", String.valueOf(killerLevel))
                         )
                 );
@@ -277,8 +271,7 @@ public final class CorridaArmada extends Evento {
                 for (String message : config.getStringList("Messages.Leader")) {
                     broadcastToEvent(
                             ColorUtils.colorize(
-                                    message.replace("&", "§")
-                                            .replace("@name", config.getString("Evento.Title"))
+                                    message.replace("@name", config.getString("Evento.Title"))
                                             .replace("@player", killer.getName())
                                             .replace("@level", String.valueOf(killerLevel))
                             )
@@ -288,9 +281,7 @@ public final class CorridaArmada extends Evento {
         }
 
         clearPlayer(victim);
-        victim.setFoodLevel(20);
-        victim.setSaturation(20.0f);
-        victim.setHealth(victim.getMaxHealth());
+        resetPlayerState(victim);
 
         if (!respawnLocations.isEmpty()) {
             victim.teleport(respawnLocations.get(random.nextInt(respawnLocations.size())), PlayerTeleportEvent.TeleportCause.PLUGIN);
@@ -332,6 +323,7 @@ public final class CorridaArmada extends Evento {
                         playerLevel.put(victim, level);
                     }
 
+                    resetPlayerState(victim);
                     setArmor(victim);
                     updateGearByLevel(victim, level);
 
@@ -574,7 +566,6 @@ public final class CorridaArmada extends Evento {
                                 .replace("@position", String.valueOf(getPlayerPosition(player)));
 
                         parsed = ColorUtils.colorize(parsed);
-                        parsed = parsed.replace('&', '§');
 
                         Component component = serializer.deserialize(parsed);
                         player.sendActionBar(component);
@@ -588,7 +579,6 @@ public final class CorridaArmada extends Evento {
                                 .replace("@position", "-");
 
                         parsed = ColorUtils.colorize(parsed);
-                        parsed = parsed.replace('&', '§');
 
                         Component component = serializer.deserialize(parsed);
                         player.sendActionBar(component);
@@ -633,6 +623,20 @@ public final class CorridaArmada extends Evento {
     private void cancelTask(BukkitTask task) {
         if (task != null) {
             task.cancel();
+        }
+    }
+
+    private void resetPlayerState(Player player) {
+        player.setFireTicks(0);
+        player.setVisualFire(false);
+        player.setFallDistance(0.0F);
+        player.setVelocity(new Vector(0, 0, 0));
+        player.setNoDamageTicks(20);
+        player.setFreezeTicks(0);
+        player.setFoodLevel(20);
+        player.setSaturation(20.0f);
+        if (player.getHealth() < player.getMaxHealth()) {
+            player.setHealth(player.getMaxHealth());
         }
     }
 
