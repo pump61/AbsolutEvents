@@ -135,6 +135,12 @@
             <artifactId>HikariCP</artifactId>
             <version>${hikari.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.bstats</groupId>
+            <artifactId>bstats-bukkit</artifactId>
+            <version>3.2.1</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -194,6 +200,10 @@
                                 <relocation>
                                     <pattern>com.cryptomorin.xseries</pattern>
                                     <shadedPattern>com.absolutgg.absolutevents.libs.xseries</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>org.bstats</pattern>
+                                    <shadedPattern>com.absolutgg.absolutevents.libs.bstats</shadedPattern>
                                 </relocation>
                             </relocations>
 
