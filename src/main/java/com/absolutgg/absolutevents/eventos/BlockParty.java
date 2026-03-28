@@ -3,6 +3,7 @@ package com.absolutgg.absolutevents.eventos;
 import com.absolutgg.absolutevents.AbsolutEventsPlugin;
 import com.absolutgg.absolutevents.api.Evento;
 import com.absolutgg.absolutevents.api.events.PlayerLoseEvent;
+import com.absolutgg.absolutevents.discord.DiscordWebhookManager;
 import com.absolutgg.absolutevents.listeners.eventos.BlockPartyListener;
 import com.absolutgg.absolutevents.utils.ColorUtils;
 import com.absolutgg.absolutevents.utils.Cuboid;
@@ -261,6 +262,21 @@ public final class BlockParty extends Evento {
                             .replace("@winner", String.join(", ", winnersNames))
                             .replace("@name", config.getString("Evento.Title"))
             ));
+        }
+
+        if (!winnersPlayers.isEmpty()) {
+            if (winnersPlayers.size() == 1) {
+                DiscordWebhookManager.sendPlayerWinner(
+                        winnersPlayers.get(0).getName(),
+                        config.getString("Evento.Title")
+                );
+            } else {
+                DiscordWebhookManager.sendTeamWinner(
+                        String.join(", ", winnersNames),
+                        config.getString("Evento.Title"),
+                        List.of()
+                );
+            }
         }
 
         endEventPreservingWinners();

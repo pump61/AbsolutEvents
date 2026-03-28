@@ -2,6 +2,7 @@ package com.absolutgg.absolutevents.eventos;
 
 import com.absolutgg.absolutevents.AbsolutEventsPlugin;
 import com.absolutgg.absolutevents.api.Evento;
+import com.absolutgg.absolutevents.discord.DiscordWebhookManager;
 import com.absolutgg.absolutevents.listeners.eventos.RainbowRunListener;
 import com.absolutgg.absolutevents.utils.ColorUtils;
 import com.absolutgg.absolutevents.utils.Cuboid;
@@ -338,6 +339,12 @@ public final class RainbowRun extends Evento {
             );
         }
 
+        DiscordWebhookManager.sendPlayerWinner(
+                player.getName(),
+                config.getString("Evento.Title"),
+                buildTopEntries(ranking)
+        );
+
         setWinner(player);
         stop();
 
@@ -391,6 +398,20 @@ public final class RainbowRun extends Evento {
         return rainbowPlayers.stream()
                 .sorted(Comparator.comparingInt(RainbowPlayer::getPunctuation).reversed())
                 .collect(Collectors.toList());
+    }
+
+    private List<DiscordWebhookManager.TopEntry> buildTopEntries(List<RainbowPlayer> ranking) {
+        List<DiscordWebhookManager.TopEntry> entries = new ArrayList<>();
+
+        for (int i = 0; i < Math.min(3, ranking.size()); i++) {
+            RainbowPlayer rainbowPlayer = ranking.get(i);
+            entries.add(new DiscordWebhookManager.TopEntry(
+                    rainbowPlayer.getPlayer().getName(),
+                    String.valueOf(rainbowPlayer.getPunctuation())
+            ));
+        }
+
+        return entries;
     }
 
     private String formatTop(RainbowPlayer rainbowPlayer, int position) {

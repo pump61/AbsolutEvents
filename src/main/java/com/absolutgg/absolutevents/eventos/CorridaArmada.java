@@ -3,6 +3,7 @@ package com.absolutgg.absolutevents.eventos;
 import com.absolutgg.absolutevents.AbsolutEventsPlugin;
 import com.absolutgg.absolutevents.api.Evento;
 import com.absolutgg.absolutevents.api.events.PlayerLoseEvent;
+import com.absolutgg.absolutevents.discord.DiscordWebhookManager;
 import com.absolutgg.absolutevents.listeners.eventos.CorridaArmadaListener;
 import com.absolutgg.absolutevents.utils.ColorUtils;
 import com.cryptomorin.xseries.XMaterial;
@@ -203,6 +204,12 @@ public final class CorridaArmada extends Evento {
                     )
             );
         }
+
+        DiscordWebhookManager.sendPlayerWinner(
+                player.getName(),
+                config.getString("Evento.Title"),
+                buildTopEntries()
+        );
 
         this.setWinner(player);
         this.stop();
@@ -638,6 +645,26 @@ public final class CorridaArmada extends Evento {
         if (player.getHealth() < player.getMaxHealth()) {
             player.setHealth(player.getMaxHealth());
         }
+    }
+
+    private List<DiscordWebhookManager.TopEntry> buildTopEntries() {
+        List<DiscordWebhookManager.TopEntry> entries = new ArrayList<>();
+        List<Player> ranking = new ArrayList<>(playerLevel.keySet());
+
+        ranking.sort(Comparator
+                .comparingInt((Player p) -> playerLevel.getOrDefault(p, 0))
+                .reversed()
+                .thenComparing(Player::getName, String.CASE_INSENSITIVE_ORDER));
+
+        for (int i = 0; i < Math.min(3, ranking.size()); i++) {
+            Player player = ranking.get(i);
+            entries.add(new DiscordWebhookManager.TopEntry(
+                    player.getName(),
+                    String.valueOf(playerLevel.getOrDefault(player, 0))
+            ));
+        }
+
+        return entries;
     }
 
     public int getHearts() {

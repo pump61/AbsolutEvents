@@ -3,6 +3,7 @@ package com.absolutgg.absolutevents.eventos;
 import com.absolutgg.absolutevents.AbsolutEventsPlugin;
 import com.absolutgg.absolutevents.api.Evento;
 import com.absolutgg.absolutevents.api.events.PlayerLoseEvent;
+import com.absolutgg.absolutevents.discord.DiscordWebhookManager;
 import com.absolutgg.absolutevents.listeners.eventos.HunterListener;
 import com.absolutgg.absolutevents.utils.ColorUtils;
 import com.cryptomorin.xseries.XEnchantment;
@@ -421,12 +422,6 @@ public final class Hunter extends Evento {
 
         setWinners(winners);
 
-        for (Player winner : winners) {
-            for (String command : config.getStringList("Rewards.Commands")) {
-                executeConsoleCommand(winner, command.replace("@winner", winner.getName()));
-            }
-        }
-
         List<String> winnerNames = winners.stream().map(Player::getName).toList();
 
         for (String message : config.getStringList("Messages.Winner")) {
@@ -434,6 +429,18 @@ public final class Hunter extends Evento {
                     message.replace("@name", config.getString("Evento.Title"))
                             .replace("@winner", String.join(", ", winnerNames))
             ));
+        }
+
+        DiscordWebhookManager.sendTeamWinner(
+                winnerTeam,
+                config.getString("Evento.Title"),
+                buildTopEntries()
+        );
+
+        for (Player winner : winners) {
+            for (String command : config.getStringList("Rewards.Commands")) {
+                executeConsoleCommand(winner, command.replace("@winner", winner.getName()));
+            }
         }
 
         sendTopKills();
@@ -732,6 +739,23 @@ public final class Hunter extends Evento {
         for (Player spectator : getSpectators()) {
             spectator.sendMessage(parsed);
         }
+    }
+
+    private List<DiscordWebhookManager.TopEntry> buildTopEntries() {
+        List<DiscordWebhookManager.TopEntry> entries = new ArrayList<>();
+        List<Map.Entry<Player, Integer>> ranking = new ArrayList<>(kills.entrySet());
+
+        ranking.sort((a, b) -> Integer.compare(b.getValue(), a.getValue()));
+
+        for (int i = 0; i < Math.min(3, ranking.size()); i++) {
+            Map.Entry<Player, Integer> entry = ranking.get(i);
+            entries.add(new DiscordWebhookManager.TopEntry(
+                    entry.getKey().getName(),
+                    String.valueOf(entry.getValue())
+            ));
+        }
+
+        return entries;
     }
 
     public Set<Player> getCapturedPlayers() {

@@ -2,6 +2,7 @@ package com.absolutgg.absolutevents.eventos;
 
 import com.absolutgg.absolutevents.AbsolutEventsPlugin;
 import com.absolutgg.absolutevents.api.Evento;
+import com.absolutgg.absolutevents.discord.DiscordWebhookManager;
 import com.absolutgg.absolutevents.listeners.eventos.FrogListener;
 import com.absolutgg.absolutevents.utils.ColorUtils;
 import com.absolutgg.absolutevents.utils.Cuboid;
@@ -171,6 +172,11 @@ public final class Frog extends Evento {
                     )
             );
         }
+
+        DiscordWebhookManager.sendPlayerWinner(
+                player.getName(),
+                config.getString("Evento.Title")
+        );
 
         setWinner(player);
         stop();

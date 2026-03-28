@@ -3,6 +3,7 @@ package com.absolutgg.absolutevents.eventos;
 import com.absolutgg.absolutevents.AbsolutEventsPlugin;
 import com.absolutgg.absolutevents.api.Evento;
 import com.absolutgg.absolutevents.api.events.PlayerLoseEvent;
+import com.absolutgg.absolutevents.discord.DiscordWebhookManager;
 import com.absolutgg.absolutevents.listeners.eventos.TDMListener;
 import com.absolutgg.absolutevents.utils.ColorUtils;
 import com.cryptomorin.xseries.XEnchantment;
@@ -451,6 +452,8 @@ public final class TeamDeathmatch extends Evento {
 
         sendTopKills();
 
+        DiscordWebhookManager.sendTeamWinner(teamName, config.getString("Evento.Title"), buildTopEntries());
+
         stop();
 
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
@@ -740,6 +743,24 @@ public final class TeamDeathmatch extends Evento {
                             .replace("@kills3", kills3)
             ));
         }
+    }
+
+    private List<DiscordWebhookManager.TopEntry> buildTopEntries() {
+        if (!config.getBoolean("Top kills.Enabled", true)) {
+            return List.of();
+        }
+
+        List<Map.Entry<Player, Integer>> top = new ArrayList<>(kills.entrySet());
+        top.sort(Comparator.comparingInt((Map.Entry<Player, Integer> e) -> e.getValue()).reversed());
+
+        List<DiscordWebhookManager.TopEntry> entries = new ArrayList<>();
+
+        for (int i = 0; i < Math.min(3, top.size()); i++) {
+            Map.Entry<Player, Integer> entry = top.get(i);
+            entries.add(new DiscordWebhookManager.TopEntry(entry.getKey().getName(), String.valueOf(entry.getValue())));
+        }
+
+        return entries;
     }
 
     private void sendTeamMessage(Player player, String teamName) {

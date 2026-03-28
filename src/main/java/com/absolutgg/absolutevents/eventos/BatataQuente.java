@@ -3,6 +3,7 @@ package com.absolutgg.absolutevents.eventos;
 import com.absolutgg.absolutevents.AbsolutEventsPlugin;
 import com.absolutgg.absolutevents.api.Evento;
 import com.absolutgg.absolutevents.api.events.PlayerLoseEvent;
+import com.absolutgg.absolutevents.discord.DiscordWebhookManager;
 import com.absolutgg.absolutevents.listeners.eventos.BatataQuenteListener;
 import com.absolutgg.absolutevents.utils.ColorUtils;
 import com.cryptomorin.xseries.XMaterial;
@@ -21,7 +22,6 @@ import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitTask;
 
-import java.util.List;
 import java.util.Random;
 
 public final class BatataQuente extends Evento {
@@ -67,6 +67,11 @@ public final class BatataQuente extends Evento {
                             .replace("@name", config.getString("Evento.Title"))
             ));
         }
+
+        DiscordWebhookManager.sendPlayerWinner(
+                player.getName(),
+                config.getString("Evento.Title")
+        );
 
         this.setWinner(player);
 

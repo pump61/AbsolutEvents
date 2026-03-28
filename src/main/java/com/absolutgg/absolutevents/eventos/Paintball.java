@@ -3,6 +3,7 @@ package com.absolutgg.absolutevents.eventos;
 import com.absolutgg.absolutevents.AbsolutEventsPlugin;
 import com.absolutgg.absolutevents.api.Evento;
 import com.absolutgg.absolutevents.api.events.PlayerLoseEvent;
+import com.absolutgg.absolutevents.discord.DiscordWebhookManager;
 import com.absolutgg.absolutevents.listeners.eventos.PaintballListener;
 import com.absolutgg.absolutevents.utils.ColorUtils;
 import net.sacredlabyrinth.phaed.simpleclans.ClanPlayer;
@@ -220,6 +221,12 @@ public final class Paintball extends Evento {
                             .replace("@mvp", mvpName)
             ));
         }
+
+        DiscordWebhookManager.sendTeamWinner(
+                String.join(", ", winnerNames),
+                config.getString("Evento.Title"),
+                buildTopEntries()
+        );
 
         stop();
 
@@ -503,6 +510,23 @@ public final class Paintball extends Evento {
         }
 
         return bestKills;
+    }
+
+    private List<DiscordWebhookManager.TopEntry> buildTopEntries() {
+        List<DiscordWebhookManager.TopEntry> entries = new ArrayList<>();
+        List<HashMap.Entry<Player, Integer>> ranking = new ArrayList<>(kills.entrySet());
+
+        ranking.sort((a, b) -> Integer.compare(b.getValue(), a.getValue()));
+
+        for (int i = 0; i < Math.min(3, ranking.size()); i++) {
+            HashMap.Entry<Player, Integer> entry = ranking.get(i);
+            entries.add(new DiscordWebhookManager.TopEntry(
+                    entry.getKey().getName(),
+                    String.valueOf(entry.getValue())
+            ));
+        }
+
+        return entries;
     }
 
     private void clearTask(BukkitTask task) {

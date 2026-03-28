@@ -2,6 +2,7 @@ package com.absolutgg.absolutevents.eventos;
 
 import com.absolutgg.absolutevents.AbsolutEventsPlugin;
 import com.absolutgg.absolutevents.api.Evento;
+import com.absolutgg.absolutevents.discord.DiscordWebhookManager;
 import com.absolutgg.absolutevents.listeners.eventos.KillerListener;
 import com.absolutgg.absolutevents.utils.ColorUtils;
 import org.bukkit.Bukkit;
@@ -102,6 +103,12 @@ public final class Killer extends Evento {
                             .replace("@winner", player.getName())
             ));
         }
+
+        DiscordWebhookManager.sendPlayerWinner(
+                player.getName(),
+                config.getString("Evento.Title", "Killer"),
+                buildTopEntries()
+        );
 
         sendTopKills();
         stopKeepingWinner(player);
@@ -312,6 +319,23 @@ public final class Killer extends Evento {
 
     private void cancelTask(BukkitTask task) {
         if (task != null) task.cancel();
+    }
+
+    private List<DiscordWebhookManager.TopEntry> buildTopEntries() {
+        List<DiscordWebhookManager.TopEntry> entries = new ArrayList<>();
+        List<Map.Entry<Player, Integer>> ranking = new ArrayList<>(kills.entrySet());
+
+        ranking.sort((a, b) -> Integer.compare(b.getValue(), a.getValue()));
+
+        for (int i = 0; i < Math.min(3, ranking.size()); i++) {
+            Map.Entry<Player, Integer> entry = ranking.get(i);
+            entries.add(new DiscordWebhookManager.TopEntry(
+                    entry.getKey().getName(),
+                    String.valueOf(entry.getValue())
+            ));
+        }
+
+        return entries;
     }
 
     public boolean isPvPEnabled() {

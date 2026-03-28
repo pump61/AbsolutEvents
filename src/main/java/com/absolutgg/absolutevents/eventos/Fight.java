@@ -3,6 +3,7 @@ package com.absolutgg.absolutevents.eventos;
 import com.absolutgg.absolutevents.AbsolutEventsPlugin;
 import com.absolutgg.absolutevents.api.Evento;
 import com.absolutgg.absolutevents.api.events.PlayerLoseEvent;
+import com.absolutgg.absolutevents.discord.DiscordWebhookManager;
 import com.absolutgg.absolutevents.listeners.eventos.FightListener;
 import com.absolutgg.absolutevents.utils.ColorUtils;
 import com.cryptomorin.xseries.XItemStack;
@@ -138,6 +139,11 @@ public final class Fight extends Evento {
                     )
             );
         }
+
+        DiscordWebhookManager.sendPlayerWinner(
+                p.getName(),
+                config.getString("Evento.Title")
+        );
 
         this.setWinner(p);
         this.stop();

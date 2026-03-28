@@ -4,6 +4,7 @@ import com.absolutgg.absolutevents.AbsolutEventsPlugin;
 import com.absolutgg.absolutevents.api.Evento;
 import com.absolutgg.absolutevents.api.events.PlayerJoinEvent;
 import com.absolutgg.absolutevents.api.events.PlayerLoseEvent;
+import com.absolutgg.absolutevents.discord.DiscordWebhookManager;
 import com.absolutgg.absolutevents.hooks.BungeecordHook;
 import com.absolutgg.absolutevents.listeners.eventos.GuerraListener;
 import com.absolutgg.absolutevents.utils.ColorUtils;
@@ -339,6 +340,14 @@ public final class Guerra extends Evento {
                             .replace("@winner", String.join(", ", winnerNames))
                             .replace("@guild", winnerGuild == null ? "" : winnerGuild)
                             .replace("@name", config.getString("Evento.Title"))
+            );
+        }
+
+        if (winnerGuild != null) {
+            DiscordWebhookManager.sendClanWinner(
+                    winnerGuild,
+                    config.getString("Evento.Title"),
+                    buildTopEntries()
             );
         }
 
@@ -730,5 +739,24 @@ public final class Guerra extends Evento {
                         .getString("Messages.Leave", "&c@player saiu do evento.")
                         .replace("@player", player.getName())
         );
+    }
+
+    private List<DiscordWebhookManager.TopEntry> buildTopEntries() {
+        List<DiscordWebhookManager.TopEntry> entries = new ArrayList<>();
+        List<Map.Entry<OfflinePlayer, Integer>> ranking = new ArrayList<>(kills.entrySet());
+
+        ranking.sort((a, b) -> Integer.compare(b.getValue(), a.getValue()));
+
+        for (int i = 0; i < Math.min(3, ranking.size()); i++) {
+            Map.Entry<OfflinePlayer, Integer> entry = ranking.get(i);
+            String name = entry.getKey().getName() == null ? "Desconhecido" : entry.getKey().getName();
+
+            entries.add(new DiscordWebhookManager.TopEntry(
+                    name,
+                    String.valueOf(entry.getValue())
+            ));
+        }
+
+        return entries;
     }
 }

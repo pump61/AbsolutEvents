@@ -3,6 +3,7 @@ package com.absolutgg.absolutevents.eventos;
 import com.absolutgg.absolutevents.AbsolutEventsPlugin;
 import com.absolutgg.absolutevents.api.Evento;
 import com.absolutgg.absolutevents.api.events.PlayerLoseEvent;
+import com.absolutgg.absolutevents.discord.DiscordWebhookManager;
 import com.absolutgg.absolutevents.listeners.eventos.NexusListener;
 import com.absolutgg.absolutevents.utils.ColorUtils;
 import com.cryptomorin.xseries.XItemStack;
@@ -14,8 +15,8 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EnderCrystal;
 import org.bukkit.entity.Entity;
@@ -451,6 +452,12 @@ public final class Nexus extends Evento {
                             .replace("@name", config.getString("Evento.Title"))
             ));
         }
+
+        DiscordWebhookManager.sendTeamWinner(
+                team.equalsIgnoreCase("blue") ? blueName : redName,
+                config.getString("Evento.Title"),
+                buildTopEntries()
+        );
 
         stop();
 
@@ -1300,6 +1307,22 @@ public final class Nexus extends Evento {
         }
 
         return new Location(w, x, y, z);
+    }
+
+    private List<DiscordWebhookManager.TopEntry> buildTopEntries() {
+        List<DiscordWebhookManager.TopEntry> list = new ArrayList<>();
+
+        kills.entrySet().stream()
+                .sorted((a, b) -> Integer.compare(b.getValue(), a.getValue()))
+                .limit(3)
+                .forEach(entry -> list.add(
+                        new DiscordWebhookManager.TopEntry(
+                                entry.getKey().getName(),
+                                String.valueOf(entry.getValue())
+                        )
+                ));
+
+        return list;
     }
 
     public HashMap<Player, Integer> getBlueTeam() {

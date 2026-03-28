@@ -3,6 +3,7 @@ package com.absolutgg.absolutevents.eventos;
 import com.absolutgg.absolutevents.AbsolutEventsPlugin;
 import com.absolutgg.absolutevents.api.Evento;
 import com.absolutgg.absolutevents.api.events.PlayerLoseEvent;
+import com.absolutgg.absolutevents.discord.DiscordWebhookManager;
 import com.absolutgg.absolutevents.listeners.eventos.QuizListener;
 import com.absolutgg.absolutevents.utils.ColorUtils;
 import com.absolutgg.absolutevents.utils.Cuboid;
@@ -204,6 +205,8 @@ public final class Quiz extends Evento {
             ));
         }
 
+        DiscordWebhookManager.sendPlayerWinner(player.getName(), config.getString("Evento.Title"));
+
         setWinner(player);
         stop();
 
@@ -237,6 +240,8 @@ public final class Quiz extends Evento {
                             .replace("@name", config.getString("Evento.Title"))
             ));
         }
+
+        DiscordWebhookManager.sendTeamWinner(String.join(", ", winners), config.getString("Evento.Title"), List.of());
 
         stop();
 

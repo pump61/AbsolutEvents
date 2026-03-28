@@ -3,6 +3,7 @@ package com.absolutgg.absolutevents.eventos;
 import com.absolutgg.absolutevents.AbsolutEventsPlugin;
 import com.absolutgg.absolutevents.api.Evento;
 import com.absolutgg.absolutevents.api.events.PlayerLoseEvent;
+import com.absolutgg.absolutevents.discord.DiscordWebhookManager;
 import com.absolutgg.absolutevents.listeners.eventos.CampoMinadoListener;
 import com.absolutgg.absolutevents.utils.ColorUtils;
 import com.absolutgg.absolutevents.utils.Cuboid;
@@ -131,6 +132,21 @@ public final class CampoMinado extends Evento {
                             .replace("@winner", String.join(", ", winners))
                             .replace("@name", config.getString("Evento.Title"))
             ));
+        }
+
+        if (!winnersList.isEmpty()) {
+            if (winnersList.size() == 1) {
+                DiscordWebhookManager.sendPlayerWinner(
+                        winnersList.get(0).getName(),
+                        config.getString("Evento.Title")
+                );
+            } else {
+                DiscordWebhookManager.sendTeamWinner(
+                        String.join(", ", winners),
+                        config.getString("Evento.Title"),
+                        List.of()
+                );
+            }
         }
 
         this.stop();

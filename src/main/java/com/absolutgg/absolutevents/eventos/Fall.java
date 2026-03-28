@@ -2,6 +2,7 @@ package com.absolutgg.absolutevents.eventos;
 
 import com.absolutgg.absolutevents.AbsolutEventsPlugin;
 import com.absolutgg.absolutevents.api.Evento;
+import com.absolutgg.absolutevents.discord.DiscordWebhookManager;
 import com.absolutgg.absolutevents.listeners.eventos.FallListener;
 import com.absolutgg.absolutevents.utils.ColorUtils;
 import org.bukkit.Bukkit;
@@ -244,6 +245,14 @@ public final class Fall extends Evento {
                 executeConsoleCommand(player, command.replace("@winner", player.getName()));
             }
             winners.add(player.getName());
+        }
+
+        if (!winnersList.isEmpty()) {
+            DiscordWebhookManager.sendTeamWinner(
+                    String.join(", ", winners),
+                    config.getString("Evento.Title"),
+                    List.of()
+            );
         }
 
         for (String message : config.getStringList("Messages.Winner")) {

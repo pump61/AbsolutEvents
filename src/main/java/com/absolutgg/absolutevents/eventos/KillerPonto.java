@@ -3,6 +3,7 @@ package com.absolutgg.absolutevents.eventos;
 import com.absolutgg.absolutevents.AbsolutEventsPlugin;
 import com.absolutgg.absolutevents.api.Evento;
 import com.absolutgg.absolutevents.api.events.PlayerLoseEvent;
+import com.absolutgg.absolutevents.discord.DiscordWebhookManager;
 import com.absolutgg.absolutevents.listeners.eventos.KillerPontoListener;
 import com.absolutgg.absolutevents.utils.ColorUtils;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
@@ -198,10 +199,16 @@ public final class KillerPonto extends Evento {
         for (String message : config.getStringList("Messages.Winner")) {
             Bukkit.broadcastMessage(ColorUtils.colorize(
                     message
-                            .replace("@name", config.getString("Evento.Title"))
+                            .replace("@name", config.getString("Evento.Title", "KillerPonto"))
                             .replace("@winner", player.getName())
             ));
         }
+
+        DiscordWebhookManager.sendPlayerWinner(
+                player.getName(),
+                config.getString("Evento.Title", "KillerPonto"),
+                buildTopEntries()
+        );
 
         for (String command : config.getStringList("Rewards.Commands")) {
             executeConsoleCommand(player, command.replace("@winner", player.getName()));
@@ -428,6 +435,23 @@ public final class KillerPonto extends Evento {
 
     private int getAliveCount() {
         return Math.max(0, getPlayers().size() - deadPlayers.size());
+    }
+
+    private List<DiscordWebhookManager.TopEntry> buildTopEntries() {
+        List<DiscordWebhookManager.TopEntry> entries = new ArrayList<>();
+        List<Map.Entry<Player, Integer>> ranking = new ArrayList<>(kills.entrySet());
+
+        ranking.sort((a, b) -> Integer.compare(b.getValue(), a.getValue()));
+
+        for (int i = 0; i < Math.min(3, ranking.size()); i++) {
+            Map.Entry<Player, Integer> entry = ranking.get(i);
+            entries.add(new DiscordWebhookManager.TopEntry(
+                    entry.getKey().getName(),
+                    String.valueOf(entry.getValue())
+            ));
+        }
+
+        return entries;
     }
 
     public int getHearts() {

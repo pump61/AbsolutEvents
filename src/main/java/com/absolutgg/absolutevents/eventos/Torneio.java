@@ -2,6 +2,7 @@ package com.absolutgg.absolutevents.eventos;
 
 import com.absolutgg.absolutevents.AbsolutEventsPlugin;
 import com.absolutgg.absolutevents.api.Evento;
+import com.absolutgg.absolutevents.discord.DiscordWebhookManager;
 import com.absolutgg.absolutevents.listeners.eventos.TorneioListener;
 import com.absolutgg.absolutevents.utils.ColorUtils;
 import com.cryptomorin.xseries.XItemStack;
@@ -433,6 +434,8 @@ public final class Torneio extends Evento {
                     )
             );
         }
+
+        DiscordWebhookManager.sendPlayerWinner(player.getName(), config.getString("Evento.Title"));
 
         this.setWinner(player);
         this.stop();

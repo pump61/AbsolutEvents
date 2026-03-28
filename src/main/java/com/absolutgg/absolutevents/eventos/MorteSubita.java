@@ -3,10 +3,11 @@ package com.absolutgg.absolutevents.eventos;
 import com.absolutgg.absolutevents.AbsolutEventsPlugin;
 import com.absolutgg.absolutevents.api.Evento;
 import com.absolutgg.absolutevents.api.events.PlayerLoseEvent;
+import com.absolutgg.absolutevents.discord.DiscordWebhookManager;
 import com.absolutgg.absolutevents.listeners.eventos.MorteSubitaListener;
-import com.absolutgg.absolutevents.utils.ColorUtils;
 import com.cryptomorin.xseries.XEnchantment;
 import com.cryptomorin.xseries.XMaterial;
+import com.iridium.iridiumcolorapi.IridiumColorAPI;
 import net.sacredlabyrinth.phaed.simpleclans.ClanPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
@@ -152,8 +153,9 @@ public final class MorteSubita extends Evento {
 
     private void sendTeamMessage(Player player, String teamName) {
         for (String message : config.getStringList("Messages.Team")) {
-            player.sendMessage(ColorUtils.colorize(
-                    message.replace("@name", config.getString("Evento.Title"))
+            player.sendMessage(IridiumColorAPI.process(
+                    message.replace("&", "§")
+                            .replace("@name", config.getString("Evento.Title"))
                             .replace("@team", teamName)
                             .replace("@time", String.valueOf(startTime))
             ));
@@ -183,9 +185,8 @@ public final class MorteSubita extends Evento {
             pvpEnabled = true;
 
             for (String message : config.getStringList("Messages.Enabled")) {
-                sendToEvent(
-                        message.replace("@name", config.getString("Evento.Title"))
-                );
+                sendToEvent(message.replace("&", "§")
+                        .replace("@name", config.getString("Evento.Title")));
             }
         }, startTime * 20L);
     }
@@ -197,9 +198,10 @@ public final class MorteSubita extends Evento {
             return;
         }
 
-        String leaveMessage = ColorUtils.colorize(
+        String leaveMessage = IridiumColorAPI.process(
                 plugin.getConfig()
                         .getString("Messages.Leave", "&c@player saiu do evento.")
+                        .replace("&", "§")
                         .replace("@player", player.getName())
         );
 
@@ -267,8 +269,9 @@ public final class MorteSubita extends Evento {
         victim.setFoodLevel(20);
 
         for (String message : config.getStringList("Messages.Eliminado")) {
-            victim.sendMessage(ColorUtils.colorize(
-                    message.replace("@name", config.getString("Evento.Title"))
+            victim.sendMessage(IridiumColorAPI.process(
+                    message.replace("&", "§")
+                            .replace("@name", config.getString("Evento.Title"))
                             .replace("@killer", killer.getName())
             ));
         }
@@ -316,12 +319,15 @@ public final class MorteSubita extends Evento {
         }
 
         for (String message : config.getStringList("Messages.Winner")) {
-            plugin.getServer().broadcastMessage(ColorUtils.colorize(
-                    message.replace("@team", teamName)
+            plugin.getServer().broadcastMessage(IridiumColorAPI.process(
+                    message.replace("&", "§")
+                            .replace("@team", teamName)
                             .replace("@winner", String.join(", ", winnerNames))
                             .replace("@name", config.getString("Evento.Title"))
             ));
         }
+
+        DiscordWebhookManager.sendTeamWinner(teamName, config.getString("Evento.Title"), List.of());
 
         setWinners(new HashSet<>(winners));
 
@@ -407,7 +413,7 @@ public final class MorteSubita extends Evento {
     }
 
     private void sendToEvent(String message) {
-        String parsed = ColorUtils.colorize(message);
+        String parsed = IridiumColorAPI.process(message);
 
         for (Player player : getPlayers()) {
             player.sendMessage(parsed);
@@ -416,6 +422,10 @@ public final class MorteSubita extends Evento {
         for (Player player : getSpectators()) {
             player.sendMessage(parsed);
         }
+    }
+
+    public boolean isPvpEnabled() {
+        return pvpEnabled;
     }
 
     public List<Player> getBlueTeam() {
@@ -428,10 +438,6 @@ public final class MorteSubita extends Evento {
 
     public double getHeartsAdded() {
         return heartsAdded;
-    }
-
-    public boolean isPvpEnabled() {
-        return pvpEnabled;
     }
 
     @Override

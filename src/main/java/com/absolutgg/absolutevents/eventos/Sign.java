@@ -2,6 +2,7 @@ package com.absolutgg.absolutevents.eventos;
 
 import com.absolutgg.absolutevents.AbsolutEventsPlugin;
 import com.absolutgg.absolutevents.api.Evento;
+import com.absolutgg.absolutevents.discord.DiscordWebhookManager;
 import com.absolutgg.absolutevents.listeners.eventos.SignListener;
 import com.absolutgg.absolutevents.managers.ParkourRecordManager;
 import com.absolutgg.absolutevents.utils.ColorUtils;
@@ -118,6 +119,8 @@ public final class Sign extends Evento {
                     )
             );
         }
+
+        DiscordWebhookManager.sendPlayerWinner(player.getName(), getConfig().getString("Evento.Title"));
 
         setWinner(player);
         stop();

@@ -5,6 +5,7 @@ import com.absolutgg.absolutevents.api.Evento;
 import com.absolutgg.absolutevents.api.EventoType;
 import com.absolutgg.absolutevents.api.events.PlayerJoinEvent;
 import com.absolutgg.absolutevents.api.events.PlayerLoseEvent;
+import com.absolutgg.absolutevents.discord.DiscordWebhookManager;
 import com.absolutgg.absolutevents.listeners.eventos.BattleRoyaleListener;
 import com.absolutgg.absolutevents.utils.ColorUtils;
 import com.absolutgg.absolutevents.utils.Cuboid;
@@ -310,6 +311,12 @@ public final class BattleRoyale extends Evento {
                             .replace("@name", config.getString("Evento.Title"))
             ));
         }
+
+        DiscordWebhookManager.sendPlayerWinner(
+                player.getName(),
+                config.getString("Evento.Title"),
+                buildTopEntries()
+        );
 
         this.setWinner(player);
         this.stop();
@@ -1042,6 +1049,27 @@ public final class BattleRoyale extends Evento {
         if (task != null) {
             task.cancel();
         }
+    }
+
+    private List<DiscordWebhookManager.TopEntry> buildTopEntries() {
+        List<DiscordWebhookManager.TopEntry> entries = new ArrayList<>();
+        List<Map.Entry<Player, Integer>> ranking = new ArrayList<>(kills.entrySet());
+
+        ranking.sort((a, b) -> Integer.compare(b.getValue(), a.getValue()));
+
+        for (int i = 0; i < Math.min(3, ranking.size()); i++) {
+            Map.Entry<Player, Integer> entry = ranking.get(i);
+            if (entry.getKey() == null) {
+                continue;
+            }
+
+            entries.add(new DiscordWebhookManager.TopEntry(
+                    Objects.requireNonNullElse(entry.getKey().getName(), "Desconhecido"),
+                    String.valueOf(entry.getValue())
+            ));
+        }
+
+        return entries;
     }
 
     @Override
