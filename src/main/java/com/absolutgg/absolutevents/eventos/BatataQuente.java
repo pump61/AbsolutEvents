@@ -16,15 +16,18 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
-import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.FireworkMeta;
+import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitTask;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 public final class BatataQuente extends Evento {
+
+    private final AbsolutEventsPlugin plugin = AbsolutEventsPlugin.getInstance();
 
     private final YamlConfiguration config;
     private final BatataQuenteListener listener = new BatataQuenteListener();
@@ -46,13 +49,13 @@ public final class BatataQuente extends Evento {
 
     @Override
     public void start() {
-        AbsolutEventsPlugin.getInstance().getServer().getPluginManager().registerEvents(listener, AbsolutEventsPlugin.getInstance());
+        plugin.getServer().getPluginManager().registerEvents(listener, plugin);
         listener.setEvento();
 
-        for (Player player : getPlayers()) {
+        for (Player player : new ArrayList<>(getPlayers())) {
             resetPlayerState(player);
             clearPlayerInventory(player);
-            resyncPlayer(player);
+            syncPlayer(player);
         }
 
         randomHolder();
@@ -60,25 +63,28 @@ public final class BatataQuente extends Evento {
 
     @Override
     public void winner(Player player) {
+        if (player == null) {
+            return;
+        }
+
         for (String message : this.config.getStringList("Messages.Winner")) {
-            AbsolutEventsPlugin.getInstance().getServer().broadcastMessage(ColorUtils.colorize(
+            plugin.getServer().broadcastMessage(ColorUtils.colorize(
                     message
                             .replace("@winner", player.getName())
-                            .replace("@name", config.getString("Evento.Title"))
+                            .replace("@name", config.getString("Evento.Title", "Batata Quente"))
             ));
         }
 
         DiscordWebhookManager.sendPlayerWinner(
                 player.getName(),
-                config.getString("Evento.Title")
+                config.getString("Evento.Title", "Batata Quente")
         );
 
         this.setWinner(player);
-
         this.stop();
 
         Bukkit.getScheduler().runTaskLater(
-                AbsolutEventsPlugin.getInstance(),
+                plugin,
                 () -> {
                     if (!player.isOnline()) {
                         return;
@@ -99,15 +105,15 @@ public final class BatataQuente extends Evento {
         cancelTask(countdownTask);
         cancelTask(explodeTask);
 
-        for (Player player : getPlayers()) {
+        for (Player player : new ArrayList<>(getPlayers())) {
             resetPlayerState(player);
             clearPlayerInventory(player);
-            resyncPlayer(player);
+            syncPlayer(player);
         }
 
-        for (Player player : getSpectators()) {
+        for (Player player : new ArrayList<>(getSpectators())) {
             resetPlayerState(player);
-            resyncPlayer(player);
+            syncPlayer(player);
         }
 
         potatoHolder = null;
@@ -128,20 +134,20 @@ public final class BatataQuente extends Evento {
                             .replace("@player", player.getName())
             );
 
-            for (Player online : getPlayers()) {
+            for (Player online : new ArrayList<>(getPlayers())) {
                 online.sendMessage(leaveMessage);
             }
 
-            for (Player online : getSpectators()) {
+            for (Player online : new ArrayList<>(getSpectators())) {
                 online.sendMessage(leaveMessage);
             }
         }
 
-        boolean wasHolder = (potatoHolder == player);
+        boolean wasHolder = potatoHolder != null && potatoHolder.getUniqueId().equals(player.getUniqueId());
 
         clearPlayerInventory(player);
         resetPlayerState(player);
-        resyncPlayer(player);
+        syncPlayer(player);
 
         if (wasHolder) {
             potatoHolder = null;
@@ -163,7 +169,7 @@ public final class BatataQuente extends Evento {
             return;
         }
 
-        if (getPlayers().size() <= 0) {
+        if (getPlayers().isEmpty()) {
             stop();
             return;
         }
@@ -173,7 +179,7 @@ public final class BatataQuente extends Evento {
             return;
         }
 
-        if (wasHolder && getPlayers().size() > 1) {
+        if (wasHolder) {
             randomHolder();
         }
     }
@@ -201,90 +207,97 @@ public final class BatataQuente extends Evento {
             return;
         }
 
-        if (player == null || !getPlayers().contains(player)) {
+        if (player == null || !player.isOnline() || !getPlayers().contains(player)) {
             return;
         }
 
         cancelTask(countdownTask);
         cancelTask(explodeTask);
 
-        if (potatoHolder != null && potatoHolder != player) {
-            clearPlayerInventory(potatoHolder);
-            resetPlayerState(potatoHolder);
-            resyncPlayer(potatoHolder);
+        Player previousHolder = this.potatoHolder;
+
+        if (previousHolder != null
+                && previousHolder.isOnline()
+                && !previousHolder.getUniqueId().equals(player.getUniqueId())) {
+            clearPlayerInventory(previousHolder);
+            resetPlayerState(previousHolder);
+            syncPlayer(previousHolder);
         }
 
-        potatoHolder = player;
-        potatoHolderChanges++;
+        this.potatoHolder = player;
+        this.potatoHolderChanges++;
 
-        resetPlayerState(potatoHolder);
-        clearPlayerInventory(potatoHolder);
+        resetPlayerState(this.potatoHolder);
+        clearPlayerInventory(this.potatoHolder);
 
-        potatoHolder.getInventory().setHelmet(new ItemStack(Material.TNT, 1));
+        this.potatoHolder.getInventory().setHelmet(new ItemStack(Material.TNT, 1));
+
         ItemStack potato = XMaterial.POTATO.parseItem();
         if (potato != null) {
             for (int i = 0; i < 9; i++) {
-                potatoHolder.getInventory().setItem(i, potato.clone());
+                this.potatoHolder.getInventory().setItem(i, potato.clone());
             }
         }
-        potatoHolder.updateInventory();
 
-        resyncPlayer(potatoHolder);
+        syncPlayer(this.potatoHolder);
 
-        Location location = potatoHolder.getLocation();
-        Firework firework = potatoHolder.getWorld().spawn(location, Firework.class);
+        Location location = this.potatoHolder.getLocation();
+        Firework firework = this.potatoHolder.getWorld().spawn(location, Firework.class);
         FireworkMeta meta = firework.getFireworkMeta();
         meta.addEffects(FireworkEffect.builder()
                 .withColor(Color.RED)
                 .with(FireworkEffect.Type.BALL)
                 .build());
-        meta.setPower(2);
+        meta.setPower(1);
         firework.setFireworkMeta(meta);
 
-        for (Player online : getPlayers()) {
+        for (Player online : new ArrayList<>(getPlayers())) {
             for (String message : config.getStringList("Messages.Potato")) {
                 online.sendMessage(ColorUtils.colorize(
                         message
-                                .replace("@player", potatoHolder.getName())
-                                .replace("@name", this.config.getString("Evento.Title"))
+                                .replace("@player", this.potatoHolder.getName())
+                                .replace("@name", this.config.getString("Evento.Title", "Batata Quente"))
                 ));
             }
         }
 
-        for (Player online : getSpectators()) {
+        for (Player online : new ArrayList<>(getSpectators())) {
             for (String message : config.getStringList("Messages.Potato")) {
                 online.sendMessage(ColorUtils.colorize(
                         message
-                                .replace("@player", potatoHolder.getName())
-                                .replace("@name", this.config.getString("Evento.Title"))
+                                .replace("@player", this.potatoHolder.getName())
+                                .replace("@name", this.config.getString("Evento.Title", "Batata Quente"))
                 ));
             }
         }
 
-        potatoHolder.sendMessage(ColorUtils.colorize(
+        this.potatoHolder.sendMessage(ColorUtils.colorize(
                 config.getString("Messages.Potato holder", "&cVocê está com a batata por @time segundos!")
                         .replace("@time", String.valueOf(maxTime))
-                        .replace("@name", this.config.getString("Evento.Title"))
+                        .replace("@name", this.config.getString("Evento.Title", "Batata Quente"))
         ));
 
-        int holderState = potatoHolderChanges;
+        final int holderState = this.potatoHolderChanges;
 
         countdownTask = Bukkit.getScheduler().runTaskTimer(
-                AbsolutEventsPlugin.getInstance(),
+                plugin,
                 new Runnable() {
                     int run = 5;
 
                     @Override
                     public void run() {
-                        if (!isHappening() || potatoHolder == null || potatoHolderChanges != holderState || run <= 0) {
+                        if (!isHappening()
+                                || potatoHolder == null
+                                || potatoHolderChanges != holderState
+                                || run <= 0) {
                             cancelTask(countdownTask);
                             return;
                         }
 
                         potatoHolder.sendMessage(ColorUtils.colorize(
-                                config.getString("Messages.Potato explode", "&cA batata explode em @time...")
+                                config.getString("Messages.Countdown", "&cA batata explode em @time...")
                                         .replace("@time", String.valueOf(run))
-                                        .replace("@name", config.getString("Evento.Title"))
+                                        .replace("@name", config.getString("Evento.Title", "Batata Quente"))
                         ));
 
                         run--;
@@ -295,7 +308,7 @@ public final class BatataQuente extends Evento {
         );
 
         explodeTask = Bukkit.getScheduler().runTaskLater(
-                AbsolutEventsPlugin.getInstance(),
+                plugin,
                 () -> {
                     if (!isHappening()) {
                         return;
@@ -323,7 +336,7 @@ public final class BatataQuente extends Evento {
 
                     clearPlayerInventory(eliminated);
                     resetPlayerState(eliminated);
-                    resyncPlayer(eliminated);
+                    syncPlayer(eliminated);
 
                     remove(eliminated);
 
@@ -367,6 +380,10 @@ public final class BatataQuente extends Evento {
             return;
         }
 
+        for (PotionEffect effect : new ArrayList<>(player.getActivePotionEffects())) {
+            player.removePotionEffect(effect.getType());
+        }
+
         player.removePotionEffect(PotionEffectType.SLOWNESS);
         player.removePotionEffect(PotionEffectType.BLINDNESS);
         player.removePotionEffect(PotionEffectType.JUMP_BOOST);
@@ -381,22 +398,12 @@ public final class BatataQuente extends Evento {
         }
     }
 
-    private void resyncPlayer(Player player) {
+    private void syncPlayer(Player player) {
         if (player == null || !player.isOnline()) {
             return;
         }
 
-        player.teleport(player.getLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN);
-
-        Bukkit.getScheduler().runTaskLater(
-                AbsolutEventsPlugin.getInstance(),
-                () -> {
-                    if (player.isOnline()) {
-                        player.teleport(player.getLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN);
-                    }
-                },
-                1L
-        );
+        player.updateInventory();
     }
 
     private void cancelTask(BukkitTask task) {
@@ -411,5 +418,9 @@ public final class BatataQuente extends Evento {
 
     public int getPotatoHolderChanges() {
         return potatoHolderChanges;
+    }
+
+    public YamlConfiguration getConfig() {
+        return config;
     }
 }

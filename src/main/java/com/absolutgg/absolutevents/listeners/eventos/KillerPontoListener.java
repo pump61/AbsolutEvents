@@ -2,11 +2,14 @@ package com.absolutgg.absolutevents.listeners.eventos;
 
 import com.absolutgg.absolutevents.AbsolutEventsPlugin;
 import com.absolutgg.absolutevents.eventos.KillerPonto;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
@@ -15,8 +18,8 @@ public final class KillerPontoListener implements Listener {
 
     private KillerPonto evento;
 
-    @EventHandler(priority = EventPriority.LOWEST)
-    public void onDamage(EntityDamageByEntityEvent event) {
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onDamageByEntity(EntityDamageByEntityEvent event) {
         KillerPonto killerPonto = getEvento();
         if (killerPonto == null) {
             return;
@@ -26,7 +29,8 @@ public final class KillerPontoListener implements Listener {
             return;
         }
 
-        if (!(event.getDamager() instanceof Player attacker)) {
+        Player attacker = getDamager(event);
+        if (attacker == null) {
             return;
         }
 
@@ -44,10 +48,56 @@ public final class KillerPontoListener implements Listener {
                 || killerPonto.getDeadPlayers().contains(damaged)
                 || killerPonto.getDeadPlayers().contains(attacker)) {
             event.setCancelled(true);
+            return;
         }
+
+        if ((damaged.getHealth() - event.getFinalDamage()) > 0.0D) {
+            return;
+        }
+
+        event.setCancelled(true);
+
+        healKiller(attacker, killerPonto);
+        preparePlayer(damaged);
+        killerPonto.eliminate(damaged, attacker);
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onDamage(EntityDamageEvent event) {
+        KillerPonto killerPonto = getEvento();
+        if (killerPonto == null) {
+            return;
+        }
+
+        if (!(event.getEntity() instanceof Player player)) {
+            return;
+        }
+
+        if (!killerPonto.getPlayers().contains(player)) {
+            return;
+        }
+
+        if (event instanceof EntityDamageByEntityEvent) {
+            return;
+        }
+
+        if (killerPonto.getInvinciblePlayers().contains(player)
+                || killerPonto.getDeadPlayers().contains(player)) {
+            event.setCancelled(true);
+            return;
+        }
+
+        if ((player.getHealth() - event.getFinalDamage()) > 0.0D) {
+            return;
+        }
+
+        event.setCancelled(true);
+
+        preparePlayer(player);
+        killerPonto.eliminate(player, null);
+    }
+
+    @EventHandler(priority = EventPriority.LOW)
     public void onDeath(PlayerDeathEvent event) {
         KillerPonto killerPonto = getEvento();
         if (killerPonto == null) {
@@ -59,21 +109,11 @@ public final class KillerPontoListener implements Listener {
             return;
         }
 
-        Player killer = victim.getKiller();
-        if (killer == null || !killerPonto.getPlayers().contains(killer)) {
-            return;
-        }
-
-        double newHealth = Math.min(killer.getMaxHealth(), killer.getHealth() + killerPonto.getHearts());
-        killer.setHealth(newHealth);
-
-        event.setCancelled(true);
-        event.setKeepInventory(true);
         event.getDrops().clear();
         event.setDroppedExp(0);
+        event.setKeepInventory(true);
         event.setKeepLevel(true);
-
-        killerPonto.eliminate(victim, killer);
+        event.setDeathMessage(null);
     }
 
     @EventHandler
@@ -106,6 +146,41 @@ public final class KillerPontoListener implements Listener {
         }
 
         event.setCancelled(true);
+    }
+
+    private void healKiller(Player killer, KillerPonto killerPonto) {
+        double maxHealth = 20.0D;
+        if (killer.getAttribute(Attribute.MAX_HEALTH) != null) {
+            maxHealth = killer.getAttribute(Attribute.MAX_HEALTH).getValue();
+        }
+
+        double newHealth = Math.min(maxHealth, killer.getHealth() + killerPonto.getHearts());
+        killer.setHealth(Math.max(1.0D, newHealth));
+    }
+
+    private void preparePlayer(Player player) {
+        double maxHealth = 20.0D;
+        if (player.getAttribute(Attribute.MAX_HEALTH) != null) {
+            maxHealth = player.getAttribute(Attribute.MAX_HEALTH).getValue();
+        }
+
+        player.setHealth(Math.max(1.0D, maxHealth));
+        player.setFoodLevel(20);
+        player.setFireTicks(0);
+        player.setFallDistance(0.0F);
+    }
+
+    private Player getDamager(EntityDamageByEntityEvent event) {
+        if (event.getDamager() instanceof Player player) {
+            return player;
+        }
+
+        if (event.getDamager() instanceof Projectile projectile
+                && projectile.getShooter() instanceof Player shooter) {
+            return shooter;
+        }
+
+        return null;
     }
 
     public void setEvento() {

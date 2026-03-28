@@ -3,6 +3,7 @@ package com.absolutgg.absolutevents.listeners.eventos;
 import com.absolutgg.absolutevents.AbsolutEventsPlugin;
 import com.absolutgg.absolutevents.eventos.BatataQuente;
 import com.cryptomorin.xseries.XMaterial;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -30,11 +31,20 @@ public final class BatataQuenteListener implements Listener {
             return;
         }
 
-        if (batataQuente.getPotatoHolder() != damager) {
+        if (batataQuente.getPotatoHolder() == null) {
             return;
         }
 
-        if (damager.getInventory().getItemInMainHand().getType() != XMaterial.POTATO.parseMaterial()) {
+        if (!batataQuente.getPotatoHolder().getUniqueId().equals(damager.getUniqueId())) {
+            return;
+        }
+
+        Material potatoType = XMaterial.POTATO.parseMaterial();
+        if (potatoType == null) {
+            potatoType = Material.POTATO;
+        }
+
+        if (damager.getInventory().getItemInMainHand().getType() != potatoType) {
             return;
         }
 

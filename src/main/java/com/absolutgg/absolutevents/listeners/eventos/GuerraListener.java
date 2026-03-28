@@ -8,14 +8,15 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 
 public final class GuerraListener implements Listener {
 
     private Guerra evento;
 
-    @EventHandler(priority = EventPriority.LOWEST)
-    public void onDamage(EntityDamageByEntityEvent event) {
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onDamageByEntity(EntityDamageByEntityEvent event) {
         Guerra guerra = getEvento();
         if (guerra == null) {
             return;
@@ -25,14 +26,7 @@ public final class GuerraListener implements Listener {
             return;
         }
 
-        Player damager = null;
-
-        if (event.getDamager() instanceof Player playerDamager) {
-            damager = playerDamager;
-        } else if (event.getDamager() instanceof Projectile projectile
-                && projectile.getShooter() instanceof Player playerShooter) {
-            damager = playerShooter;
-        }
+        Player damager = getDamager(event);
 
         if (damager == null) {
             return;
@@ -49,10 +43,56 @@ public final class GuerraListener implements Listener {
 
         if (!guerra.isPvPEnabled()) {
             event.setCancelled(true);
+            return;
         }
+
+        if ((damaged.getHealth() - event.getFinalDamage()) > 0.0D) {
+            return;
+        }
+
+        event.setCancelled(true);
+
+        guerra.getKills().merge(damager, 1, Integer::sum);
+
+        preparePlayer(damaged);
+        guerra.eliminate(damaged);
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onDamage(EntityDamageEvent event) {
+        Guerra guerra = getEvento();
+        if (guerra == null) {
+            return;
+        }
+
+        if (!(event.getEntity() instanceof Player player)) {
+            return;
+        }
+
+        if (guerra.getSpectators().contains(player)) {
+            event.setCancelled(true);
+            return;
+        }
+
+        if (!guerra.getPlayers().contains(player)) {
+            return;
+        }
+
+        if (event instanceof EntityDamageByEntityEvent) {
+            return;
+        }
+
+        if ((player.getHealth() - event.getFinalDamage()) > 0.0D) {
+            return;
+        }
+
+        event.setCancelled(true);
+
+        preparePlayer(player);
+        guerra.eliminate(player);
+    }
+
+    @EventHandler(priority = EventPriority.LOW)
     public void onDeath(PlayerDeathEvent event) {
         Guerra guerra = getEvento();
         if (guerra == null) {
@@ -61,17 +101,39 @@ public final class GuerraListener implements Listener {
 
         Player dead = event.getEntity();
 
-        if (!guerra.getPlayers().contains(dead)) {
+        if (!guerra.getPlayers().contains(dead) && !guerra.getSpectators().contains(dead)) {
             return;
         }
 
-        Player killer = dead.getKiller();
+        event.getDrops().clear();
+        event.setDroppedExp(0);
+        event.setKeepInventory(true);
+        event.setKeepLevel(true);
+        event.setDeathMessage(null);
+    }
 
-        if (killer != null) {
-            guerra.getKills().merge(killer, 1, Integer::sum);
+    private void preparePlayer(Player player) {
+        double maxHealth = player.getAttribute(org.bukkit.attribute.Attribute.MAX_HEALTH) != null
+                ? player.getAttribute(org.bukkit.attribute.Attribute.MAX_HEALTH).getValue()
+                : 20.0D;
+
+        player.setHealth(Math.max(1.0D, Math.min(maxHealth, maxHealth)));
+        player.setFoodLevel(20);
+        player.setFireTicks(0);
+        player.setFallDistance(0.0F);
+    }
+
+    private Player getDamager(EntityDamageByEntityEvent event) {
+        if (event.getDamager() instanceof Player player) {
+            return player;
         }
 
-        guerra.eliminate(dead);
+        if (event.getDamager() instanceof Projectile projectile
+                && projectile.getShooter() instanceof Player shooter) {
+            return shooter;
+        }
+
+        return null;
     }
 
     public void setEvento() {

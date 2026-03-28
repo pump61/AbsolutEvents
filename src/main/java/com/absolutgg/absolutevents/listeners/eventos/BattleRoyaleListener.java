@@ -5,17 +5,22 @@ import com.absolutgg.absolutevents.eventos.BattleRoyale;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockBurnEvent;
+import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.block.BlockIgniteEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerBucketEmptyEvent;
+import org.bukkit.event.player.PlayerBucketFillEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 
 public final class BattleRoyaleListener implements Listener {
@@ -42,15 +47,10 @@ public final class BattleRoyaleListener implements Listener {
             return;
         }
 
-        // impede morte real por PvP
         if ((damaged.getHealth() - event.getFinalDamage()) <= 0.0D) {
             event.setCancelled(true);
 
-            Player killer = null;
-            if (event.getDamager() instanceof Player player) {
-                killer = player;
-            }
-
+            Player killer = getDamager(event);
             br.eliminate(damaged, killer);
         }
     }
@@ -70,12 +70,10 @@ public final class BattleRoyaleListener implements Listener {
             return;
         }
 
-        // PvP já é tratado em outro evento
         if (event instanceof EntityDamageByEntityEvent) {
             return;
         }
 
-        // impede morte real por qualquer outra fonte
         if ((player.getHealth() - event.getFinalDamage()) <= 0.0D) {
             event.setCancelled(true);
             br.eliminate(player);
@@ -95,7 +93,6 @@ public final class BattleRoyaleListener implements Listener {
             return;
         }
 
-        // segurança extra caso algo passe pelas checagens de dano
         event.setCancelled(true);
         event.getDrops().clear();
         event.setDroppedExp(0);
@@ -105,54 +102,47 @@ public final class BattleRoyaleListener implements Listener {
         br.eliminate(player, player.getKiller());
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onPlace(BlockPlaceEvent event) {
-        if (event.isCancelled()) {
-            return;
-        }
-
         BattleRoyale br = getEvento();
         if (br == null) {
             return;
         }
 
         Player player = event.getPlayer();
-
         if (!br.getPlayers().contains(player)) {
             return;
         }
 
-        if (!br.removePlayerPlacedBlocks()) {
+        if (!br.isInsideMapRegion(event.getBlockPlaced())) {
             return;
         }
 
-        br.getBlocksToRemove().add(event.getBlockPlaced());
+        if (br.removePlayerPlacedBlocks()) {
+            br.getBlocksToRemove().add(event.getBlockPlaced());
+            return;
+        }
+
+        event.setCancelled(true);
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onBreak(BlockBreakEvent event) {
-        if (event.isCancelled()) {
-            return;
-        }
-
         BattleRoyale br = getEvento();
         if (br == null) {
             return;
         }
 
         Player player = event.getPlayer();
-
         if (!br.getPlayers().contains(player)) {
             return;
         }
 
-        if (!br.removePlayerPlacedBlocks()) {
+        if (!br.isInsideMapRegion(event.getBlock())) {
             return;
         }
 
-        if (!br.getBlocksToRemove().contains(event.getBlock())) {
-            event.setCancelled(true);
-        }
+        event.setCancelled(true);
     }
 
     @EventHandler
@@ -175,34 +165,51 @@ public final class BattleRoyaleListener implements Listener {
         if (event.getFrom().getBlock().equals(event.getTo().getBlock())) {
             return;
         }
-
-        // água não elimina mais
     }
 
-    @EventHandler
-    public void onBucket(PlayerBucketEmptyEvent event) {
-        if (event.isCancelled()) {
-            return;
-        }
-
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onBucketEmpty(PlayerBucketEmptyEvent event) {
         BattleRoyale br = getEvento();
         if (br == null) {
             return;
         }
 
         Player player = event.getPlayer();
-
         if (!br.getPlayers().contains(player)) {
             return;
         }
 
-        if (!br.removePlayerPlacedBlocks()) {
+        Block target = event.getBlockClicked().getRelative(event.getBlockFace());
+
+        if (!br.isInsideMapRegion(target)) {
             return;
         }
 
-        br.getBlocksToRemove().add(
-                event.getBlockClicked().getRelative(event.getBlockFace())
-        );
+        if (br.removePlayerPlacedBlocks()) {
+            br.getBlocksToRemove().add(target);
+            return;
+        }
+
+        event.setCancelled(true);
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onBucketFill(PlayerBucketFillEvent event) {
+        BattleRoyale br = getEvento();
+        if (br == null) {
+            return;
+        }
+
+        Player player = event.getPlayer();
+        if (!br.getPlayers().contains(player)) {
+            return;
+        }
+
+        if (!br.isInsideMapRegion(event.getBlock())) {
+            return;
+        }
+
+        event.setCancelled(true);
     }
 
     @EventHandler
@@ -212,8 +219,18 @@ public final class BattleRoyaleListener implements Listener {
             return;
         }
 
+        if (!br.isInsideMapRegion(event.getBlock()) && !br.isInsideMapRegion(event.getToBlock())) {
+            return;
+        }
+
+        if (!br.removePlayerPlacedBlocks()) {
+            event.setCancelled(true);
+            return;
+        }
+
         if (!br.getBlocksToRemove().contains(event.getBlock())
                 && !br.getBlocksToRemove().contains(event.getToBlock())) {
+            event.setCancelled(true);
             return;
         }
 
@@ -229,16 +246,17 @@ public final class BattleRoyaleListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onIgnite(BlockIgniteEvent event) {
-        if (event.isCancelled()) {
-            return;
-        }
-
         BattleRoyale br = getEvento();
         if (br == null) {
             return;
         }
 
+        if (!br.isInsideMapRegion(event.getBlock())) {
+            return;
+        }
+
         if (!br.removePlayerPlacedBlocks()) {
+            event.setCancelled(true);
             return;
         }
 
@@ -258,6 +276,53 @@ public final class BattleRoyaleListener implements Listener {
                 && !br.getBlocksToRemove().contains(event.getBlock())) {
             event.setCancelled(true);
         }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onBurn(BlockBurnEvent event) {
+        BattleRoyale br = getEvento();
+        if (br == null) {
+            return;
+        }
+
+        if (!br.isInsideMapRegion(event.getBlock())) {
+            return;
+        }
+
+        event.setCancelled(true);
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onBlockExplode(BlockExplodeEvent event) {
+        BattleRoyale br = getEvento();
+        if (br == null) {
+            return;
+        }
+
+        event.blockList().removeIf(br::isInsideMapRegion);
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onEntityExplode(EntityExplodeEvent event) {
+        BattleRoyale br = getEvento();
+        if (br == null) {
+            return;
+        }
+
+        event.blockList().removeIf(br::isInsideMapRegion);
+    }
+
+    private Player getDamager(EntityDamageByEntityEvent event) {
+        if (event.getDamager() instanceof Player player) {
+            return player;
+        }
+
+        if (event.getDamager() instanceof Projectile projectile
+                && projectile.getShooter() instanceof Player shooter) {
+            return shooter;
+        }
+
+        return null;
     }
 
     public void setEvento() {
