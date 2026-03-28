@@ -28,10 +28,62 @@ public final class DiscordWebhookManager {
         String description = getString("Discord.Embeds.Winner.Description", "%winner% venceu o evento %event%!")
                 .replace("%winner%", player)
                 .replace("%event%", event);
+
         int color = getInt("Discord.Embeds.Winner.Color", 16711880);
         String footer = getString("Discord.Embeds.Winner.Footer", "");
         String thumbnail = getString("Discord.Embeds.Winner.ThumbnailUrl", "https://mc-heads.net/avatar/%winner%/128")
                 .replace("%winner%", player);
+
+        sendEmbed(title, description, color, thumbnail, footer, topEntries);
+    }
+
+    public static void sendMultipleWinners(List<String> winners, String event) {
+        sendMultipleWinners(winners, event, List.of());
+    }
+
+    public static void sendMultipleWinners(List<String> winners, String event, List<TopEntry> topEntries) {
+        if (!isEnabled()) {
+            return;
+        }
+
+        if (winners == null || winners.isEmpty()) {
+            return;
+        }
+
+        if (winners.size() == 1) {
+            sendPlayerWinner(winners.get(0), event, topEntries);
+            return;
+        }
+
+        String title = getString("Discord.Embeds.MultipleWinners.Title", "Fim de Papo!");
+        String description = getString("Discord.Embeds.MultipleWinners.Description", "Os vencedores do evento %event% foram:%winners%")
+                .replace("%event%", event)
+                .replace("%winners%", formatWinnersList(winners));
+
+        int color = getInt("Discord.Embeds.MultipleWinners.Color", 16711880);
+        String footer = getString("Discord.Embeds.MultipleWinners.Footer", "");
+        String thumbnail = getString("Discord.Embeds.MultipleWinners.ThumbnailUrl", "");
+
+        sendEmbed(title, description, color, thumbnail, footer, topEntries);
+    }
+
+    public static void sendTeamWinner(String team, String event) {
+        sendTeamWinner(team, event, List.of());
+    }
+
+    public static void sendTeamWinner(String team, String event, List<TopEntry> topEntries) {
+        if (!isEnabled()) {
+            return;
+        }
+
+        String title = getString("Discord.Embeds.TeamWinner.Title", "Fim de Papo!");
+        String description = getString("Discord.Embeds.TeamWinner.Description", "O time %team% venceu o evento %event%!")
+                .replace("%team%", team)
+                .replace("%event%", event);
+
+        int color = getInt("Discord.Embeds.TeamWinner.Color", 16711880);
+        String footer = getString("Discord.Embeds.TeamWinner.Footer", "");
+        String thumbnail = getString("Discord.Embeds.TeamWinner.ThumbnailUrl", "");
 
         sendEmbed(title, description, color, thumbnail, footer, topEntries);
     }
@@ -49,23 +101,10 @@ public final class DiscordWebhookManager {
         String description = getString("Discord.Embeds.ClanWinner.Description", "O clã %clan% venceu o evento %event%!")
                 .replace("%clan%", clan)
                 .replace("%event%", event);
+
         int color = getInt("Discord.Embeds.ClanWinner.Color", 9109504);
         String footer = getString("Discord.Embeds.ClanWinner.Footer", "Evento exclusivo do servidor.");
         String thumbnail = getString("Discord.Embeds.ClanWinner.ThumbnailUrl", "");
-
-        sendEmbed(title, description, color, thumbnail, footer, topEntries);
-    }
-
-    public static void sendTeamWinner(String team, String event, List<TopEntry> topEntries) {
-        if (!isEnabled()) {
-            return;
-        }
-
-        String title = getString("Discord.Embeds.Winner.Title", "Fim de Papo!");
-        String description = team + " venceu o evento " + event + "!";
-        int color = getInt("Discord.Embeds.Winner.Color", 16711880);
-        String footer = getString("Discord.Embeds.Winner.Footer", "");
-        String thumbnail = "";
 
         sendEmbed(title, description, color, thumbnail, footer, topEntries);
     }
@@ -134,8 +173,10 @@ public final class DiscordWebhookManager {
 
             for (int i = 0; i < safeTopEntries.size(); i++) {
                 TopEntry entry = safeTopEntries.get(i);
-                fieldJson.add("{\"name\":\"" + escape("Top " + (i + 1)) + "\",\"value\":\"" +
-                        escape(entry.name() + " - " + entry.value()) + "\",\"inline\":true}");
+                fieldJson.add(
+                        "{\"name\":\"" + escape("Top " + (i + 1)) + "\",\"value\":\"" +
+                                escape(entry.name() + " - " + entry.value()) + "\",\"inline\":true}"
+                );
             }
 
             json.append(String.join(",", fieldJson));
@@ -144,6 +185,16 @@ public final class DiscordWebhookManager {
 
         json.append("}]}");
         return json.toString();
+    }
+
+    private static String formatWinnersList(List<String> winners) {
+        StringBuilder builder = new StringBuilder();
+
+        for (String winner : winners) {
+            builder.append("\n• ").append(winner);
+        }
+
+        return builder.toString();
     }
 
     private static boolean isEnabled() {
