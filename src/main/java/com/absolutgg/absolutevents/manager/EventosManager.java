@@ -100,6 +100,7 @@ public final class EventosManager {
             case TEAM_DEATHMATCH -> new TeamDeathmatch(config);
             case TNT_RUN -> new TNTRun(config);
             case TORNEIO -> new Torneio(config);
+            case SUPERSMACKERS -> new SuperSmackers(config);
 
             default -> null;
         };
@@ -128,12 +129,15 @@ public final class EventosManager {
                 }
             }
 
+            case SUPERSMACKERS -> {
+                if (!config.contains("Arenas")) {
+                    return false;
+                }
+            }
+
             default -> {
             }
         }
-
-        // Empty inventory NÃO pode bloquear o evento.
-        // Agora ele serve apenas para decidir a regra de entrada do jogador.
 
         if (!config.contains("Locations.Lobby")
                 || !config.contains("Locations.Entrance")
@@ -157,15 +161,14 @@ public final class EventosManager {
         return true;
     }
 
-    // Pode manter esse método por compatibilidade futura,
-    // mas ele não deve mais ser usado para bloquear start de evento.
     private boolean requiresEmptyInventory(EventoType type) {
 
         return switch (type) {
             case BATATA_QUENTE, SEMAFORO, PAINTBALL, HUNTER,
                     CORRIDA_ARMADA, BLOCK_PARTY, KILLER_PONTO,
                     KOTH, MORTE_SUBITA, RAINBOW_RUN,
-                    SPLEGG, TEAM_DEATHMATCH, TNT_RUN, TORNEIO -> true;
+                    SPLEGG, TEAM_DEATHMATCH, TNT_RUN, TORNEIO,
+                    SUPERSMACKERS -> true;
 
             default -> false;
         };

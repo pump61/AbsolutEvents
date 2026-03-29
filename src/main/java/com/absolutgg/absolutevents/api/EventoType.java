@@ -43,6 +43,7 @@ public enum EventoType {
     TEAM_DEATHMATCH("teamdeathmatch"),
     TNT_RUN("tntrun"),
     TORNEIO("torneio"),
+    SUPERSMACKERS("supersmackers"),
 
     NONE("none");
 
@@ -115,6 +116,10 @@ public enum EventoType {
         register("tnt_run", TNT_RUN);
         register("tnt-run", TNT_RUN);
         register("tnt run", TNT_RUN);
+
+        register("super smackers", SUPERSMACKERS);
+        register("super-smackers", SUPERSMACKERS);
+        register("super_smackers", SUPERSMACKERS);
     }
 
     private final String key;

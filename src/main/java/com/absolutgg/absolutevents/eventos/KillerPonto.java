@@ -6,12 +6,14 @@ import com.absolutgg.absolutevents.api.events.PlayerLoseEvent;
 import com.absolutgg.absolutevents.discord.DiscordWebhookManager;
 import com.absolutgg.absolutevents.listeners.eventos.KillerPontoListener;
 import com.absolutgg.absolutevents.utils.ColorUtils;
+import com.absolutgg.absolutevents.utils.EventKitApplier;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
@@ -54,6 +56,7 @@ public final class KillerPonto extends Evento {
     private int maxPoints;
 
     private BukkitTask actionbarTask;
+    private BukkitTask enablePvpTask;
 
     public KillerPonto(YamlConfiguration config) {
         super(config);
@@ -88,10 +91,18 @@ public final class KillerPonto extends Evento {
                     config.getDouble(path + ".x"),
                     config.getDouble(path + ".y"),
                     config.getDouble(path + ".z"),
-                    (float) config.getDouble(path + ".yaw"),
-                    (float) config.getDouble(path + ".pitch")
+                    (float) getAngle(path, "Yaw"),
+                    (float) getAngle(path, "Pitch")
             ));
         }
+    }
+
+    private double getAngle(String path, String key) {
+        if (config.contains(path + "." + key)) {
+            return config.getDouble(path + "." + key);
+        }
+        String lower = Character.toLowerCase(key.charAt(0)) + key.substring(1);
+        return config.getDouble(path + "." + lower);
     }
 
     @Override
@@ -104,9 +115,13 @@ public final class KillerPonto extends Evento {
         deadPlayers.clear();
         invinciblePlayers.clear();
 
+        pvpEnabled = false;
+
         for (Player player : getPlayers()) {
             points.put(player, 0);
             kills.put(player, 0);
+            clearDeathState(player);
+            applyConfiguredItems(player);
         }
 
         int configuredMax = config.getInt("Evento.Max points");
@@ -114,8 +129,7 @@ public final class KillerPonto extends Evento {
 
         for (String message : config.getStringList("Messages.Start")) {
             sendToEvent(
-                    message
-                            .replace("@name", config.getString("Evento.Title"))
+                    message.replace("@name", config.getString("Evento.Title"))
             );
         }
 
@@ -127,7 +141,7 @@ public final class KillerPonto extends Evento {
             );
         }
 
-        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+        enablePvpTask = Bukkit.getScheduler().runTaskLater(plugin, () -> {
             if (!isHappening()) {
                 return;
             }
@@ -151,8 +165,14 @@ public final class KillerPonto extends Evento {
             actionbarTask = null;
         }
 
+        if (enablePvpTask != null) {
+            enablePvpTask.cancel();
+            enablePvpTask = null;
+        }
+
         for (Player player : new ArrayList<>(getPlayers())) {
             clearDeathState(player);
+            clearConfiguredInventory(player);
         }
 
         points.clear();
@@ -169,6 +189,7 @@ public final class KillerPonto extends Evento {
     @Override
     public void leave(Player player) {
         clearDeathState(player);
+        clearConfiguredInventory(player);
 
         points.remove(player);
         kills.remove(player);
@@ -219,7 +240,7 @@ public final class KillerPonto extends Evento {
     }
 
     public void eliminate(Player victim, Player killer) {
-        if (!isHappening()) {
+        if (!isHappening() || victim == null || killer == null || victim.equals(killer)) {
             return;
         }
 
@@ -253,11 +274,14 @@ public final class KillerPonto extends Evento {
 
             deadPlayers.remove(victim);
             clearDeathState(victim);
+            clearConfiguredInventory(victim);
 
             Location respawn = getRandomRespawn();
             if (respawn != null) {
                 victim.teleport(respawn, PlayerTeleportEvent.TeleportCause.PLUGIN);
             }
+
+            applyConfiguredItems(victim);
 
             invinciblePlayers.add(victim);
 
@@ -324,6 +348,25 @@ public final class KillerPonto extends Evento {
         }, 0L, 20L);
     }
 
+    private void applyConfiguredItems(Player player) {
+        ConfigurationSection itensSection = config.getConfigurationSection("Itens");
+        if (itensSection == null || !config.getBoolean("Itens.Enabled", false)) {
+            return;
+        }
+
+        EventKitApplier.apply(player, itensSection);
+    }
+
+    private void clearConfiguredInventory(Player player) {
+        player.getInventory().clear();
+        player.getInventory().setHelmet(null);
+        player.getInventory().setChestplate(null);
+        player.getInventory().setLeggings(null);
+        player.getInventory().setBoots(null);
+        player.getInventory().setItemInOffHand(null);
+        player.updateInventory();
+    }
+
     private Player getLeader() {
         Player leader = null;
         int best = -1;
@@ -380,7 +423,7 @@ public final class KillerPonto extends Evento {
     }
 
     private void setDeadState(Player player) {
-        player.getInventory().clear();
+        clearConfiguredInventory(player);
 
         player.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, deadTime * 20 + 10, 10, false, false, false));
         player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, deadTime * 20 + 10, 1, false, false, false));

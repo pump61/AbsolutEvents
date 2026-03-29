@@ -5,6 +5,8 @@ import com.absolutgg.absolutevents.api.Evento;
 import com.absolutgg.absolutevents.discord.DiscordWebhookManager;
 import com.absolutgg.absolutevents.listeners.eventos.KillerListener;
 import com.absolutgg.absolutevents.utils.ColorUtils;
+import com.absolutgg.absolutevents.utils.CustomItemResolver;
+import com.absolutgg.absolutevents.utils.EventKitApplier;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
@@ -16,7 +18,14 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitTask;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
 public final class Killer extends Evento {
 
@@ -61,7 +70,7 @@ public final class Killer extends Evento {
 
         if (isKitEnabled()) {
             for (Player player : getPlayers()) {
-                setInventory(player);
+                applyKit(player);
             }
         }
 
@@ -237,28 +246,41 @@ public final class Killer extends Evento {
     }
 
     private ConfigurationSection getInventorySection() {
-        if (config.isConfigurationSection("Itens.Inventory"))
+        if (config.isConfigurationSection("Itens.Inventory")) {
             return config.getConfigurationSection("Itens.Inventory");
+        }
 
-        if (config.isConfigurationSection("Kit.Inventory"))
+        if (config.isConfigurationSection("Kit.Inventory")) {
             return config.getConfigurationSection("Kit.Inventory");
+        }
 
         return null;
     }
 
     private ConfigurationSection getArmorRoot() {
-        if (config.isConfigurationSection("Kit.Armor"))
+        if (config.isConfigurationSection("Kit.Armor")) {
             return config.getConfigurationSection("Kit.Armor");
+        }
 
-        if (config.isConfigurationSection("Itens"))
+        if (config.isConfigurationSection("Itens")) {
             return config.getConfigurationSection("Itens");
+        }
 
         return null;
     }
 
-    private void setInventory(Player player) {
+    private void applyKit(Player player) {
+        if (config.isConfigurationSection("Itens")) {
+            EventKitApplier.apply(player, config.getConfigurationSection("Itens"));
+            return;
+        }
+
+        setInventoryLegacy(player);
+    }
+
+    private void setInventoryLegacy(Player player) {
         player.getInventory().clear();
-        applyArmor(player);
+        applyArmorLegacy(player);
 
         ConfigurationSection inv = getInventorySection();
         if (inv != null) {
@@ -269,14 +291,15 @@ public final class Killer extends Evento {
                 try {
                     int slot = Integer.parseInt(key);
                     player.getInventory().setItem(slot, item);
-                } catch (Exception ignored) {}
+                } catch (Exception ignored) {
+                }
             }
         }
 
         player.updateInventory();
     }
 
-    private void applyArmor(Player player) {
+    private void applyArmorLegacy(Player player) {
         ConfigurationSection root = getArmorRoot();
         if (root == null) return;
 
@@ -292,6 +315,16 @@ public final class Killer extends Evento {
     }
 
     private ItemStack buildItem(String path) {
+        ConfigurationSection section = config.getConfigurationSection(path);
+        if (section == null) {
+            return null;
+        }
+
+        ItemStack customResolved = CustomItemResolver.resolve(section);
+        if (customResolved != null) {
+            return customResolved;
+        }
+
         String materialName = config.getString(path + ".material");
         if (materialName == null) return null;
 

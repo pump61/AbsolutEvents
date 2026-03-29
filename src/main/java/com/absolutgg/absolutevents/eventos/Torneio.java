@@ -5,15 +5,17 @@ import com.absolutgg.absolutevents.api.Evento;
 import com.absolutgg.absolutevents.discord.DiscordWebhookManager;
 import com.absolutgg.absolutevents.listeners.eventos.TorneioListener;
 import com.absolutgg.absolutevents.utils.ColorUtils;
-import com.cryptomorin.xseries.XItemStack;
+import com.absolutgg.absolutevents.utils.CustomItemResolver;
 import net.sacredlabyrinth.phaed.simpleclans.ClanPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.ArrayList;
@@ -512,39 +514,69 @@ public final class Torneio extends Evento {
 
         if (config.getConfigurationSection(base + ".Inventory") != null) {
             for (String item : config.getConfigurationSection(base + ".Inventory").getKeys(false)) {
-                fighter1.getInventory().setItem(
-                        Integer.parseInt(item),
-                        XItemStack.deserialize(config.getConfigurationSection(base + ".Inventory." + item))
-                );
-                fighter2.getInventory().setItem(
-                        Integer.parseInt(item),
-                        XItemStack.deserialize(config.getConfigurationSection(base + ".Inventory." + item))
-                );
+                ConfigurationSection itemSection = config.getConfigurationSection(base + ".Inventory." + item);
+                if (itemSection == null) {
+                    continue;
+                }
+
+                ItemStack resolved = CustomItemResolver.resolve(itemSection);
+                if (resolved == null) {
+                    continue;
+                }
+
+                int slot;
+                try {
+                    slot = Integer.parseInt(item);
+                } catch (NumberFormatException ignored) {
+                    continue;
+                }
+
+                fighter1.getInventory().setItem(slot, resolved.clone());
+                fighter2.getInventory().setItem(slot, resolved.clone());
             }
         }
 
-        if (config.getConfigurationSection(base + ".Armor.Helmet") != null) {
-            fighter1.getInventory().setHelmet(XItemStack.deserialize(config.getConfigurationSection(base + ".Armor.Helmet")));
-            fighter2.getInventory().setHelmet(XItemStack.deserialize(config.getConfigurationSection(base + ".Armor.Helmet")));
-        }
+        equipArmorPiece(base + ".Armor.Helmet", item -> {
+            fighter1.getInventory().setHelmet(item.clone());
+            fighter2.getInventory().setHelmet(item.clone());
+        });
 
-        if (config.getConfigurationSection(base + ".Armor.Chestplate") != null) {
-            fighter1.getInventory().setChestplate(XItemStack.deserialize(config.getConfigurationSection(base + ".Armor.Chestplate")));
-            fighter2.getInventory().setChestplate(XItemStack.deserialize(config.getConfigurationSection(base + ".Armor.Chestplate")));
-        }
+        equipArmorPiece(base + ".Armor.Chestplate", item -> {
+            fighter1.getInventory().setChestplate(item.clone());
+            fighter2.getInventory().setChestplate(item.clone());
+        });
 
-        if (config.getConfigurationSection(base + ".Armor.Leggings") != null) {
-            fighter1.getInventory().setLeggings(XItemStack.deserialize(config.getConfigurationSection(base + ".Armor.Leggings")));
-            fighter2.getInventory().setLeggings(XItemStack.deserialize(config.getConfigurationSection(base + ".Armor.Leggings")));
-        }
+        equipArmorPiece(base + ".Armor.Leggings", item -> {
+            fighter1.getInventory().setLeggings(item.clone());
+            fighter2.getInventory().setLeggings(item.clone());
+        });
 
-        if (config.getConfigurationSection(base + ".Armor.Boots") != null) {
-            fighter1.getInventory().setBoots(XItemStack.deserialize(config.getConfigurationSection(base + ".Armor.Boots")));
-            fighter2.getInventory().setBoots(XItemStack.deserialize(config.getConfigurationSection(base + ".Armor.Boots")));
-        }
+        equipArmorPiece(base + ".Armor.Boots", item -> {
+            fighter1.getInventory().setBoots(item.clone());
+            fighter2.getInventory().setBoots(item.clone());
+        });
+
+        equipArmorPiece(base + ".Armor.Offhand", item -> {
+            fighter1.getInventory().setItemInOffHand(item.clone());
+            fighter2.getInventory().setItemInOffHand(item.clone());
+        });
 
         fighter1.updateInventory();
         fighter2.updateInventory();
+    }
+
+    private void equipArmorPiece(String path, java.util.function.Consumer<ItemStack> consumer) {
+        ConfigurationSection section = config.getConfigurationSection(path);
+        if (section == null) {
+            return;
+        }
+
+        ItemStack resolved = CustomItemResolver.resolve(section);
+        if (resolved == null) {
+            return;
+        }
+
+        consumer.accept(resolved);
     }
 
     private void normalizePairs() {
@@ -619,6 +651,7 @@ public final class Torneio extends Evento {
         player.getInventory().setChestplate(null);
         player.getInventory().setLeggings(null);
         player.getInventory().setBoots(null);
+        player.getInventory().setItemInOffHand(null);
         player.updateInventory();
     }
 

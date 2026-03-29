@@ -6,7 +6,7 @@ import com.absolutgg.absolutevents.api.events.PlayerLoseEvent;
 import com.absolutgg.absolutevents.discord.DiscordWebhookManager;
 import com.absolutgg.absolutevents.listeners.eventos.NexusListener;
 import com.absolutgg.absolutevents.utils.ColorUtils;
-import com.cryptomorin.xseries.XItemStack;
+import com.absolutgg.absolutevents.utils.EventKitApplier;
 import net.sacredlabyrinth.phaed.simpleclans.ClanPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
@@ -831,8 +831,15 @@ public final class Nexus extends Evento {
             default -> Material.WOODEN_AXE;
         };
 
-        player.getInventory().setItem(0, new ItemStack(swordMat));
-        player.getInventory().setItem(1, new ItemStack(axeMat));
+        ItemStack slot0 = player.getInventory().getItem(0);
+        if (slot0 == null || slot0.getType() == Material.AIR) {
+            player.getInventory().setItem(0, new ItemStack(swordMat));
+        }
+
+        ItemStack slot1 = player.getInventory().getItem(1);
+        if (slot1 == null || slot1.getType() == Material.AIR) {
+            player.getInventory().setItem(1, new ItemStack(axeMat));
+        }
     }
 
     private int getUpgradeTier(Player player) {
@@ -867,26 +874,12 @@ public final class Nexus extends Evento {
     }
 
     private void applyConfiguredItems(Player player) {
-        ConfigurationSection section = config.getConfigurationSection("Itens.Inventory");
-        if (section == null) {
+        ConfigurationSection itens = config.getConfigurationSection("Itens");
+        if (itens == null) {
             return;
         }
 
-        for (String item : section.getKeys(false)) {
-            ItemStack deserialized = XItemStack.deserialize(config.getConfigurationSection("Itens.Inventory." + item));
-            if (deserialized == null) {
-                continue;
-            }
-
-            if (deserialized.getType() == Material.SHIELD) {
-                player.getInventory().setItemInOffHand(deserialized);
-                continue;
-            }
-
-            player.getInventory().setItem(Integer.parseInt(item), deserialized);
-        }
-
-        player.updateInventory();
+        EventKitApplier.apply(player, itens);
     }
 
     private void sendTeamMessages(Player player, List<String> messages, String teamDisplay) {

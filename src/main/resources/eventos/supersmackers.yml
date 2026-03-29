@@ -1,0 +1,237 @@
+Evento:
+  Title: Super Smackers
+  Type: supersmackers
+  Mode: SOLO
+  Calls: 10
+  Calls interval: 15
+  Mininum players: 2
+  Eliminate on quit: true
+  Empty inventory: true
+  Spectator mode: true
+  Permission: absolutevents.evento
+  Count participation: true
+  Count victory: true
+
+  Round countdown: 3
+  Round max time: 60
+  Total rounds: 5
+
+  Knockback horizontal: 1.35
+  Knockback vertical: 0.55
+
+  Duo auto pair: true
+  Duo prefer clans: true
+  Duo eliminate odd player: true
+
+Itens:
+  Enabled: true
+  Inventory:
+    "0":
+      Type: MMOITEMS
+      Id: SWORD:BOXING_GLOVE
+      Amount: 1
+
+Messages:
+  Broadcast:
+    - ''
+    - '&#ff69f0Evento &f@name &#ff69f0Clique @join_button &#ff69f0para participar!'
+    - '&#ff69f0Modo: &f@mode'
+    - '&#ff69f0Jogadores: &#0088ff@players &#ff69f0Chamadas restantes: &#0088ff@broadcasts'
+    - ''
+
+  Start:
+    - ''
+    - '&#ff69f0Iniciando evento...'
+    - ''
+
+  No players:
+    - ''
+    - '&#ff69f0Evento cancelado.'
+    - '&#ff69f0A quantidade mínima de jogadores não foi atingida.'
+    - ''
+
+  Cancelled:
+    - ''
+    - '&#ff69f0O evento foi cancelado manualmente.'
+    - ''
+
+  Round:
+    - ''
+    - '&#ff69f0Arena sorteada: &f@arena'
+    - '&#ff69f0Confronto: &f@player1 &#ff69f0vs &f@player2'
+    - ''
+
+  Countdown:
+    Three: '&#ff69f03'
+    Two: '&#fff0002'
+    One: '&#ff88001'
+    Start: '&#00ff88Valendo!'
+
+  Round winner:
+    - ''
+    - '&#ff69f0@winner venceu a rodada!'
+    - '&#ff69f0Pontuação atual: &f@points'
+    - ''
+
+  Round draw:
+    - ''
+    - '&#ff69f0A rodada empatou por tempo.'
+    - ''
+
+  Winner:
+    - ''
+    - '&#ff69f0O evento &f@name &#ff69f0foi finalizado!'
+    - '&#ff69f0O vencedor foi &f@winner&#ff69f0!'
+    - ''
+
+  Team winner:
+    - ''
+    - '&#ff69f0O evento &f@name &#ff69f0foi finalizado!'
+    - '&#ff69f0A equipe vencedora foi &f@team&#ff69f0!'
+    - ''
+
+  No winner:
+    - ''
+    - '&#ff69f0O evento &f@name &#ff69f0foi finalizado!'
+    - '&#ff69f0Não houveram vencedores.'
+    - ''
+
+  Duo auto pair:
+    - '&#ff69f0Você foi automaticamente pareado com &f@partner'
+
+  Duo odd eliminated:
+    - '&#ff69f0@player foi eliminado por não ter dupla.'
+
+  Spectator arena:
+    - '&#ff69f0Você está assistindo a luta na arena &f@arena'
+
+  Actionbar solo:
+    - '&#ff69f0Rodada: &f@round/@total_rounds &#ff69f0Pontos: &f@points'
+
+  Actionbar duo:
+    - '&#ff69f0Rodada: &f@round/@total_rounds &#ff69f0Pontos do time: &f@points'
+
+Rewards:
+  Money: 1000
+  Commands:
+    - give @winner diamond 1
+  Broadcast:
+    - '&#0088ff$&f@money'
+
+Pads:
+  Jump:
+    Enabled: true
+    Materials:
+      - LIGHT_BLUE_WOOL
+      - DIAMOND_BLOCK
+    Power: 1.25
+    Cooldown: 8
+
+  Speed:
+    Enabled: true
+    Materials:
+      - LIME_WOOL
+      - EMERALD_BLOCK
+    Amplifier: 2
+    Duration: 4
+    Cooldown: 10
+
+Team colors:
+  - BLUE
+  - RED
+  - GREEN
+  - YELLOW
+  - PURPLE
+  - AQUA
+  - GOLD
+  - PINK
+
+Arenas:
+  arena1:
+    Display: "Arena Clássica"
+
+    Spawn1:
+      world: pvp
+      x: 250.5
+      y: 100.0
+      z: -249.5
+      Yaw: -89.66676
+      Pitch: 23.156382
+
+    Spawn2:
+      world: pvp
+      x: 270.5
+      y: 100.0
+      z: -249.5
+      Yaw: 89.66676
+      Pitch: 23.156382
+
+    Spectator:
+      world: pvp
+      x: 260.5
+      y: 109.0
+      z: -222.5
+      Yaw: 177.6332
+      Pitch: 20.456457
+
+  arena2:
+    Display: "Arena Ponte"
+
+    Spawn1:
+      world: pvp
+      x: 300.5
+      y: 100.0
+      z: -249.5
+      Yaw: -89.0
+      Pitch: 0.0
+
+    Spawn2:
+      world: pvp
+      x: 320.5
+      y: 100.0
+      z: -249.5
+      Yaw: 89.0
+      Pitch: 0.0
+
+    Spectator:
+      world: pvp
+      x: 310.5
+      y: 110.0
+      z: -230.5
+      Yaw: 180.0
+      Pitch: 15.0
+
+Locations:
+  Lobby:
+    world: pvp
+    x: 0.5
+    y: 100.0
+    z: 0.5
+    Yaw: -2.3652446
+    Pitch: 27.749992
+
+  Entrance:
+    world: pvp
+    x: 0.5
+    y: 100.0
+    z: 0.5
+    Yaw: -2.3652446
+    Pitch: 27.749992
+
+  Spectator:
+    world: pvp
+    x: 0.5
+    y: 100.0
+    z: 0.5
+    Yaw: -2.3652446
+    Pitch: 27.749992
+
+  Exit:
+    world: world
+    x: 2.5
+    y: 70.0
+    z: -119.5
+    Yaw: -8.518799
+    Pitch: 5.2499814
+
+  Server: 'null'

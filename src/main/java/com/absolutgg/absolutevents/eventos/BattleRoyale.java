@@ -7,9 +7,10 @@ import com.absolutgg.absolutevents.api.events.PlayerJoinEvent;
 import com.absolutgg.absolutevents.api.events.PlayerLoseEvent;
 import com.absolutgg.absolutevents.discord.DiscordWebhookManager;
 import com.absolutgg.absolutevents.listeners.eventos.BattleRoyaleListener;
+import com.absolutgg.absolutevents.utils.ArenaRestorer;
 import com.absolutgg.absolutevents.utils.ColorUtils;
 import com.absolutgg.absolutevents.utils.Cuboid;
-import com.cryptomorin.xseries.XItemStack;
+import com.absolutgg.absolutevents.utils.EventKitApplier;
 import net.sacredlabyrinth.phaed.simpleclans.ClanPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -20,14 +21,13 @@ import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.scheduler.BukkitTask;
-import com.absolutgg.absolutevents.utils.ArenaRestorer;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -399,7 +399,7 @@ public final class BattleRoyale extends Evento {
         this.removePlayers();
     }
 
-        public void eliminate(Player player) {
+    public void eliminate(Player player) {
         eliminate(player, null);
     }
 
@@ -532,38 +532,14 @@ public final class BattleRoyale extends Evento {
     }
 
     private void giveConfiguredItems() {
+        ConfigurationSection itensSection = config.getConfigurationSection("Itens");
+        if (itensSection == null) {
+            return;
+        }
+
         for (Player player : getPlayers()) {
-            if (config.isConfigurationSection("Itens.Helmet")) {
-                player.getInventory().setHelmet(XItemStack.deserialize(config.getConfigurationSection("Itens.Helmet")));
-            }
-
-            if (config.isConfigurationSection("Itens.Chestplate")) {
-                player.getInventory().setChestplate(XItemStack.deserialize(config.getConfigurationSection("Itens.Chestplate")));
-            }
-
-            if (config.isConfigurationSection("Itens.Leggings")) {
-                player.getInventory().setLeggings(XItemStack.deserialize(config.getConfigurationSection("Itens.Leggings")));
-            }
-
-            if (config.isConfigurationSection("Itens.Boots")) {
-                player.getInventory().setBoots(XItemStack.deserialize(config.getConfigurationSection("Itens.Boots")));
-            }
-
-            if (config.isConfigurationSection("Itens.Offhand")) {
-                player.getInventory().setItemInOffHand(XItemStack.deserialize(config.getConfigurationSection("Itens.Offhand")));
-            }
-
-            ConfigurationSection inventorySection = config.getConfigurationSection("Itens.Inventory");
-            if (inventorySection != null) {
-                for (String item : inventorySection.getKeys(false)) {
-                    player.getInventory().setItem(
-                            Integer.parseInt(item),
-                            XItemStack.deserialize(config.getConfigurationSection("Itens.Inventory." + item))
-                    );
-                }
-            }
-
-            player.updateInventory();
+            clearConfiguredInventory(player);
+            EventKitApplier.apply(player, itensSection);
         }
     }
 
@@ -1092,5 +1068,5 @@ public final class BattleRoyale extends Evento {
     @Override
     public YamlConfiguration getConfig() {
         return config;
-    } 
+    }
 }

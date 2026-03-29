@@ -6,9 +6,9 @@ import com.absolutgg.absolutevents.api.events.PlayerLoseEvent;
 import com.absolutgg.absolutevents.discord.DiscordWebhookManager;
 import com.absolutgg.absolutevents.listeners.eventos.SumoListener;
 import com.absolutgg.absolutevents.utils.ColorUtils;
-import com.cryptomorin.xseries.XItemStack;
+import com.absolutgg.absolutevents.utils.CustomItemResolver;
+import com.absolutgg.absolutevents.utils.EventKitApplier;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -278,6 +278,12 @@ public final class Sumo extends Evento {
     private void applyConfiguredItems(Player player) {
         clearInventory(player);
 
+        ConfigurationSection itensSection = config.getConfigurationSection("Itens");
+        if (itensSection != null) {
+            EventKitApplier.apply(player, itensSection);
+            return;
+        }
+
         ItemStack helmet = getOptionalItem("Itens.Helmet");
         ItemStack chestplate = getOptionalItem("Itens.Chestplate");
         ItemStack leggings = getOptionalItem("Itens.Leggings");
@@ -327,12 +333,7 @@ public final class Sumo extends Evento {
             return null;
         }
 
-        ItemStack item = XItemStack.deserialize(section);
-        if (item == null || item.getType() == Material.AIR || item.getType() == Material.BARRIER) {
-            return null;
-        }
-
-        return item;
+        return CustomItemResolver.resolve(section);
     }
 
     private void clearInventory(Player player) {

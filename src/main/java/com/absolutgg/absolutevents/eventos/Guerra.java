@@ -8,7 +8,7 @@ import com.absolutgg.absolutevents.discord.DiscordWebhookManager;
 import com.absolutgg.absolutevents.hooks.BungeecordHook;
 import com.absolutgg.absolutevents.listeners.eventos.GuerraListener;
 import com.absolutgg.absolutevents.utils.ColorUtils;
-import com.cryptomorin.xseries.XItemStack;
+import com.absolutgg.absolutevents.utils.EventKitApplier;
 import com.cryptomorin.xseries.messages.ActionBar;
 import net.sacredlabyrinth.phaed.simpleclans.Clan;
 import net.sacredlabyrinth.phaed.simpleclans.ClanPlayer;
@@ -96,6 +96,12 @@ public final class Guerra extends Evento {
                 AbsolutEventsPlugin.getInstance()
         );
         listener.setEvento();
+
+        this.pvpEnabled = false;
+        this.ended = false;
+
+        kills.clear();
+        simpleClansClanParticipants.clear();
 
         if (AbsolutEventsPlugin.getInstance().getSimpleClans() != null) {
             for (Player player : new ArrayList<>(getPlayers())) {
@@ -402,6 +408,9 @@ public final class Guerra extends Evento {
         }
 
         simpleClansClanParticipants.clear();
+        kills.clear();
+        pvpEnabled = false;
+        ended = false;
 
         HandlerList.unregisterAll(listener);
         removePlayers();
@@ -416,38 +425,14 @@ public final class Guerra extends Evento {
     }
 
     private void giveConfiguredItems() {
+        ConfigurationSection itensSection = config.getConfigurationSection("Itens");
+        if (itensSection == null) {
+            return;
+        }
+
         for (Player player : getPlayers()) {
-            if (config.isConfigurationSection("Itens.Helmet")) {
-                player.getInventory().setHelmet(XItemStack.deserialize(config.getConfigurationSection("Itens.Helmet")));
-            }
-
-            if (config.isConfigurationSection("Itens.Chestplate")) {
-                player.getInventory().setChestplate(XItemStack.deserialize(config.getConfigurationSection("Itens.Chestplate")));
-            }
-
-            if (config.isConfigurationSection("Itens.Leggings")) {
-                player.getInventory().setLeggings(XItemStack.deserialize(config.getConfigurationSection("Itens.Leggings")));
-            }
-
-            if (config.isConfigurationSection("Itens.Boots")) {
-                player.getInventory().setBoots(XItemStack.deserialize(config.getConfigurationSection("Itens.Boots")));
-            }
-
-            if (config.isConfigurationSection("Itens.Offhand")) {
-                player.getInventory().setItemInOffHand(XItemStack.deserialize(config.getConfigurationSection("Itens.Offhand")));
-            }
-
-            ConfigurationSection inventorySection = config.getConfigurationSection("Itens.Inventory");
-            if (inventorySection != null) {
-                for (String item : inventorySection.getKeys(false)) {
-                    player.getInventory().setItem(
-                            Integer.parseInt(item),
-                            XItemStack.deserialize(config.getConfigurationSection("Itens.Inventory." + item))
-                    );
-                }
-            }
-
-            player.updateInventory();
+            clearConfiguredInventory(player);
+            EventKitApplier.apply(player, itensSection);
         }
     }
 
@@ -758,5 +743,10 @@ public final class Guerra extends Evento {
         }
 
         return entries;
+    }
+
+    @Override
+    public YamlConfiguration getConfig() {
+        return config;
     }
 }

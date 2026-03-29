@@ -5,6 +5,7 @@ import com.absolutgg.absolutevents.api.Evento;
 import com.absolutgg.absolutevents.api.events.PlayerLoseEvent;
 import com.absolutgg.absolutevents.discord.DiscordWebhookManager;
 import com.absolutgg.absolutevents.listeners.eventos.MorteSubitaListener;
+import com.absolutgg.absolutevents.utils.EventKitApplier;
 import com.cryptomorin.xseries.XEnchantment;
 import com.cryptomorin.xseries.XMaterial;
 import com.iridium.iridiumcolorapi.IridiumColorAPI;
@@ -14,6 +15,7 @@ import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
@@ -268,11 +270,13 @@ public final class MorteSubita extends Evento {
         victim.setHealth(victim.getMaxHealth());
         victim.setFoodLevel(20);
 
+        String killerName = killer != null ? killer.getName() : "Desconhecido";
+
         for (String message : config.getStringList("Messages.Eliminado")) {
             victim.sendMessage(IridiumColorAPI.process(
                     message.replace("&", "§")
                             .replace("@name", config.getString("Evento.Title"))
-                            .replace("@killer", killer.getName())
+                            .replace("@killer", killerName)
             ));
         }
 
@@ -350,6 +354,16 @@ public final class MorteSubita extends Evento {
 
     private void setGear(Player player) {
         player.getInventory().clear();
+        player.getInventory().setItemInOffHand(null);
+
+        ConfigurationSection itensSection = config.getConfigurationSection("Itens");
+        boolean customItemsEnabled = itensSection != null && config.getBoolean("Itens.Enabled", false);
+
+        if (customItemsEnabled) {
+            EventKitApplier.apply(player, itensSection);
+            return;
+        }
+
         player.getInventory().setItem(0, SWORD.clone());
         player.getInventory().setItem(1, FOOD.clone());
 

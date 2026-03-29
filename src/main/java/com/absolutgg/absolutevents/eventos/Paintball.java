@@ -6,12 +6,14 @@ import com.absolutgg.absolutevents.api.events.PlayerLoseEvent;
 import com.absolutgg.absolutevents.discord.DiscordWebhookManager;
 import com.absolutgg.absolutevents.listeners.eventos.PaintballListener;
 import com.absolutgg.absolutevents.utils.ColorUtils;
+import com.absolutgg.absolutevents.utils.EventKitApplier;
 import net.sacredlabyrinth.phaed.simpleclans.ClanPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -125,6 +127,7 @@ public final class Paintball extends Evento {
 
         for (Player player : new ArrayList<>(getPlayers())) {
             clearPaintballInventory(player);
+            applyConfiguredItems(player);
 
             if (blueTeam.contains(player)) {
                 sendTeamMessages(player, teamMessages, "§9" + blueName);
@@ -136,8 +139,22 @@ public final class Paintball extends Evento {
                 player.teleport(red);
             }
 
-            player.getInventory().setItem(0, bow.clone());
-            player.getInventory().setItem(9, new ItemStack(Material.ARROW, 1));
+            if (player.getInventory().getItem(0) == null || player.getInventory().getItem(0).getType() == Material.AIR) {
+                player.getInventory().setItem(0, bow.clone());
+            }
+
+            boolean hasArrow = false;
+            for (ItemStack content : player.getInventory().getContents()) {
+                if (content != null && content.getType() == Material.ARROW) {
+                    hasArrow = true;
+                    break;
+                }
+            }
+
+            if (!hasArrow) {
+                player.getInventory().setItem(9, new ItemStack(Material.ARROW, 1));
+            }
+
             player.updateInventory();
         }
 
@@ -172,6 +189,15 @@ public final class Paintball extends Evento {
                 },
                 time * 20L
         );
+    }
+
+    private void applyConfiguredItems(Player player) {
+        ConfigurationSection itensSection = config.getConfigurationSection("Itens");
+        if (itensSection == null) {
+            return;
+        }
+
+        EventKitApplier.apply(player, itensSection);
     }
 
     public void registerElimination(Player killer, Player victim) {
@@ -533,5 +559,10 @@ public final class Paintball extends Evento {
         if (task != null) {
             task.cancel();
         }
+    }
+
+    @Override
+    public YamlConfiguration getConfig() {
+        return config;
     }
 }

@@ -6,6 +6,7 @@ import com.absolutgg.absolutevents.discord.DiscordWebhookManager;
 import com.absolutgg.absolutevents.listeners.eventos.KothListener;
 import com.absolutgg.absolutevents.utils.ColorUtils;
 import com.absolutgg.absolutevents.utils.Cuboid;
+import com.absolutgg.absolutevents.utils.EventKitApplier;
 import com.cryptomorin.xseries.XEnchantment;
 import com.cryptomorin.xseries.XMaterial;
 import net.sacredlabyrinth.phaed.simpleclans.ClanPlayer;
@@ -17,6 +18,7 @@ import org.bukkit.World;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
@@ -168,6 +170,7 @@ public final class Koth extends Evento {
             playersLevels.putIfAbsent(player, player.getLevel());
             playersDeaths.put(player, 0);
             playersPoints.put(player, 0);
+            playersLevels.putIfAbsent(player, player.getLevel());
             awayWarningSent.put(player, false);
 
             player.setExp(0F);
@@ -454,6 +457,7 @@ public final class Koth extends Evento {
         player.getInventory().clear();
         player.setHealth(player.getMaxHealth());
         player.setFoodLevel(20);
+        player.setSaturation(20F);
         playersPoints.put(player, 0);
 
         Random random = new Random();
@@ -613,6 +617,17 @@ public final class Koth extends Evento {
 
     private void setGear(Player player) {
         if (!isHappening()) {
+            return;
+        }
+
+        player.getInventory().clear();
+        player.getInventory().setItemInOffHand(null);
+
+        ConfigurationSection itensSection = config.getConfigurationSection("Itens");
+        boolean customItemsEnabled = itensSection != null && config.getBoolean("Itens.Enabled", false);
+
+        if (customItemsEnabled) {
+            EventKitApplier.apply(player, itensSection);
             return;
         }
 
