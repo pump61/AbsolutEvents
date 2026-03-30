@@ -5,6 +5,7 @@ import com.absolutgg.absolutevents.commands.EventoCommand;
 import com.absolutgg.absolutevents.eventos.BattleRoyale;
 import com.absolutgg.absolutevents.eventos.Guerra;
 import com.absolutgg.absolutevents.eventos.Nexus;
+import com.absolutgg.absolutevents.eventos.SuperSmackers;
 import com.absolutgg.absolutevents.hooks.BungeecordHook;
 import com.absolutgg.absolutevents.manager.InventorySerializer;
 import com.absolutgg.absolutevents.utils.ColorUtils;
@@ -252,7 +253,8 @@ public final class EventoListener implements Listener {
 
         if (evento instanceof Nexus
                 || evento instanceof BattleRoyale
-                || evento instanceof Guerra) {
+                || evento instanceof Guerra
+                || evento instanceof SuperSmackers) {
             return;
         }
 

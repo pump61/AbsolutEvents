@@ -2,6 +2,7 @@ package com.absolutgg.absolutevents.commands;
 
 import com.absolutgg.absolutevents.AbsolutEventsPlugin;
 import com.absolutgg.absolutevents.api.EventoType;
+import com.absolutgg.absolutevents.eventos.SuperSmackers;
 import com.absolutgg.absolutevents.hooks.BungeecordHook;
 import com.absolutgg.absolutevents.manager.InventoryManager;
 import com.absolutgg.absolutevents.manager.InventorySerializer;
@@ -38,7 +39,12 @@ public final class EventoCommand implements CommandExecutor, TabCompleter {
             "sair",
             "leave",
             "ajuda",
-            "help"
+            "help",
+            "dupla",
+            "aceitar",
+            "accept",
+            "recusar",
+            "decline"
     );
 
     private static final List<String> ADMIN_COMMANDS = Arrays.asList(
@@ -123,6 +129,17 @@ public final class EventoCommand implements CommandExecutor, TabCompleter {
             case "camarote":
             case "spectate":
                 return handleSpectate(sender);
+
+            case "dupla":
+                return handleDuoInvite(sender, args);
+
+            case "aceitar":
+            case "accept":
+                return handleDuoAccept(sender);
+
+            case "recusar":
+            case "decline":
+                return handleDuoDecline(sender);
 
             case "parar":
             case "cancelar":
@@ -279,6 +296,80 @@ public final class EventoCommand implements CommandExecutor, TabCompleter {
         }
 
         evento.spectateBungeecord(player);
+        return true;
+    }
+
+    private boolean handleDuoInvite(CommandSender sender, String[] args) {
+        if (!(sender instanceof Player player)) {
+            sender.sendMessage(color(message("Messages.Console")));
+            return true;
+        }
+
+        if (args.length < 2) {
+            sender.sendMessage(color("&cUse: /evento dupla <jogador>"));
+            return true;
+        }
+
+        var evento = AbsolutEventsPlugin.getInstance().getEventoManager().getEvento();
+        if (!(evento instanceof SuperSmackers smackers)) {
+            sender.sendMessage(color("&cEsse comando só pode ser usado no Super Smackers."));
+            return true;
+        }
+
+        if (!smackers.isDuoMode()) {
+            sender.sendMessage(color("&cEsse comando só pode ser usado no modo duo."));
+            return true;
+        }
+
+        Player target = Bukkit.getPlayerExact(args[1]);
+        if (target == null) {
+            sender.sendMessage(color("&cJogador offline."));
+            return true;
+        }
+
+        smackers.inviteDuo(player, target);
+        return true;
+    }
+
+    private boolean handleDuoAccept(CommandSender sender) {
+        if (!(sender instanceof Player player)) {
+            sender.sendMessage(color(message("Messages.Console")));
+            return true;
+        }
+
+        var evento = AbsolutEventsPlugin.getInstance().getEventoManager().getEvento();
+        if (!(evento instanceof SuperSmackers smackers)) {
+            sender.sendMessage(color("&cEsse comando só pode ser usado no Super Smackers."));
+            return true;
+        }
+
+        if (!smackers.isDuoMode()) {
+            sender.sendMessage(color("&cEsse comando só pode ser usado no modo duo."));
+            return true;
+        }
+
+        smackers.acceptDuo(player);
+        return true;
+    }
+
+    private boolean handleDuoDecline(CommandSender sender) {
+        if (!(sender instanceof Player player)) {
+            sender.sendMessage(color(message("Messages.Console")));
+            return true;
+        }
+
+        var evento = AbsolutEventsPlugin.getInstance().getEventoManager().getEvento();
+        if (!(evento instanceof SuperSmackers smackers)) {
+            sender.sendMessage(color("&cEsse comando só pode ser usado no Super Smackers."));
+            return true;
+        }
+
+        if (!smackers.isDuoMode()) {
+            sender.sendMessage(color("&cEsse comando só pode ser usado no modo duo."));
+            return true;
+        }
+
+        smackers.declineDuo(player);
         return true;
     }
 
@@ -528,6 +619,8 @@ public final class EventoCommand implements CommandExecutor, TabCompleter {
                     sendQuizSetupHelp(player, current);
                 } else if (isBattleRoyale(current)) {
                     sendBattleRoyaleSetupHelp(player, current);
+                } else if (isSuperSmackers(current)) {
+                    sendSuperSmackersSetupHelp(player, current);
                 } else {
                     sendDefaultSetupHelp(player, current);
                 }
@@ -703,7 +796,6 @@ public final class EventoCommand implements CommandExecutor, TabCompleter {
                 return true;
         }
     }
-
     private boolean handleSetupPosTool(CommandSender sender, Player player, YamlConfiguration settings) {
         if (!SETUP.get(player).isSet("Locations.Pos1")
                 && EventoType.getEventoType(settings.getString("Evento.Type")) != EventoType.BATTLE_ROYALE) {
@@ -749,6 +841,7 @@ public final class EventoCommand implements CommandExecutor, TabCompleter {
             sender.sendMessage(color("&cConfigure o kit manualmente na seção &fItens &cdo arquivo."));
             return true;
         }
+
         if (!SETUP.get(player).isSet("Itens")) {
             sender.sendMessage(color(
                     message("Messages.Not needed kit").replace("@name", settings.getString("Evento.Title"))
@@ -1557,6 +1650,16 @@ public final class EventoCommand implements CommandExecutor, TabCompleter {
                     if (!admin) {
                         return Collections.emptyList();
                     }
+                    return filter(
+                            Bukkit.getOnlinePlayers()
+                                    .stream()
+                                    .map(Player::getName)
+                                    .sorted(String.CASE_INSENSITIVE_ORDER)
+                                    .collect(Collectors.toList()),
+                            args[1]
+                    );
+
+                case "dupla":
                     return filter(
                             Bukkit.getOnlinePlayers()
                                     .stream()

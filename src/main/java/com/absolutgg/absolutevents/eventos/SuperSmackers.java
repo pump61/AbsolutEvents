@@ -66,6 +66,7 @@ public final class SuperSmackers extends Evento {
     private final Map<UUID, Long> jumpCooldown = new HashMap<>();
     private final Map<UUID, Long> speedCooldown = new HashMap<>();
     private final List<ClanPlayer> simpleClansPlayers = new ArrayList<>();
+    private final Map<UUID, UUID> duoInvites = new HashMap<>();
 
     private final List<Material> jumpPadMaterials = new ArrayList<>();
     private final List<Material> speedPadMaterials = new ArrayList<>();
@@ -170,6 +171,17 @@ public final class SuperSmackers extends Evento {
         }
 
         setupFriendlyFire();
+
+        for (String line : config.getStringList("Messages.Start")) {
+            sendToEvent(line.replace("@name", config.getString("Evento.Title", "Super Smackers")));
+        }
+
+        if (!isSolo()) {
+            for (String line : config.getStringList("Messages.Duo help")) {
+                sendToEvent(line);
+            }
+        }
+
         prepareModeData();
 
         if (isSolo()) {
@@ -183,10 +195,6 @@ public final class SuperSmackers extends Evento {
                 return;
             }
             generateDuoMatches();
-        }
-
-        for (String line : config.getStringList("Messages.Start")) {
-            sendToEvent(line.replace("@name", config.getString("Evento.Title", "Super Smackers")));
         }
 
         startActionbar();
@@ -241,6 +249,7 @@ public final class SuperSmackers extends Evento {
         player.setAllowFlight(false);
         player.setFlying(false);
         clearPlayer(player);
+        removePendingInvites(player);
 
         if (isSolo()) {
             processSoloForfeit(player);
@@ -253,7 +262,16 @@ public final class SuperSmackers extends Evento {
                 return;
             }
         } else {
+            TeamData team = getTeam(player);
             processDuoForfeit(player);
+
+            if (team != null) {
+                for (Player member : team.members) {
+                    if (!member.equals(player)) {
+                        sendConfigMessage(member, "Messages.Duo partner left", placeholder("@player", player.getName()));
+                    }
+                }
+            }
 
             if (wasFighting) {
                 handleCombatLeave(player);
@@ -328,6 +346,100 @@ public final class SuperSmackers extends Evento {
         stop();
     }
 
+    public boolean isDuoMode() {
+        return !isSolo();
+    }
+
+    public boolean inviteDuo(Player inviter, Player target) {
+        if (isSolo()) {
+            inviter.sendMessage(ColorUtils.colorize("&#ff4444Esse evento não está em modo duo."));
+            return false;
+        }
+
+        if (!isOpen()) {
+            inviter.sendMessage(ColorUtils.colorize("&#ff4444As duplas só podem ser definidas durante as chamadas."));
+            return false;
+        }
+
+        if (inviter.equals(target)) {
+            inviter.sendMessage(ColorUtils.colorize("&#ff4444Você não pode se convidar."));
+            return false;
+        }
+
+        if (!getPlayers().contains(inviter) || !getPlayers().contains(target)) {
+            inviter.sendMessage(ColorUtils.colorize("&#ff4444Os dois jogadores precisam estar no evento."));
+            return false;
+        }
+
+        if (hasTeam(inviter)) {
+            sendConfigMessage(inviter, "Messages.Duo already has team");
+            return false;
+        }
+
+        if (hasTeam(target)) {
+            sendConfigMessage(inviter, "Messages.Duo target already has team");
+            return false;
+        }
+
+        duoInvites.put(target.getUniqueId(), inviter.getUniqueId());
+
+        sendConfigMessage(inviter, "Messages.Duo invite sent", placeholder("@player", target.getName()));
+        sendConfigMessage(target, "Messages.Duo invite received", placeholder("@player", inviter.getName()));
+        return true;
+    }
+
+    public boolean acceptDuo(Player player) {
+        if (isSolo()) {
+            player.sendMessage(ColorUtils.colorize("&#ff4444Esse evento não está em modo duo."));
+            return false;
+        }
+
+        UUID inviterId = duoInvites.remove(player.getUniqueId());
+        if (inviterId == null) {
+            sendConfigMessage(player, "Messages.Duo no pending invite");
+            return false;
+        }
+
+        Player inviter = Bukkit.getPlayer(inviterId);
+        if (inviter == null || !inviter.isOnline() || !getPlayers().contains(inviter)) {
+            sendConfigMessage(player, "Messages.Duo no pending invite");
+            return false;
+        }
+
+        if (hasTeam(player) || hasTeam(inviter)) {
+            sendConfigMessage(player, "Messages.Duo already has team");
+            return false;
+        }
+
+        createTeam(inviter, player);
+        removePendingInvites(inviter);
+        removePendingInvites(player);
+
+        sendConfigMessage(player, "Messages.Duo accepted", placeholder("@player", inviter.getName()));
+        sendConfigMessage(inviter, "Messages.Duo accepted", placeholder("@player", player.getName()));
+        return true;
+    }
+
+    public boolean declineDuo(Player player) {
+        UUID inviterId = duoInvites.remove(player.getUniqueId());
+        if (inviterId == null) {
+            sendConfigMessage(player, "Messages.Duo no pending invite");
+            return false;
+        }
+
+        Player inviter = Bukkit.getPlayer(inviterId);
+        sendConfigMessage(player, "Messages.Duo declined", placeholder("@player", inviter != null ? inviter.getName() : "desconhecido"));
+
+        if (inviter != null && inviter.isOnline()) {
+            inviter.sendMessage(ColorUtils.colorize("&#ff4444" + player.getName() + " recusou seu convite de dupla."));
+        }
+        return true;
+    }
+
+    public boolean hasTeam(Player player) {
+        return getTeam(player) != null;
+    }
+
     public void handleRoundLose(Player loser) {
         if (!roundRunning || eventEnding || loser == null) {
             return;
@@ -381,6 +493,7 @@ public final class SuperSmackers extends Evento {
 
             if (winnerTeam.equals(currentDuoLegWinnerTeam)) {
                 winnerTeam.points++;
+
                 for (String line : config.getStringList("Messages.Round winner")) {
                     sendToEvent(line.replace("@winner", winner.getName())
                             .replace("@points", String.valueOf(winnerTeam.points)));
@@ -400,6 +513,7 @@ public final class SuperSmackers extends Evento {
 
         if (currentDuoLeg == 3) {
             winnerTeam.points++;
+
             for (String line : config.getStringList("Messages.Round winner")) {
                 sendToEvent(line.replace("@winner", winner.getName())
                         .replace("@points", String.valueOf(winnerTeam.points)));
@@ -525,6 +639,7 @@ public final class SuperSmackers extends Evento {
         jumpCooldown.clear();
         speedCooldown.clear();
         simpleClansPlayers.clear();
+        duoInvites.clear();
         availableSoloColors.clear();
         availableTeamColors.clear();
         soloMatches.clear();
@@ -555,6 +670,7 @@ public final class SuperSmackers extends Evento {
         }
 
         List<Player> players = new ArrayList<>(getPlayers());
+        players.removeIf(this::hasTeam);
 
         if (duoPreferClans && plugin.getSimpleClans() != null) {
             Map<String, List<Player>> byClan = new LinkedHashMap<>();
@@ -573,7 +689,7 @@ public final class SuperSmackers extends Evento {
                     Player a = sameClan.remove(0);
                     Player b = sameClan.remove(0);
 
-                    if (used.contains(a) || used.contains(b)) {
+                    if (used.contains(a) || used.contains(b) || hasTeam(a) || hasTeam(b)) {
                         continue;
                     }
 
@@ -590,6 +706,11 @@ public final class SuperSmackers extends Evento {
             while (players.size() >= 2) {
                 Player a = players.remove(0);
                 Player b = players.remove(0);
+
+                if (hasTeam(a) || hasTeam(b)) {
+                    continue;
+                }
+
                 createTeam(a, b);
 
                 for (String line : config.getStringList("Messages.Duo auto pair")) {
@@ -606,6 +727,7 @@ public final class SuperSmackers extends Evento {
                 sendToEvent(line.replace("@player", odd.getName()));
             }
 
+            removePendingInvites(odd);
             remove(odd);
         }
 
@@ -615,6 +737,10 @@ public final class SuperSmackers extends Evento {
     }
 
     private void createTeam(Player a, Player b) {
+        if (hasTeam(a) || hasTeam(b)) {
+            return;
+        }
+
         String uniqueColor = takeNextTeamColor();
         if (uniqueColor == null) {
             return;
@@ -745,6 +871,7 @@ public final class SuperSmackers extends Evento {
         }
 
         for (Player member : new ArrayList<>(team.members)) {
+            removePendingInvites(member);
             remove(member);
         }
 
@@ -946,6 +1073,32 @@ public final class SuperSmackers extends Evento {
 
     private ArenaData randomArena() {
         return arenas.get(ThreadLocalRandom.current().nextInt(arenas.size()));
+    }
+
+    private void removePendingInvites(Player player) {
+        duoInvites.remove(player.getUniqueId());
+        duoInvites.entrySet().removeIf(entry -> entry.getValue().equals(player.getUniqueId()));
+    }
+
+    private Map<String, String> placeholder(String key, String value) {
+        Map<String, String> map = new HashMap<>();
+        map.put(key, value);
+        return map;
+    }
+
+    private void sendConfigMessage(Player player, String path) {
+        sendConfigMessage(player, path, new HashMap<>());
+    }
+
+    private void sendConfigMessage(Player player, String path, Map<String, String> replacements) {
+        List<String> list = config.getStringList(path);
+        for (String line : list) {
+            String parsed = line;
+            for (Map.Entry<String, String> entry : replacements.entrySet()) {
+                parsed = parsed.replace(entry.getKey(), entry.getValue());
+            }
+            player.sendMessage(ColorUtils.colorize(parsed));
+        }
     }
     private void beginPreparedRound() {
         if (!isHappening() || eventEnding || currentArena == null || currentP1 == null || currentP2 == null) {
@@ -1564,21 +1717,15 @@ public final class SuperSmackers extends Evento {
             if (isSolo()) {
                 for (Player player : getPlayers()) {
                     int points = soloPoints.getOrDefault(player, 0);
-
-                    String message = ColorUtils.colorize(
-                            "&#ffaa00Pontuação: &f" + points
-                    );
-
+                    String message = ColorUtils.colorize("&#ffaa00Pontuação: &f" + points);
                     player.sendActionBar(message);
                 }
-
                 return;
             }
 
             for (TeamData team : teams) {
                 String message = ColorUtils.colorize(
-                        team.colorHex + team.getDisplayName() +
-                                " &f- &e" + team.points + " pontos"
+                        team.colorHex + team.getDisplayName() + " &f- &e" + team.points + " pontos"
                 );
 
                 for (Player member : team.members) {
@@ -1587,7 +1734,6 @@ public final class SuperSmackers extends Evento {
                     }
                 }
             }
-
         }, 0L, 20L);
     }
 
