@@ -12,6 +12,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
@@ -43,6 +44,7 @@ public final class TNTRun extends Evento {
     private boolean tntRunHappening;
     private boolean ending;
     private BukkitTask startTask;
+    private BukkitTask floorTask;
 
     public TNTRun(YamlConfiguration config) {
         super(config);
@@ -109,6 +111,7 @@ public final class TNTRun extends Evento {
             }
 
             this.tntRunHappening = true;
+            startFloorCheckTask();
         }, startTime * 20L);
     }
 
@@ -120,6 +123,11 @@ public final class TNTRun extends Evento {
         if (startTask != null) {
             startTask.cancel();
             startTask = null;
+        }
+
+        if (floorTask != null) {
+            floorTask.cancel();
+            floorTask = null;
         }
 
         for (var entry : pattern.entrySet()) {
@@ -173,6 +181,41 @@ public final class TNTRun extends Evento {
                 executeConsoleCommand(online, command.replace("@winner", online.getName()));
             }
         }, 5L);
+    }
+
+    private void startFloorCheckTask() {
+        if (floorTask != null) {
+            floorTask.cancel();
+        }
+
+        floorTask = scheduler.runTaskTimer(plugin, () -> {
+            if (!isHappening() || !tntRunHappening || ending) {
+                return;
+            }
+
+            for (Player player : new ArrayList<>(getPlayers())) {
+                if (player == null || !player.isOnline()) {
+                    continue;
+                }
+
+                Location location = player.getLocation();
+
+                Material feetType = location.getBlock().getType();
+                boolean inWater = feetType == XMaterial.WATER.parseMaterial();
+                boolean fellBelowArena = location.getY() < Math.min(
+                        cuboid.getPoint1().getY(),
+                        cuboid.getPoint2().getY()
+                ) - 3;
+
+                if (inWater || fellBelowArena) {
+                    listener.forceScheduleBreak(location.getBlock().getRelative(BlockFace.DOWN));
+                    continue;
+                }
+
+                Block under = location.getBlock().getRelative(BlockFace.DOWN);
+                listener.forceScheduleBreak(under);
+            }
+        }, 1L, 2L);
     }
 
     private void sendToEvent(String message) {

@@ -35,21 +35,17 @@ public final class SuperSmackersListener implements Listener {
             return;
         }
 
-        if (!smackers.getPlayers().contains(attacker) || !smackers.getPlayers().contains(victim)) {
-            return;
-        }
-
-        if (!smackers.isPvPEnabled()) {
-            event.setCancelled(true);
-            return;
-        }
-
         if (!attacker.equals(smackers.getCurrentP1()) && !attacker.equals(smackers.getCurrentP2())) {
             event.setCancelled(true);
             return;
         }
 
         if (!victim.equals(smackers.getCurrentP1()) && !victim.equals(smackers.getCurrentP2())) {
+            event.setCancelled(true);
+            return;
+        }
+
+        if (!smackers.isPvPEnabled()) {
             event.setCancelled(true);
             return;
         }
@@ -78,7 +74,8 @@ public final class SuperSmackersListener implements Listener {
             return;
         }
 
-        if (!smackers.getPlayers().contains(player)) {
+        if (!player.equals(smackers.getCurrentP1()) && !player.equals(smackers.getCurrentP2())) {
+            event.setCancelled(true);
             return;
         }
 

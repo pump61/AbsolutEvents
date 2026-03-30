@@ -4,9 +4,6 @@ import com.absolutgg.absolutevents.api.EventoType;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-/*
- * Chamado quando um evento é iniciado.
- */
 public final class EventoStartedEvent extends Event {
 
     private static final HandlerList HANDLERS = new HandlerList();

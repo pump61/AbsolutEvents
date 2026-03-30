@@ -5,10 +5,11 @@ import com.absolutgg.absolutevents.api.Evento;
 import com.absolutgg.absolutevents.discord.DiscordWebhookManager;
 import com.absolutgg.absolutevents.listeners.eventos.SuperSmackersListener;
 import com.absolutgg.absolutevents.utils.ColorUtils;
-import com.absolutgg.absolutevents.utils.CustomItemResolver;
+import com.absolutgg.absolutevents.utils.EventKitApplier;
 import net.sacredlabyrinth.phaed.simpleclans.ClanPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -21,10 +22,18 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.scheduler.BukkitTask;
 
-
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 
 public final class SuperSmackers extends Evento {
 
@@ -35,7 +44,7 @@ public final class SuperSmackers extends Evento {
     private final String mode;
     private final int roundCountdown;
     private final int roundMaxTime;
-    private final int totalRounds;
+    private final int nextRoundDelay;
 
     private final double knockbackHorizontal;
     private final double knockbackVertical;
@@ -44,27 +53,36 @@ public final class SuperSmackers extends Evento {
     private final boolean duoPreferClans;
     private final boolean duoEliminateOdd;
 
-    private final List<ArenaData> arenas = new ArrayList<>();
-    private final List<Location> lobbySpectators = new ArrayList<>();
-    private final List<TeamData> teams = new ArrayList<>();
-    private final Map<Player, Integer> soloPoints = new HashMap<>();
-    private final Map<UUID, Long> jumpCooldown = new HashMap<>();
-    private final Map<UUID, Long> speedCooldown = new HashMap<>();
-    private final List<ClanPlayer> simpleClansPlayers = new ArrayList<>();
-
-    private final List<Material> jumpPadMaterials = new ArrayList<>();
-    private final List<Material> speedPadMaterials = new ArrayList<>();
-
     private final double jumpPower;
     private final int jumpCooldownSeconds;
     private final int speedAmplifier;
     private final int speedDuration;
     private final int speedCooldownSeconds;
 
+    private final List<ArenaData> arenas = new ArrayList<>();
+    private final List<TeamData> teams = new ArrayList<>();
+    private final Map<Player, Integer> soloPoints = new HashMap<>();
+    private final Map<Player, String> playerColors = new HashMap<>();
+    private final Map<UUID, Long> jumpCooldown = new HashMap<>();
+    private final Map<UUID, Long> speedCooldown = new HashMap<>();
+    private final List<ClanPlayer> simpleClansPlayers = new ArrayList<>();
+
+    private final List<Material> jumpPadMaterials = new ArrayList<>();
+    private final List<Material> speedPadMaterials = new ArrayList<>();
+    private final List<String> availableSoloColors = new ArrayList<>();
+    private final List<String> availableTeamColors = new ArrayList<>();
+
+    private final List<SoloMatch> soloMatches = new ArrayList<>();
+    private final List<SoloMatch> tieBreakSoloMatches = new ArrayList<>();
+
+    private final List<DuoMatch> duoMatches = new ArrayList<>();
+    private final List<DuoMatch> tieBreakDuoMatches = new ArrayList<>();
+
     private int currentRound = 0;
     private boolean roundRunning = false;
     private boolean roundStarting = false;
     private boolean eventEnding = false;
+    private boolean tieBreakMode = false;
 
     private ArenaData currentArena;
     private Player currentP1;
@@ -72,18 +90,23 @@ public final class SuperSmackers extends Evento {
     private TeamData currentTeam1;
     private TeamData currentTeam2;
 
+    private DuoMatch currentDuoMatch;
+    private int currentDuoLeg = 0;
+    private TeamData currentDuoLegWinnerTeam;
+
     private BukkitTask roundTask;
     private BukkitTask countdownTask;
     private BukkitTask actionbarTask;
+    private BukkitTask nextRoundTask;
 
     public SuperSmackers(YamlConfiguration config) {
         super(config);
         this.config = config;
 
-        this.mode = config.getString("Evento.Mode", "SOLO").toUpperCase(Locale.ROOT);
+        this.mode = config.getString("Evento.Mode", "SOLO").toUpperCase(Locale.ROOT).replace("#", "").trim();
         this.roundCountdown = Math.max(1, config.getInt("Evento.Round countdown", 3));
         this.roundMaxTime = Math.max(5, config.getInt("Evento.Round max time", 60));
-        this.totalRounds = Math.max(1, config.getInt("Evento.Total rounds", 5));
+        this.nextRoundDelay = Math.max(1, config.getInt("Evento.Next round delay", 10));
 
         this.knockbackHorizontal = config.getDouble("Evento.Knockback horizontal", 1.35D);
         this.knockbackVertical = config.getDouble("Evento.Knockback vertical", 0.55D);
@@ -100,7 +123,6 @@ public final class SuperSmackers extends Evento {
 
         loadPads();
         loadArenas();
-        loadLobbyLocations();
     }
 
     @Override
@@ -108,39 +130,67 @@ public final class SuperSmackers extends Evento {
         plugin.getServer().getPluginManager().registerEvents(listener, plugin);
         listener.setEvento();
 
-        this.roundRunning = false;
-        this.roundStarting = false;
-        this.eventEnding = false;
-        this.currentRound = 0;
-        this.currentArena = null;
-        this.currentP1 = null;
-        this.currentP2 = null;
-        this.currentTeam1 = null;
-        this.currentTeam2 = null;
+        resetState();
 
-        soloPoints.clear();
-        teams.clear();
-        jumpCooldown.clear();
-        speedCooldown.clear();
-        simpleClansPlayers.clear();
+        prepareAvailableColors();
 
-        for (Player player : getPlayers()) {
-            soloPoints.put(player, 0);
-            clearPlayer(player);
-            applyFightItem(player);
+        if (!hasEnoughColors()) {
+            Bukkit.broadcastMessage(ColorUtils.colorize(
+                    "&#ff4444SuperSmackers não pode iniciar: faltam cores suficientes em &fTeam colors&#ff4444."
+            ));
+            stop();
+            return;
+        }
+
+        restoreRoundVisibility();
+
+        if (isSolo()) {
+            for (Player player : getPlayers()) {
+                String uniqueColor = takeNextSoloColor();
+                if (uniqueColor == null) {
+                    Bukkit.broadcastMessage(ColorUtils.colorize(
+                            "&#ff4444SuperSmackers não pode iniciar: faltam cores únicas para os jogadores."
+                    ));
+                    stop();
+                    return;
+                }
+
+                soloPoints.put(player, 0);
+                playerColors.put(player, uniqueColor);
+                prepareAsLobbyPlayer(player);
+            }
+        } else {
+            for (Player player : getPlayers()) {
+                prepareAsLobbyPlayer(player);
+            }
+        }
+
+        for (Player spectator : getSpectators()) {
+            prepareAsGlobalSpectator(spectator);
         }
 
         setupFriendlyFire();
         prepareModeData();
 
+        if (isSolo()) {
+            generateSoloMatches();
+        } else {
+            if (teams.size() < 2) {
+                for (String line : config.getStringList("Messages.No players")) {
+                    Bukkit.broadcastMessage(ColorUtils.colorize(line));
+                }
+                stop();
+                return;
+            }
+            generateDuoMatches();
+        }
+
         for (String line : config.getStringList("Messages.Start")) {
-            sendToEvent(
-                    line.replace("@name", config.getString("Evento.Title"))
-            );
+            sendToEvent(line.replace("@name", config.getString("Evento.Title", "Super Smackers")));
         }
 
         startActionbar();
-        startNextRound();
+        scheduleNextRound(nextRoundDelay);
     }
 
     @Override
@@ -148,28 +198,28 @@ public final class SuperSmackers extends Evento {
         cancelTask(roundTask);
         cancelTask(countdownTask);
         cancelTask(actionbarTask);
+        cancelTask(nextRoundTask);
+
+        restoreRoundVisibility();
 
         for (ClanPlayer clanPlayer : simpleClansPlayers) {
             clanPlayer.setFriendlyFire(false);
         }
 
         simpleClansPlayers.clear();
-        soloPoints.clear();
-        teams.clear();
-        jumpCooldown.clear();
-        speedCooldown.clear();
-
-        currentArena = null;
-        currentP1 = null;
-        currentP2 = null;
-        currentTeam1 = null;
-        currentTeam2 = null;
-        roundRunning = false;
-        roundStarting = false;
-        eventEnding = false;
 
         for (Player player : new ArrayList<>(getPlayers())) {
+            player.setGameMode(GameMode.SURVIVAL);
+            player.setAllowFlight(false);
+            player.setFlying(false);
             clearPlayer(player);
+        }
+
+        for (Player spectator : new ArrayList<>(getSpectators())) {
+            spectator.setGameMode(GameMode.SURVIVAL);
+            spectator.setAllowFlight(false);
+            spectator.setFlying(false);
+            clearPlayer(spectator);
         }
 
         HandlerList.unregisterAll(listener);
@@ -183,14 +233,32 @@ public final class SuperSmackers extends Evento {
             return;
         }
 
-        clearPlayer(player);
-        soloPoints.remove(player);
-        removeFromTeams(player);
+        restoreRoundVisibility();
 
-        if (player.equals(currentP1) || player.equals(currentP2)) {
-            handleCombatLeave(player);
-        } else {
+        boolean wasFighting = player.equals(currentP1) || player.equals(currentP2);
+
+        player.setGameMode(GameMode.SURVIVAL);
+        player.setAllowFlight(false);
+        player.setFlying(false);
+        clearPlayer(player);
+
+        if (isSolo()) {
+            processSoloForfeit(player);
+            soloPoints.remove(player);
+            playerColors.remove(player);
             remove(player);
+
+            if (wasFighting) {
+                handleCombatLeave(player);
+                return;
+            }
+        } else {
+            processDuoForfeit(player);
+
+            if (wasFighting) {
+                handleCombatLeave(player);
+                return;
+            }
         }
 
         if (isHappening() && !eventEnding) {
@@ -208,14 +276,14 @@ public final class SuperSmackers extends Evento {
 
         for (String line : config.getStringList("Messages.Winner")) {
             Bukkit.broadcastMessage(ColorUtils.colorize(
-                    line.replace("@name", config.getString("Evento.Title"))
+                    line.replace("@name", config.getString("Evento.Title", "Super Smackers"))
                             .replace("@winner", player.getName())
             ));
         }
 
         DiscordWebhookManager.sendPlayerWinner(
                 player.getName(),
-                config.getString("Evento.Title")
+                config.getString("Evento.Title", "Super Smackers")
         );
 
         setWinner(player);
@@ -236,7 +304,7 @@ public final class SuperSmackers extends Evento {
 
         for (String line : config.getStringList("Messages.Team winner")) {
             Bukkit.broadcastMessage(ColorUtils.colorize(
-                    line.replace("@name", config.getString("Evento.Title"))
+                    line.replace("@name", config.getString("Evento.Title", "Super Smackers"))
                             .replace("@team", team.getDisplayName())
             ));
         }
@@ -247,7 +315,7 @@ public final class SuperSmackers extends Evento {
 
         DiscordWebhookManager.sendTeamWinner(
                 team.getDisplayName(),
-                config.getString("Evento.Title"),
+                config.getString("Evento.Title", "Super Smackers"),
                 List.of()
         );
 
@@ -279,20 +347,68 @@ public final class SuperSmackers extends Evento {
                 sendToEvent(line.replace("@winner", winner.getName())
                         .replace("@points", String.valueOf(points)));
             }
-        } else {
-            TeamData winnerTeam = currentTeam1 != null && currentTeam1.contains(winner) ? currentTeam1 : currentTeam2;
-            if (winnerTeam != null) {
-                winnerTeam.points++;
 
+            sendRoundWinnerTitle(winner);
+            sendStandingsChat();
+            endCurrentRoundAndReturnLobby();
+            return;
+        }
+
+        TeamData winnerTeam = getCurrentWinnerTeam(winner);
+        if (winnerTeam == null) {
+            finishRoundDraw();
+            return;
+        }
+
+        if (currentDuoLeg == 1) {
+            currentDuoLegWinnerTeam = winnerTeam;
+
+            for (String line : config.getStringList("Messages.Round winner")) {
+                sendToEvent(line.replace("@winner", winner.getName())
+                        .replace("@points", String.valueOf(winnerTeam.points)));
+            }
+
+            sendRoundWinnerTitle(winner);
+            sendStandingsChat();
+            prepareSecondLeg();
+            return;
+        }
+
+        if (currentDuoLeg == 2) {
+            if (currentDuoLegWinnerTeam == null) {
+                currentDuoLegWinnerTeam = winnerTeam;
+            }
+
+            if (winnerTeam.equals(currentDuoLegWinnerTeam)) {
+                winnerTeam.points++;
                 for (String line : config.getStringList("Messages.Round winner")) {
                     sendToEvent(line.replace("@winner", winner.getName())
                             .replace("@points", String.valueOf(winnerTeam.points)));
                 }
+
+                sendRoundWinnerTitle(winner);
+                sendStandingsChat();
+                finishCurrentDuoMatchAndReturnLobby();
+                return;
             }
+
+            sendRoundWinnerTitle(winner);
+            sendStandingsChat();
+            prepareTieBreakLeg();
+            return;
         }
 
-        endCurrentRoundAndReturnLobby();
-        checkEndConditions();
+        if (currentDuoLeg == 3) {
+            winnerTeam.points++;
+            for (String line : config.getStringList("Messages.Round winner")) {
+                sendToEvent(line.replace("@winner", winner.getName())
+                        .replace("@points", String.valueOf(winnerTeam.points)));
+            }
+
+            sendRoundWinnerTitle(winner);
+            sendStandingsChat();
+            finishCurrentDuoMatchAndReturnLobby();
+        }
     }
 
     public void finishRoundDraw() {
@@ -304,6 +420,17 @@ public final class SuperSmackers extends Evento {
             sendToEvent(line);
         }
 
+        if (!isSolo() && currentDuoLeg == 1) {
+            prepareSecondLeg();
+            return;
+        }
+
+        if (!isSolo() && currentDuoLeg == 2) {
+            prepareTieBreakLeg();
+            return;
+        }
+
+        sendStandingsChat();
         endCurrentRoundAndReturnLobby();
     }
 
@@ -376,6 +503,52 @@ public final class SuperSmackers extends Evento {
         return config;
     }
 
+    private void resetState() {
+        currentRound = 0;
+        roundRunning = false;
+        roundStarting = false;
+        eventEnding = false;
+        tieBreakMode = false;
+
+        currentArena = null;
+        currentP1 = null;
+        currentP2 = null;
+        currentTeam1 = null;
+        currentTeam2 = null;
+        currentDuoMatch = null;
+        currentDuoLeg = 0;
+        currentDuoLegWinnerTeam = null;
+
+        soloPoints.clear();
+        teams.clear();
+        playerColors.clear();
+        jumpCooldown.clear();
+        speedCooldown.clear();
+        simpleClansPlayers.clear();
+        availableSoloColors.clear();
+        availableTeamColors.clear();
+        soloMatches.clear();
+        tieBreakSoloMatches.clear();
+        duoMatches.clear();
+        tieBreakDuoMatches.clear();
+    }
+
+    private void prepareAsLobbyPlayer(Player player) {
+        player.setGameMode(GameMode.SURVIVAL);
+        player.setAllowFlight(false);
+        player.setFlying(false);
+        clearPlayer(player);
+        teleport(player, "lobby");
+    }
+
+    private void prepareAsGlobalSpectator(Player player) {
+        player.setGameMode(GameMode.SPECTATOR);
+        player.setAllowFlight(true);
+        player.setFlying(true);
+        clearPlayer(player);
+        teleport(player, "spectator");
+    }
+
     private void prepareModeData() {
         if (isSolo()) {
             return;
@@ -388,8 +561,10 @@ public final class SuperSmackers extends Evento {
 
             for (Player player : players) {
                 ClanPlayer clanPlayer = plugin.getSimpleClans().getClanManager().getClanPlayer(player);
-                String key = clanPlayer != null && clanPlayer.getClan() != null ? clanPlayer.getClan().getTag() : "__NO_CLAN__";
-                byClan.computeIfAbsent(key, k -> new ArrayList<>()).add(player);
+                String key = clanPlayer != null && clanPlayer.getClan() != null
+                        ? clanPlayer.getClan().getTag()
+                        : "__NO_CLAN__";
+                byClan.computeIfAbsent(key, ignored -> new ArrayList<>()).add(player);
             }
 
             Set<Player> used = new HashSet<>();
@@ -397,9 +572,11 @@ public final class SuperSmackers extends Evento {
                 while (sameClan.size() >= 2) {
                     Player a = sameClan.remove(0);
                     Player b = sameClan.remove(0);
+
                     if (used.contains(a) || used.contains(b)) {
                         continue;
                     }
+
                     createTeam(a, b);
                     used.add(a);
                     used.add(b);
@@ -431,68 +608,354 @@ public final class SuperSmackers extends Evento {
 
             remove(odd);
         }
+
+        for (TeamData team : teams) {
+            team.points = 0;
+        }
     }
 
     private void createTeam(Player a, Player b) {
+        String uniqueColor = takeNextTeamColor();
+        if (uniqueColor == null) {
+            return;
+        }
+
         TeamData team = new TeamData();
-        team.colorName = getRandomConfiguredColorName();
+        team.colorHex = uniqueColor;
         team.members.add(a);
         team.members.add(b);
         teams.add(team);
     }
 
-    private void startNextRound() {
-        if (!isHappening() || eventEnding) {
+    private void prepareAvailableColors() {
+        List<String> configured = new ArrayList<>(config.getStringList("Team colors"));
+        availableSoloColors.addAll(configured);
+        availableTeamColors.addAll(configured);
+    }
+
+    private boolean hasEnoughColors() {
+        int configuredColors = config.getStringList("Team colors").size();
+        if (isSolo()) {
+            return configuredColors >= getPlayers().size();
+        }
+        int teamCount = getPlayers().size() / 2;
+        return configuredColors >= teamCount;
+    }
+
+    private String takeNextSoloColor() {
+        if (availableSoloColors.isEmpty()) {
+            return null;
+        }
+        int index = ThreadLocalRandom.current().nextInt(availableSoloColors.size());
+        return availableSoloColors.remove(index);
+    }
+
+    private String takeNextTeamColor() {
+        if (availableTeamColors.isEmpty()) {
+            return null;
+        }
+        int index = ThreadLocalRandom.current().nextInt(availableTeamColors.size());
+        return availableTeamColors.remove(index);
+    }
+
+    private void generateSoloMatches() {
+        soloMatches.clear();
+
+        List<Player> players = new ArrayList<>(getPlayers());
+        players.sort(Comparator.comparing(Player::getName, String.CASE_INSENSITIVE_ORDER));
+
+        for (int i = 0; i < players.size(); i++) {
+            for (int j = i + 1; j < players.size(); j++) {
+                soloMatches.add(new SoloMatch(players.get(i), players.get(j)));
+            }
+        }
+    }
+
+    private void generateDuoMatches() {
+        duoMatches.clear();
+
+        List<TeamData> localTeams = new ArrayList<>(teams);
+        localTeams.sort(Comparator.comparing(team -> team.getDisplayName().toLowerCase(Locale.ROOT)));
+
+        for (int i = 0; i < localTeams.size(); i++) {
+            for (int j = i + 1; j < localTeams.size(); j++) {
+                duoMatches.add(new DuoMatch(localTeams.get(i), localTeams.get(j)));
+            }
+        }
+    }
+
+    private void processSoloForfeit(Player quitter) {
+        List<SoloMatch> affected = new ArrayList<>();
+
+        for (SoloMatch match : soloMatches) {
+            if (match.first.equals(quitter) || match.second.equals(quitter)) {
+                affected.add(match);
+            }
+        }
+
+        for (SoloMatch match : affected) {
+            Player winner = match.first.equals(quitter) ? match.second : match.first;
+            if (getPlayers().contains(winner)) {
+                soloPoints.put(winner, soloPoints.getOrDefault(winner, 0) + 1);
+            }
+            soloMatches.remove(match);
+        }
+
+        List<SoloMatch> affectedTie = new ArrayList<>();
+
+        for (SoloMatch match : tieBreakSoloMatches) {
+            if (match.first.equals(quitter) || match.second.equals(quitter)) {
+                affectedTie.add(match);
+            }
+        }
+
+        for (SoloMatch match : affectedTie) {
+            Player winner = match.first.equals(quitter) ? match.second : match.first;
+            if (getPlayers().contains(winner)) {
+                soloPoints.put(winner, soloPoints.getOrDefault(winner, 0) + 1);
+            }
+            tieBreakSoloMatches.remove(match);
+        }
+    }
+
+    private void processDuoForfeit(Player quitter) {
+        TeamData team = getTeam(quitter);
+        if (team == null) {
             return;
         }
 
-        currentRound++;
-        if (currentRound > totalRounds) {
-            finishEventByScore();
+        for (DuoMatch match : new ArrayList<>(duoMatches)) {
+            if (match.hasTeam(team)) {
+                TeamData winnerTeam = match.first.equals(team) ? match.second : match.first;
+                if (winnerTeam != null) {
+                    winnerTeam.points++;
+                }
+                duoMatches.remove(match);
+            }
+        }
+
+        for (DuoMatch match : new ArrayList<>(tieBreakDuoMatches)) {
+            if (match.hasTeam(team)) {
+                TeamData winnerTeam = match.first.equals(team) ? match.second : match.first;
+                if (winnerTeam != null) {
+                    winnerTeam.points++;
+                }
+                tieBreakDuoMatches.remove(match);
+            }
+        }
+
+        for (Player member : new ArrayList<>(team.members)) {
+            remove(member);
+        }
+
+        teams.remove(team);
+    }
+
+    private boolean prepareTieBreakSoloMatches() {
+        int max = soloPoints.values().stream().max(Integer::compareTo).orElse(0);
+
+        List<Player> leaders = soloPoints.entrySet().stream()
+                .filter(entry -> entry.getValue() == max)
+                .map(Map.Entry::getKey)
+                .filter(getPlayers()::contains)
+                .sorted(Comparator.comparing(Player::getName, String.CASE_INSENSITIVE_ORDER))
+                .collect(Collectors.toList());
+
+        if (leaders.size() <= 1) {
+            return false;
+        }
+
+        tieBreakSoloMatches.clear();
+        tieBreakMode = true;
+
+        for (int i = 0; i < leaders.size(); i++) {
+            for (int j = i + 1; j < leaders.size(); j++) {
+                tieBreakSoloMatches.add(new SoloMatch(leaders.get(i), leaders.get(j)));
+            }
+        }
+
+        return !tieBreakSoloMatches.isEmpty();
+    }
+
+    private boolean prepareTieBreakDuoMatches() {
+        int max = teams.stream().map(team -> team.points).max(Integer::compareTo).orElse(0);
+
+        List<TeamData> leaders = teams.stream()
+                .filter(team -> team.points == max)
+                .sorted(Comparator.comparing(team -> team.getDisplayName().toLowerCase(Locale.ROOT)))
+                .collect(Collectors.toList());
+
+        if (leaders.size() <= 1) {
+            return false;
+        }
+
+        tieBreakDuoMatches.clear();
+        tieBreakMode = true;
+
+        for (int i = 0; i < leaders.size(); i++) {
+            for (int j = i + 1; j < leaders.size(); j++) {
+                tieBreakDuoMatches.add(new DuoMatch(leaders.get(i), leaders.get(j)));
+            }
+        }
+
+        return !tieBreakDuoMatches.isEmpty();
+    }
+
+    private void applyRoundVisibility() {
+        if (currentP1 == null || currentP2 == null) {
             return;
+        }
+
+        List<Player> viewers = new ArrayList<>();
+
+        for (Player player : getPlayers()) {
+            if (!player.equals(currentP1) && !player.equals(currentP2)) {
+                viewers.add(player);
+            }
+        }
+
+        viewers.addAll(getSpectators());
+
+        for (Player viewer : viewers) {
+            currentP1.hidePlayer(plugin, viewer);
+            currentP2.hidePlayer(plugin, viewer);
+
+            viewer.showPlayer(plugin, currentP1);
+            viewer.showPlayer(plugin, currentP2);
+
+            for (Player otherViewer : viewers) {
+                if (!viewer.equals(otherViewer)) {
+                    viewer.hidePlayer(plugin, otherViewer);
+                }
+            }
+
+            viewer.setSpectatorTarget(null);
+        }
+
+        currentP1.showPlayer(plugin, currentP2);
+        currentP2.showPlayer(plugin, currentP1);
+    }
+
+    private void restoreRoundVisibility() {
+        List<Player> everyone = new ArrayList<>();
+        everyone.addAll(getPlayers());
+        everyone.addAll(getSpectators());
+
+        for (Player a : everyone) {
+            for (Player b : everyone) {
+                a.showPlayer(plugin, b);
+            }
+        }
+    }
+
+    private void scheduleNextRound(int delaySeconds) {
+        cancelTask(nextRoundTask);
+
+        if (!prepareNextRoundMatchup()) {
+            return;
+        }
+
+        for (Player player : getPlayers()) {
+            prepareAsLobbyPlayer(player);
+        }
+
+        for (Player spectator : getSpectators()) {
+            prepareAsGlobalSpectator(spectator);
+        }
+
+        sendNextRoundMessage(delaySeconds);
+
+        if (delaySeconds <= 0) {
+            beginPreparedRound();
+            return;
+        }
+
+        nextRoundTask = Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            if (!isHappening() || eventEnding) {
+                return;
+            }
+            beginPreparedRound();
+        }, delaySeconds * 20L);
+    }
+
+    private boolean prepareNextRoundMatchup() {
+        if (!isHappening() || eventEnding) {
+            return false;
         }
 
         if (isSolo()) {
-            List<Player> alive = new ArrayList<>(getPlayers());
-            if (alive.size() < 2) {
-                finishEventByScore();
-                return;
+            List<SoloMatch> source = tieBreakMode ? tieBreakSoloMatches : soloMatches;
+
+            while (!source.isEmpty()) {
+                SoloMatch match = source.remove(0);
+
+                if (!getPlayers().contains(match.first) || !getPlayers().contains(match.second)) {
+                    continue;
+                }
+
+                currentRound++;
+                currentP1 = match.first;
+                currentP2 = match.second;
+                currentTeam1 = null;
+                currentTeam2 = null;
+                currentArena = randomArena();
+                return true;
             }
 
-            Collections.shuffle(alive);
-            currentP1 = alive.get(0);
-            currentP2 = alive.get(1);
-            currentTeam1 = null;
-            currentTeam2 = null;
-        } else {
-            List<TeamData> available = teams.stream()
-                    .filter(team -> team.members.size() >= 2)
-                    .collect(Collectors.toList());
-
-            if (available.size() < 2) {
-                finishEventByScore();
-                return;
+            if (prepareTieBreakSoloMatches()) {
+                return prepareNextRoundMatchup();
             }
 
-            Collections.shuffle(available);
-            currentTeam1 = available.get(0);
-            currentTeam2 = available.get(1);
-
-            currentP1 = currentTeam1.getRandomMember();
-            currentP2 = currentTeam2.getRandomMember();
-
-            if (currentP1 == null || currentP2 == null) {
-                finishEventByScore();
-                return;
-            }
+            finishEventByScore();
+            return false;
         }
 
-        currentArena = arenas.get(ThreadLocalRandom.current().nextInt(arenas.size()));
+        List<DuoMatch> source = tieBreakMode ? tieBreakDuoMatches : duoMatches;
+
+        while (!source.isEmpty()) {
+            DuoMatch match = source.remove(0);
+
+            if (!teams.contains(match.first) || !teams.contains(match.second)) {
+                continue;
+            }
+
+            if (match.first.members.size() < 2 || match.second.members.size() < 2) {
+                continue;
+            }
+
+            currentRound++;
+            currentDuoMatch = match;
+            currentDuoLeg = 1;
+            currentDuoLegWinnerTeam = null;
+
+            currentTeam1 = match.first;
+            currentTeam2 = match.second;
+            currentP1 = currentTeam1.members.get(0);
+            currentP2 = currentTeam2.members.get(0);
+            currentArena = randomArena();
+            return true;
+        }
+
+        if (prepareTieBreakDuoMatches()) {
+            return prepareNextRoundMatchup();
+        }
+
+        finishEventByScore();
+        return false;
+    }
+
+    private ArenaData randomArena() {
+        return arenas.get(ThreadLocalRandom.current().nextInt(arenas.size()));
+    }
+    private void beginPreparedRound() {
+        if (!isHappening() || eventEnding || currentArena == null || currentP1 == null || currentP2 == null) {
+            return;
+        }
 
         for (String line : config.getStringList("Messages.Round")) {
             sendToEvent(line.replace("@arena", currentArena.display)
-                    .replace("@player1", currentP1.getName())
-                    .replace("@player2", currentP2.getName()));
+                    .replace("@player1", getPlayerColorCode(currentP1) + currentP1.getName())
+                    .replace("@player2", getPlayerColorCode(currentP2) + currentP2.getName()));
         }
 
         sendPlayersToArena();
@@ -500,26 +963,52 @@ public final class SuperSmackers extends Evento {
     }
 
     private void sendPlayersToArena() {
-        if (currentArena == null) {
+        if (currentArena == null || currentP1 == null || currentP2 == null) {
             return;
         }
+
+        restoreRoundVisibility();
+
+        for (Player player : getPlayers()) {
+            player.setGameMode(GameMode.SURVIVAL);
+            player.setAllowFlight(false);
+            player.setFlying(false);
+            clearPlayer(player);
+        }
+
+        for (Player spectator : getSpectators()) {
+            clearPlayer(spectator);
+            spectator.setGameMode(GameMode.SPECTATOR);
+            spectator.setAllowFlight(true);
+            spectator.setFlying(true);
+        }
+
+        currentP1.setGameMode(GameMode.SURVIVAL);
+        currentP1.setAllowFlight(false);
+        currentP1.setFlying(false);
+
+        currentP2.setGameMode(GameMode.SURVIVAL);
+        currentP2.setAllowFlight(false);
+        currentP2.setFlying(false);
 
         currentP1.teleport(currentArena.spawn1, PlayerTeleportEvent.TeleportCause.PLUGIN);
         currentP2.teleport(currentArena.spawn2, PlayerTeleportEvent.TeleportCause.PLUGIN);
 
-        clearPlayer(currentP1);
-        clearPlayer(currentP2);
         applyFightItem(currentP1);
         applyFightItem(currentP2);
 
-        equipRandomColorArmor(currentP1);
-        equipRandomColorArmor(currentP2);
+        equipFighterArmor(currentP1);
+        equipFighterArmor(currentP2);
 
         for (Player player : getPlayers()) {
             if (player.equals(currentP1) || player.equals(currentP2)) {
                 continue;
             }
 
+            clearPlayer(player);
+            player.setGameMode(GameMode.SPECTATOR);
+            player.setAllowFlight(true);
+            player.setFlying(true);
             player.teleport(currentArena.spectator, PlayerTeleportEvent.TeleportCause.PLUGIN);
 
             for (String line : config.getStringList("Messages.Spectator arena")) {
@@ -528,6 +1017,22 @@ public final class SuperSmackers extends Evento {
                 ));
             }
         }
+
+        for (Player spectator : getSpectators()) {
+            clearPlayer(spectator);
+            spectator.setGameMode(GameMode.SPECTATOR);
+            spectator.setAllowFlight(true);
+            spectator.setFlying(true);
+            spectator.teleport(currentArena.spectator, PlayerTeleportEvent.TeleportCause.PLUGIN);
+
+            for (String line : config.getStringList("Messages.Spectator arena")) {
+                spectator.sendMessage(ColorUtils.colorize(
+                        line.replace("@arena", currentArena.display)
+                ));
+            }
+        }
+
+        applyRoundVisibility();
     }
 
     private void startRoundCountdown() {
@@ -570,6 +1075,70 @@ public final class SuperSmackers extends Evento {
         }, roundMaxTime * 20L);
     }
 
+    private void prepareSecondLeg() {
+        if (currentDuoMatch == null) {
+            endCurrentRoundAndReturnLobby();
+            return;
+        }
+
+        roundRunning = false;
+        roundStarting = false;
+        cancelTask(roundTask);
+        cancelTask(countdownTask);
+
+        currentDuoLeg = 2;
+        currentP1 = currentDuoMatch.first.members.get(1);
+        currentP2 = currentDuoMatch.second.members.get(1);
+        currentArena = randomArena();
+
+        schedulePreparedLeg();
+    }
+
+    private void prepareTieBreakLeg() {
+        if (currentDuoMatch == null) {
+            endCurrentRoundAndReturnLobby();
+            return;
+        }
+
+        roundRunning = false;
+        roundStarting = false;
+        cancelTask(roundTask);
+        cancelTask(countdownTask);
+
+        currentDuoLeg = 3;
+        currentP1 = currentDuoMatch.first.members.get(0);
+        currentP2 = currentDuoMatch.second.members.get(0);
+        currentArena = randomArena();
+
+        schedulePreparedLeg();
+    }
+
+    private void schedulePreparedLeg() {
+        for (Player player : getPlayers()) {
+            prepareAsLobbyPlayer(player);
+        }
+
+        for (Player spectator : getSpectators()) {
+            prepareAsGlobalSpectator(spectator);
+        }
+
+        sendNextRoundMessage(nextRoundDelay);
+
+        nextRoundTask = Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            if (!isHappening() || eventEnding) {
+                return;
+            }
+            beginPreparedRound();
+        }, nextRoundDelay * 20L);
+    }
+
+    private void finishCurrentDuoMatchAndReturnLobby() {
+        currentDuoMatch = null;
+        currentDuoLeg = 0;
+        currentDuoLegWinnerTeam = null;
+        endCurrentRoundAndReturnLobby();
+    }
+
     private void endCurrentRoundAndReturnLobby() {
         cancelTask(roundTask);
         cancelTask(countdownTask);
@@ -577,9 +1146,14 @@ public final class SuperSmackers extends Evento {
         roundRunning = false;
         roundStarting = false;
 
+        restoreRoundVisibility();
+
         for (Player player : new ArrayList<>(getPlayers())) {
-            clearPlayer(player);
-            teleport(player, "lobby");
+            prepareAsLobbyPlayer(player);
+        }
+
+        for (Player spectator : new ArrayList<>(getSpectators())) {
+            prepareAsGlobalSpectator(spectator);
         }
 
         currentArena = null;
@@ -588,12 +1162,16 @@ public final class SuperSmackers extends Evento {
         currentTeam1 = null;
         currentTeam2 = null;
 
-        Bukkit.getScheduler().runTaskLater(plugin, this::startNextRound, 60L);
+        if (!eventEnding) {
+            scheduleNextRound(nextRoundDelay);
+        }
     }
 
     private void finishEventByScore() {
         if (isSolo()) {
-            Player winner = soloPoints.entrySet().stream()
+            Player winner = soloPoints.entrySet()
+                    .stream()
+                    .filter(entry -> getPlayers().contains(entry.getKey()))
                     .max(Comparator.comparingInt(Map.Entry::getValue))
                     .map(Map.Entry::getKey)
                     .orElse(null);
@@ -603,6 +1181,7 @@ public final class SuperSmackers extends Evento {
                 return;
             }
 
+            tieBreakMode = false;
             winner(winner);
             return;
         }
@@ -616,6 +1195,7 @@ public final class SuperSmackers extends Evento {
             return;
         }
 
+        tieBreakMode = false;
         teamWinner(best);
     }
 
@@ -627,7 +1207,10 @@ public final class SuperSmackers extends Evento {
             return;
         }
 
-        long teamsAlive = teams.stream().filter(team -> team.members.size() >= 2).count();
+        long teamsAlive = teams.stream()
+                .filter(team -> team.members.size() >= 2)
+                .count();
+
         if (teamsAlive <= 1) {
             finishEventByScore();
         }
@@ -642,6 +1225,7 @@ public final class SuperSmackers extends Evento {
         Player winner = leaver.equals(currentP1) ? currentP2 : currentP1;
 
         remove(leaver);
+
         if (winner == null) {
             finishRoundDraw();
             return;
@@ -650,14 +1234,85 @@ public final class SuperSmackers extends Evento {
         if (isSolo()) {
             int points = soloPoints.getOrDefault(winner, 0) + 1;
             soloPoints.put(winner, points);
-        } else {
-            TeamData team = currentTeam1 != null && currentTeam1.contains(winner) ? currentTeam1 : currentTeam2;
-            if (team != null) {
-                team.points++;
+
+            for (String line : config.getStringList("Messages.Round winner")) {
+                sendToEvent(line.replace("@winner", winner.getName())
+                        .replace("@points", String.valueOf(points)));
             }
+
+            sendRoundWinnerTitle(winner);
+            sendStandingsChat();
+            endCurrentRoundAndReturnLobby();
+            return;
         }
 
-        endCurrentRoundAndReturnLobby();
+        TeamData winnerTeam = getCurrentWinnerTeam(winner);
+        if (winnerTeam == null) {
+            finishRoundDraw();
+            return;
+        }
+
+        if (currentDuoLeg == 1) {
+            currentDuoLegWinnerTeam = winnerTeam;
+
+            for (String line : config.getStringList("Messages.Round winner")) {
+                sendToEvent(line.replace("@winner", winner.getName())
+                        .replace("@points", String.valueOf(winnerTeam.points)));
+            }
+
+            sendRoundWinnerTitle(winner);
+            sendStandingsChat();
+            prepareSecondLeg();
+            return;
+        }
+
+        if (currentDuoLeg == 2) {
+            if (currentDuoLegWinnerTeam == null) {
+                currentDuoLegWinnerTeam = winnerTeam;
+            }
+
+            if (winnerTeam.equals(currentDuoLegWinnerTeam)) {
+                winnerTeam.points++;
+
+                for (String line : config.getStringList("Messages.Round winner")) {
+                    sendToEvent(line.replace("@winner", winner.getName())
+                            .replace("@points", String.valueOf(winnerTeam.points)));
+                }
+
+                sendRoundWinnerTitle(winner);
+                sendStandingsChat();
+                finishCurrentDuoMatchAndReturnLobby();
+                return;
+            }
+
+            sendRoundWinnerTitle(winner);
+            sendStandingsChat();
+            prepareTieBreakLeg();
+            return;
+        }
+
+        if (currentDuoLeg == 3) {
+            winnerTeam.points++;
+
+            for (String line : config.getStringList("Messages.Round winner")) {
+                sendToEvent(line.replace("@winner", winner.getName())
+                        .replace("@points", String.valueOf(winnerTeam.points)));
+            }
+
+            sendRoundWinnerTitle(winner);
+            sendStandingsChat();
+            finishCurrentDuoMatchAndReturnLobby();
+        }
+    }
+
+    private TeamData getCurrentWinnerTeam(Player winner) {
+        if (currentTeam1 != null && currentTeam1.contains(winner)) {
+            return currentTeam1;
+        }
+        if (currentTeam2 != null && currentTeam2.contains(winner)) {
+            return currentTeam2;
+        }
+        return null;
     }
 
     private boolean canUseCooldown(Player player, Map<UUID, Long> map, int cooldownSeconds) {
@@ -716,20 +1371,13 @@ public final class SuperSmackers extends Evento {
         }
     }
 
-    private void loadLobbyLocations() {
-        Location spectator = loadLocation(config.getConfigurationSection("Locations.Spectator"));
-        if (spectator != null) {
-            lobbySpectators.add(spectator);
-        }
-    }
-
     private Location loadLocation(ConfigurationSection section) {
         if (section == null) {
             return null;
         }
 
         String worldName = section.getString("world");
-        if (worldName == null) {
+        if (worldName == null || worldName.isBlank()) {
             return null;
         }
 
@@ -752,21 +1400,18 @@ public final class SuperSmackers extends Evento {
         if (section.contains(key)) {
             return section.getDouble(key);
         }
+
         String lower = Character.toLowerCase(key.charAt(0)) + key.substring(1);
         return section.getDouble(lower);
     }
 
     private void applyFightItem(Player player) {
-        ConfigurationSection section = config.getConfigurationSection("Itens.Inventory.0");
-        if (section == null) {
+        ConfigurationSection itensSection = config.getConfigurationSection("Itens");
+        if (itensSection == null || !config.getBoolean("Itens.Enabled", false)) {
             return;
         }
 
-        ItemStack stack = CustomItemResolver.resolve(section);
-        if (stack != null) {
-            player.getInventory().setItem(0, stack);
-            player.updateInventory();
-        }
+        EventKitApplier.apply(player, itensSection);
     }
 
     private void clearPlayer(Player player) {
@@ -776,8 +1421,17 @@ public final class SuperSmackers extends Evento {
         player.updateInventory();
     }
 
-    private void equipRandomColorArmor(Player player) {
-        Color color = randomArmorColor();
+    private void equipFighterArmor(Player player) {
+        String colorHex;
+
+        if (isSolo()) {
+            colorHex = playerColors.getOrDefault(player, "&#00aaff");
+        } else {
+            TeamData team = getTeam(player);
+            colorHex = team != null ? team.colorHex : "&#00aaff";
+        }
+
+        Color color = parseArmorColor(colorHex);
 
         player.getInventory().setHelmet(coloredArmor(Material.LEATHER_HELMET, color));
         player.getInventory().setChestplate(coloredArmor(Material.LEATHER_CHESTPLATE, color));
@@ -789,47 +1443,168 @@ public final class SuperSmackers extends Evento {
     private ItemStack coloredArmor(Material material, Color color) {
         ItemStack item = new ItemStack(material);
         LeatherArmorMeta meta = (LeatherArmorMeta) item.getItemMeta();
+
         if (meta != null) {
             meta.setColor(color);
             item.setItemMeta(meta);
         }
+
         return item;
     }
 
-    private Color randomArmorColor() {
-        List<String> colors = config.getStringList("Team colors");
-        if (colors.isEmpty()) {
+    private Color parseArmorColor(String hex) {
+        String clean = hex.replace("&#", "").replace("#", "");
+
+        if (clean.length() != 6) {
             return Color.BLUE;
         }
 
-        String name = colors.get(ThreadLocalRandom.current().nextInt(colors.size())).toUpperCase(Locale.ROOT);
-        return switch (name) {
-            case "RED" -> Color.RED;
-            case "GREEN" -> Color.GREEN;
-            case "YELLOW" -> Color.YELLOW;
-            case "PURPLE" -> Color.PURPLE;
-            case "AQUA" -> Color.AQUA;
-            case "GOLD" -> Color.ORANGE;
-            case "PINK" -> Color.FUCHSIA;
-            default -> Color.BLUE;
-        };
+        try {
+            int r = Integer.parseInt(clean.substring(0, 2), 16);
+            int g = Integer.parseInt(clean.substring(2, 4), 16);
+            int b = Integer.parseInt(clean.substring(4, 6), 16);
+            return Color.fromRGB(r, g, b);
+        } catch (Exception ignored) {
+            return Color.BLUE;
+        }
     }
 
-    private String getRandomConfiguredColorName() {
-        List<String> colors = config.getStringList("Team colors");
-        if (colors.isEmpty()) {
-            return "BLUE";
+    private String getPlayerColorCode(Player player) {
+        if (!isSolo()) {
+            TeamData team = getTeam(player);
+            if (team != null) {
+                return team.colorHex;
+            }
         }
-        return colors.get(ThreadLocalRandom.current().nextInt(colors.size()));
+
+        return playerColors.getOrDefault(player, "&#00aaff");
     }
 
     private void titleToFighters(String text) {
         String parsed = ColorUtils.colorize(text);
+
         if (currentP1 != null) {
             currentP1.sendTitle(parsed, "", 0, 20, 0);
         }
+
         if (currentP2 != null) {
             currentP2.sendTitle(parsed, "", 0, 20, 0);
+        }
+    }
+
+    private void sendRoundWinnerTitle(Player winner) {
+        String titleRaw = config.getString("Messages.Round winner title.Title", "@winner");
+        String subtitleRaw = config.getString("Messages.Round winner title.Subtitle", "venceu a rodada!");
+
+        String title = ColorUtils.colorize(
+                titleRaw.replace("@winner", getPlayerColorCode(winner) + winner.getName())
+        );
+        String subtitle = ColorUtils.colorize(
+                subtitleRaw.replace("@winner", getPlayerColorCode(winner) + winner.getName())
+        );
+
+        for (Player player : getPlayers()) {
+            player.sendTitle(title, subtitle, 10, 40, 10);
+        }
+
+        for (Player spectator : getSpectators()) {
+            spectator.sendTitle(title, subtitle, 10, 40, 10);
+        }
+    }
+
+    private void sendStandingsChat() {
+        for (String line : config.getStringList("Messages.Standings header")) {
+            sendToEvent(line);
+        }
+
+        if (isSolo()) {
+            List<Map.Entry<Player, Integer>> ranking = new ArrayList<>(soloPoints.entrySet());
+            ranking.sort((a, b) -> Integer.compare(b.getValue(), a.getValue()));
+
+            for (Map.Entry<Player, Integer> entry : ranking) {
+                Player player = entry.getKey();
+
+                for (String line : config.getStringList("Messages.Standings line solo")) {
+                    sendToEvent(
+                            line.replace("@color", getPlayerColorCode(player))
+                                    .replace("@player", player.getName())
+                                    .replace("@points", String.valueOf(entry.getValue()))
+                    );
+                }
+            }
+        } else {
+            List<TeamData> ranking = new ArrayList<>(teams);
+            ranking.sort((a, b) -> Integer.compare(b.points, a.points));
+
+            for (TeamData team : ranking) {
+                for (String line : config.getStringList("Messages.Standings line duo")) {
+                    sendToEvent(
+                            line.replace("@color", team.colorHex)
+                                    .replace("@team", team.getDisplayName())
+                                    .replace("@points", String.valueOf(team.points))
+                    );
+                }
+            }
+        }
+
+        for (String line : config.getStringList("Messages.Standings footer")) {
+            sendToEvent(line);
+        }
+    }
+
+    private void startActionbar() {
+        cancelTask(actionbarTask);
+
+        actionbarTask = Bukkit.getScheduler().runTaskTimer(plugin, () -> {
+            if (!isHappening() || eventEnding) {
+                cancelTask(actionbarTask);
+                return;
+            }
+
+            if (isSolo()) {
+                for (Player player : getPlayers()) {
+                    int points = soloPoints.getOrDefault(player, 0);
+
+                    String message = ColorUtils.colorize(
+                            "&#ffaa00Pontuação: &f" + points
+                    );
+
+                    player.sendActionBar(message);
+                }
+
+                return;
+            }
+
+            for (TeamData team : teams) {
+                String message = ColorUtils.colorize(
+                        team.colorHex + team.getDisplayName() +
+                                " &f- &e" + team.points + " pontos"
+                );
+
+                for (Player member : team.members) {
+                    if (member != null && member.isOnline()) {
+                        member.sendActionBar(message);
+                    }
+                }
+            }
+
+        }, 0L, 20L);
+    }
+
+    private void sendNextRoundMessage(int delay) {
+        if (currentP1 == null || currentP2 == null) {
+            return;
+        }
+
+        String first = getPlayerColorCode(currentP1) + currentP1.getName();
+        String second = getPlayerColorCode(currentP2) + currentP2.getName();
+
+        for (String line : config.getStringList("Messages.Lobby wait")) {
+            sendToEvent(
+                    line.replace("@player1", first)
+                            .replace("@player2", second)
+                            .replace("@time", String.valueOf(delay))
+            );
         }
     }
 
@@ -845,45 +1620,6 @@ public final class SuperSmackers extends Evento {
                 clanPlayer.setFriendlyFire(true);
             }
         }
-    }
-
-    private void removeFromTeams(Player player) {
-        for (TeamData team : teams) {
-            team.members.remove(player);
-        }
-    }
-
-    private void startActionbar() {
-        actionbarTask = Bukkit.getScheduler().runTaskTimer(plugin, () -> {
-            if (!isHappening() || eventEnding) {
-                return;
-            }
-
-            for (Player player : getPlayers()) {
-                if (isSolo()) {
-                    String line = config.getStringList("Messages.Actionbar solo").stream().findFirst()
-                            .orElse("&fRodada: @round/@total_rounds &fPontos: @points");
-
-                    player.sendActionBar(ColorUtils.colorize(
-                            line.replace("@round", String.valueOf(currentRound))
-                                    .replace("@total_rounds", String.valueOf(totalRounds))
-                                    .replace("@points", String.valueOf(soloPoints.getOrDefault(player, 0)))
-                    ));
-                } else {
-                    TeamData team = getTeam(player);
-                    int points = team == null ? 0 : team.points;
-
-                    String line = config.getStringList("Messages.Actionbar duo").stream().findFirst()
-                            .orElse("&fRodada: @round/@total_rounds &fPontos do time: @points");
-
-                    player.sendActionBar(ColorUtils.colorize(
-                            line.replace("@round", String.valueOf(currentRound))
-                                    .replace("@total_rounds", String.valueOf(totalRounds))
-                                    .replace("@points", String.valueOf(points))
-                    ));
-                }
-            }
-        }, 0L, 20L);
     }
 
     private TeamData getTeam(Player player) {
@@ -925,8 +1661,32 @@ public final class SuperSmackers extends Evento {
         private Location spectator;
     }
 
-    private static final class TeamData {
-        private String colorName;
+    private static final class SoloMatch {
+        private final Player first;
+        private final Player second;
+
+        private SoloMatch(Player first, Player second) {
+            this.first = first;
+            this.second = second;
+        }
+    }
+
+    private static final class DuoMatch {
+        private final TeamData first;
+        private final TeamData second;
+
+        private DuoMatch(TeamData first, TeamData second) {
+            this.first = first;
+            this.second = second;
+        }
+
+        private boolean hasTeam(TeamData team) {
+            return first.equals(team) || second.equals(team);
+        }
+    }
+
+    public static final class TeamData {
+        private String colorHex;
         private final List<Player> members = new ArrayList<>();
         private int points = 0;
 
@@ -934,15 +1694,10 @@ public final class SuperSmackers extends Evento {
             return members.contains(player);
         }
 
-        private Player getRandomMember() {
-            if (members.isEmpty()) {
-                return null;
-            }
-            return members.get(ThreadLocalRandom.current().nextInt(members.size()));
-        }
-
         private String getDisplayName() {
-            return colorName + " (" + members.stream().map(Player::getName).collect(Collectors.joining(", ")) + ")";
+            return members.stream()
+                    .map(Player::getName)
+                    .collect(Collectors.joining(", "));
         }
     }
 }

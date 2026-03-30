@@ -13,56 +13,35 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public final class TNTRunListener implements Listener {
 
     private TNTRun evento;
+    private final Set<String> queuedBlocks = new HashSet<>();
 
-    @EventHandler
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
     public void onMove(PlayerMoveEvent event) {
         TNTRun tntRun = getEvento();
         if (tntRun == null) return;
 
         Player player = event.getPlayer();
-
         if (!tntRun.getPlayers().contains(player)) return;
-
         if (!tntRun.isTntRunHappening() || !tntRun.isHappening() || event.getTo() == null) return;
 
         Location from = event.getFrom();
         Location to = event.getTo();
-
-        if (from.getBlockX() == to.getBlockX()
-                && from.getBlockY() == to.getBlockY()
-                && from.getBlockZ() == to.getBlockZ()) {
-            return;
-        }
-
-        Block fromBlockUnder = from.getBlock().getRelative(BlockFace.DOWN);
-
-        if (tntRun.getTriggers().contains(fromBlockUnder.getType())) {
-            Block below = fromBlockUnder.getRelative(BlockFace.DOWN);
-
-            if (below.getType() == XMaterial.TNT.parseMaterial()) {
-                tntRun.getScheduler().runTaskLater(AbsolutEventsPlugin.getInstance(), () -> {
-                    if (!tntRun.isHappening()) return;
-
-                    if (fromBlockUnder.getType() != Material.AIR) {
-                        fromBlockUnder.setType(Material.AIR, false);
-                    }
-
-                    if (below.getType() != Material.AIR) {
-                        below.setType(Material.AIR, false);
-                    }
-                }, tntRun.getDelay());
-            }
-        }
 
         Material toType = to.getBlock().getType();
         boolean inWater = toType == XMaterial.WATER.parseMaterial();
@@ -73,31 +52,40 @@ public final class TNTRunListener implements Listener {
 
         if (inWater || fellBelowArena) {
             eliminate(player, tntRun);
+            return;
+        }
+
+        Block currentUnder = to.getBlock().getRelative(BlockFace.DOWN);
+        forceScheduleBreak(currentUnder);
+
+        if (from.getBlockX() != to.getBlockX()
+                || from.getBlockY() != to.getBlockY()
+                || from.getBlockZ() != to.getBlockZ()) {
+            Block previousUnder = from.getBlock().getRelative(BlockFace.DOWN);
+            if (!sameBlock(previousUnder, currentUnder)) {
+                forceScheduleBreak(previousUnder);
+            }
         }
     }
 
-    private void eliminate(Player player, TNTRun tntRun) {
-        if (!tntRun.getPlayers().contains(player)) return;
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
+    public void onBlockPlace(BlockPlaceEvent event) {
+        TNTRun tntRun = getEvento();
+        if (tntRun == null) return;
 
-        // ✅ CORREÇÃO HEX
-        player.sendMessage(ColorUtils.colorize(
-                AbsolutEventsPlugin.getInstance().getConfig()
-                        .getString("Messages.Eliminated", "&cVocê foi eliminado.")
-        ));
+        if (!tntRun.getPlayers().contains(event.getPlayer())) return;
 
-        tntRun.remove(player);
-        tntRun.notifyLeave(player);
+        event.setCancelled(true);
+    }
 
-        PlayerLoseEvent lose = new PlayerLoseEvent(
-                player,
-                tntRun.getConfig().getString("filename", "").replace(".yml", ""),
-                tntRun.getType()
-        );
-        Bukkit.getPluginManager().callEvent(lose);
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
+    public void onBlockBreak(BlockBreakEvent event) {
+        TNTRun tntRun = getEvento();
+        if (tntRun == null) return;
 
-        if (tntRun.isHappening() && tntRun.getPlayers().size() == 1) {
-            tntRun.winner(tntRun.getPlayers().get(0));
-        }
+        if (!tntRun.getPlayers().contains(event.getPlayer())) return;
+
+        event.setCancelled(true);
     }
 
     @EventHandler
@@ -146,6 +134,61 @@ public final class TNTRunListener implements Listener {
         }
     }
 
+    public void forceScheduleBreak(Block topBlock) {
+        TNTRun tntRun = getEvento();
+        if (tntRun == null) return;
+        if (topBlock == null) return;
+        if (!tntRun.isHappening() || !tntRun.isTntRunHappening()) return;
+        if (!tntRun.getCuboid().isIn(topBlock.getLocation())) return;
+        if (!tntRun.getTriggers().contains(topBlock.getType())) return;
+
+        String key = blockKey(topBlock);
+        if (!queuedBlocks.add(key)) {
+            return;
+        }
+
+        Block below = topBlock.getRelative(BlockFace.DOWN);
+
+        tntRun.getScheduler().runTaskLater(AbsolutEventsPlugin.getInstance(), () -> {
+            try {
+                if (!tntRun.isHappening()) return;
+
+                if (tntRun.getTriggers().contains(topBlock.getType())) {
+                    topBlock.setType(Material.AIR, false);
+                }
+
+                if (below.getType() == XMaterial.TNT.parseMaterial()) {
+                    below.setType(Material.AIR, false);
+                }
+            } finally {
+                queuedBlocks.remove(key);
+            }
+        }, tntRun.getDelay());
+    }
+
+    private void eliminate(Player player, TNTRun tntRun) {
+        if (!tntRun.getPlayers().contains(player)) return;
+
+        player.sendMessage(ColorUtils.colorize(
+                AbsolutEventsPlugin.getInstance().getConfig()
+                        .getString("Messages.Eliminated", "&cVocê foi eliminado.")
+        ));
+
+        tntRun.remove(player);
+        tntRun.notifyLeave(player);
+
+        PlayerLoseEvent lose = new PlayerLoseEvent(
+                player,
+                tntRun.getConfig().getString("filename", "").replace(".yml", ""),
+                tntRun.getType()
+        );
+        Bukkit.getPluginManager().callEvent(lose);
+
+        if (tntRun.isHappening() && tntRun.getPlayers().size() == 1) {
+            tntRun.winner(tntRun.getPlayers().get(0));
+        }
+    }
+
     public void setEvento() {
         if (AbsolutEventsPlugin.getInstance().getEventoManager().getEvento() instanceof TNTRun tntRun) {
             this.evento = tntRun;
@@ -157,5 +200,17 @@ public final class TNTRunListener implements Listener {
             setEvento();
         }
         return evento;
+    }
+
+    private boolean sameBlock(Block a, Block b) {
+        if (a == null || b == null) return false;
+        return a.getWorld().equals(b.getWorld())
+                && a.getX() == b.getX()
+                && a.getY() == b.getY()
+                && a.getZ() == b.getZ();
+    }
+
+    private String blockKey(Block block) {
+        return block.getWorld().getName() + ":" + block.getX() + ":" + block.getY() + ":" + block.getZ();
     }
 }

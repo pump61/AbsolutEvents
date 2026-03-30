@@ -87,6 +87,10 @@ public final class EventoCommand implements CommandExecutor, TabCompleter {
             "finishpos2",
             "checkpoint",
             "finish",
+            "arena",
+            "spawn1",
+            "spawn2",
+            "display",
             "sair",
             "leave",
             "quit"
@@ -552,6 +556,10 @@ public final class EventoCommand implements CommandExecutor, TabCompleter {
                 sendSignSetupHelp(player, config);
             } else if (isQuiz(config)) {
                 sendQuizSetupHelp(player, config);
+            } else if (isBattleRoyale(config)) {
+                sendBattleRoyaleSetupHelp(player, config);
+            } else if (isSuperSmackers(config)) {
+                sendSuperSmackersSetupHelp(player, config);
             } else {
                 sendDefaultSetupHelp(player, config);
             }
@@ -571,6 +579,10 @@ public final class EventoCommand implements CommandExecutor, TabCompleter {
                 sendSignSetupHelp(player, settings);
             } else if (isQuiz(settings)) {
                 sendQuizSetupHelp(player, settings);
+            } else if (isBattleRoyale(settings)) {
+                sendBattleRoyaleSetupHelp(player, settings);
+            } else if (isSuperSmackers(settings)) {
+                sendSuperSmackersSetupHelp(player, settings);
             } else {
                 sendDefaultSetupHelp(player, settings);
             }
@@ -602,6 +614,9 @@ public final class EventoCommand implements CommandExecutor, TabCompleter {
             case "camarote":
             case "assistir":
             case "spectator":
+                if (isSuperSmackers(settings) && args.length >= 3) {
+                    return handleSuperSmackersArenaSpawn(sender, player, settings, args, "Spectator");
+                }
                 savePlayerLocation(settings, player, "Spectator");
                 return true;
 
@@ -638,6 +653,34 @@ public final class EventoCommand implements CommandExecutor, TabCompleter {
             case "finish":
                 if (isSign(settings)) {
                     return handleSignFinish(sender, player, settings);
+                }
+                sender.sendMessage(color(message("Messages.Unknown argument")));
+                return true;
+
+            case "arena":
+                if (isSuperSmackers(settings)) {
+                    return handleSuperSmackersArena(sender, player, settings, args);
+                }
+                sender.sendMessage(color(message("Messages.Unknown argument")));
+                return true;
+
+            case "spawn1":
+                if (isSuperSmackers(settings)) {
+                    return handleSuperSmackersArenaSpawn(sender, player, settings, args, "Spawn1");
+                }
+                sender.sendMessage(color(message("Messages.Unknown argument")));
+                return true;
+
+            case "spawn2":
+                if (isSuperSmackers(settings)) {
+                    return handleSuperSmackersArenaSpawn(sender, player, settings, args, "Spawn2");
+                }
+                sender.sendMessage(color(message("Messages.Unknown argument")));
+                return true;
+
+            case "display":
+                if (isSuperSmackers(settings)) {
+                    return handleSuperSmackersArenaDisplay(sender, player, settings, args);
                 }
                 sender.sendMessage(color(message("Messages.Unknown argument")));
                 return true;
@@ -701,6 +744,11 @@ public final class EventoCommand implements CommandExecutor, TabCompleter {
     }
 
     private boolean handleSetupItems(CommandSender sender, Player player, YamlConfiguration settings, String[] args) {
+        if (isSuperSmackers(settings)) {
+            sender.sendMessage(color("&cO Super Smackers não usa /evento setup itens."));
+            sender.sendMessage(color("&cConfigure o kit manualmente na seção &fItens &cdo arquivo."));
+            return true;
+        }
         if (!SETUP.get(player).isSet("Itens")) {
             sender.sendMessage(color(
                     message("Messages.Not needed kit").replace("@name", settings.getString("Evento.Title"))
@@ -1305,6 +1353,133 @@ public final class EventoCommand implements CommandExecutor, TabCompleter {
         player.sendMessage(color("&f11. Sair do setup: &e/evento setup sair"));
     }
 
+    private boolean isSuperSmackers(YamlConfiguration config) {
+        return config.getString("Evento.Type", "").equalsIgnoreCase("supersmackers");
+    }
+
+    private void sendSuperSmackersSetupHelp(Player player, YamlConfiguration config) {
+        player.sendMessage(color("&6[Super Smackers Setup] &f" + config.getString("Evento.Title")));
+        player.sendMessage(color("&f1. Defina o lobby global: &e/evento setup lobby"));
+        player.sendMessage(color("&f2. Defina a entrada global: &e/evento setup entrance"));
+        player.sendMessage(color("&f3. Defina o spectator global: &e/evento setup spectator"));
+        player.sendMessage(color("&f4. Defina a saída global: &e/evento setup exit"));
+        player.sendMessage(color("&f5. Crie uma arena: &e/evento setup arena add <id>"));
+        player.sendMessage(color("&f6. Defina o nome da arena: &e/evento setup display <id> <nome>"));
+        player.sendMessage(color("&f7. Defina o spawn 1 da arena: &e/evento setup spawn1 <id>"));
+        player.sendMessage(color("&f8. Defina o spawn 2 da arena: &e/evento setup spawn2 <id>"));
+        player.sendMessage(color("&f9. Defina o spectator da arena: &e/evento setup spectator <id>"));
+        player.sendMessage(color("&f10. O kit do evento deve ser configurado manualmente no YAML em &eItens"));
+        player.sendMessage(color("&f11. Sair do setup: &e/evento setup sair"));
+    }
+
+    private boolean handleSuperSmackersArena(CommandSender sender, Player player, YamlConfiguration settings, String[] args) {
+        if (args.length < 4) {
+            sender.sendMessage(color("&cUse: /evento setup arena add <id>"));
+            return true;
+        }
+
+        String sub = args[2].toLowerCase(Locale.ROOT);
+        String arenaId = args[3];
+
+        if (!sub.equals("add")) {
+            sender.sendMessage(color("&cUse: /evento setup arena add <id>"));
+            return true;
+        }
+
+        String base = "Arenas." + arenaId;
+
+        if (settings.contains(base)) {
+            sender.sendMessage(color("&cEssa arena já existe."));
+            return true;
+        }
+
+        settings.set(base + ".Display", arenaId);
+
+        try {
+            EventoConfigFile.save(settings);
+            SETUP.put(player, settings);
+        } catch (IOException exception) {
+            sender.sendMessage(color(
+                    message("Messages.Error")
+                            .replace("@name", settings.getString("Evento.Title"))
+            ));
+            exception.printStackTrace();
+            return true;
+        }
+
+        sender.sendMessage(color("&aArena &f" + arenaId + " &acriada com sucesso."));
+        return true;
+    }
+
+    private boolean handleSuperSmackersArenaSpawn(CommandSender sender, Player player, YamlConfiguration settings, String[] args, String node) {
+        if (args.length < 3) {
+            sender.sendMessage(color("&cUse: /evento setup " + node.toLowerCase(Locale.ROOT) + " <id>"));
+            return true;
+        }
+
+        String arenaId = args[2];
+        String base = "Arenas." + arenaId + "." + node;
+
+        if (!settings.contains("Arenas." + arenaId)) {
+            sender.sendMessage(color("&cEssa arena não existe. Use /evento setup arena add <id>"));
+            return true;
+        }
+
+        settings.set(base + ".world", player.getLocation().getWorld().getName());
+        settings.set(base + ".x", player.getLocation().getX());
+        settings.set(base + ".y", player.getLocation().getY());
+        settings.set(base + ".z", player.getLocation().getZ());
+        settings.set(base + ".Yaw", player.getLocation().getYaw());
+        settings.set(base + ".Pitch", player.getLocation().getPitch());
+
+        try {
+            EventoConfigFile.save(settings);
+            SETUP.put(player, settings);
+        } catch (IOException exception) {
+            sender.sendMessage(color(
+                    message("Messages.Error")
+                            .replace("@name", settings.getString("Evento.Title"))
+            ));
+            exception.printStackTrace();
+            return true;
+        }
+
+        sender.sendMessage(color("&a" + node + " da arena &f" + arenaId + " &asalvo com sucesso."));
+        return true;
+    }
+
+    private boolean handleSuperSmackersArenaDisplay(CommandSender sender, Player player, YamlConfiguration settings, String[] args) {
+        if (args.length < 4) {
+            sender.sendMessage(color("&cUse: /evento setup display <id> <nome>"));
+            return true;
+        }
+
+        String arenaId = args[2];
+
+        if (!settings.contains("Arenas." + arenaId)) {
+            sender.sendMessage(color("&cEssa arena não existe. Use /evento setup arena add <id>"));
+            return true;
+        }
+
+        String display = String.join(" ", Arrays.copyOfRange(args, 3, args.length));
+        settings.set("Arenas." + arenaId + ".Display", display);
+
+        try {
+            EventoConfigFile.save(settings);
+            SETUP.put(player, settings);
+        } catch (IOException exception) {
+            sender.sendMessage(color(
+                    message("Messages.Error")
+                            .replace("@name", settings.getString("Evento.Title"))
+            ));
+            exception.printStackTrace();
+            return true;
+        }
+
+        sender.sendMessage(color("&aNome da arena &f" + arenaId + " &aatualizado para &f" + display));
+        return true;
+    }
+
     private boolean isMontaria(YamlConfiguration config) {
         return config.getString("Evento.Type", "").equalsIgnoreCase("montaria");
     }
@@ -1417,35 +1592,36 @@ public final class EventoCommand implements CommandExecutor, TabCompleter {
             }
         }
 
-        if (args.length == 3) {
-            if (sub.equals("setup") && admin && sender instanceof Player player && SETUP.containsKey(player)) {
+        if (sub.equals("setup") && admin && sender instanceof Player player && SETUP.containsKey(player)) {
+            YamlConfiguration settings = SETUP.get(player);
+
+            if (isSuperSmackers(settings)) {
                 String action = args[1].toLowerCase(Locale.ROOT);
 
-                if (action.equals("kit") || action.equals("item") || action.equals("itens")) {
-                    return filter(KIT_TYPES, args[2]);
+                if (action.equals("arena")) {
+                    return filter(Collections.singletonList("add"), args[2]);
                 }
 
-                if (action.equals("checkpoint")) {
-                    YamlConfiguration settings = SETUP.get(player);
-                    if (isMontaria(settings)) {
-                        return filter(Arrays.asList("add", "pos1", "pos2"), args[2]);
+                if (action.equals("spawn1") || action.equals("spawn2") || action.equals("spectator") || action.equals("display")) {
+                    ConfigurationSection arenas = settings.getConfigurationSection("Arenas");
+                    if (arenas == null) {
+                        return Collections.emptyList();
                     }
+                    return filter(new ArrayList<>(arenas.getKeys(false)), args[2]);
                 }
             }
         }
 
         if (args.length == 4) {
             if (sub.equals("setup") && admin && sender instanceof Player player && SETUP.containsKey(player)) {
-                String action = args[1].toLowerCase(Locale.ROOT);
-                String subAction = args[2].toLowerCase(Locale.ROOT);
+                YamlConfiguration settings = SETUP.get(player);
 
-                if (action.equals("checkpoint") && (subAction.equals("pos1") || subAction.equals("pos2"))) {
-                    YamlConfiguration settings = SETUP.get(player);
-                    ConfigurationSection section = settings.getConfigurationSection("Checkpoints");
-                    if (section == null) {
+                if (isSuperSmackers(settings)) {
+                    String action = args[1].toLowerCase(Locale.ROOT);
+
+                    if (action.equals("display")) {
                         return Collections.emptyList();
                     }
-                    return filter(section.getKeys(false), args[3]);
                 }
             }
         }
