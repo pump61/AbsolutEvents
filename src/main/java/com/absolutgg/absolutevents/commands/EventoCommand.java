@@ -102,12 +102,6 @@ public final class EventoCommand implements CommandExecutor, TabCompleter {
             "quit"
     );
 
-    private static final List<String> KIT_TYPES = Arrays.asList(
-            "normal",
-            "last",
-            "lastfight"
-    );
-
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         if (!cmd.getName().equalsIgnoreCase("evento")) {
@@ -186,16 +180,16 @@ public final class EventoCommand implements CommandExecutor, TabCompleter {
 
     private boolean handleDefault(CommandSender sender) {
         if (AbsolutEventsPlugin.getInstance().getEventoManager().getEvento() == null) {
-            if (sender instanceof Player player
-                    && AbsolutEventsPlugin.getInstance().getConfig().getBoolean("Enable GUI")) {
-                InventoryManager.openMainInventory(player);
-
-                if (!AbsolutEventsPlugin.getInstance().getConfig().getBoolean("Show commands")) {
-                    return true;
-                }
+            if (!(sender instanceof Player player)) {
+                sender.sendMessage(color(message("Messages.Console")));
+                return true;
             }
 
-            sendHelp(sender);
+            if (AbsolutEventsPlugin.getInstance().getConfig().getBoolean("Enable GUI")) {
+                InventoryManager.openMainInventory(player);
+                return true;
+            }
+
             return true;
         }
 
@@ -403,7 +397,7 @@ public final class EventoCommand implements CommandExecutor, TabCompleter {
         }
 
         for (String msg : config.getStringList("Messages.Cancelled")) {
-            Bukkit.broadcastMessage(color(msg.replace("@name", config.getString("Evento.Title"))));
+            Bukkit.broadcast(net.kyori.adventure.text.Component.text(color(msg.replace("@name", config.getString("Evento.Title")))));
         }
 
         return true;
@@ -1154,10 +1148,10 @@ public final class EventoCommand implements CommandExecutor, TabCompleter {
         ItemStack axe = new ItemStack(Material.STONE_AXE, 1);
         ItemMeta axeMeta = axe.getItemMeta();
         if (axeMeta != null) {
-            axeMeta.setDisplayName("§6Machado de Posições");
-            axeMeta.setLore(Arrays.asList(
-                    "§7* Clique esquerdo para definir a primeira posição.",
-                    "§7* Clique direito para definir a segunda posição."
+            axeMeta.displayName(net.kyori.adventure.text.Component.text("§6Machado de Posições"));
+            axeMeta.lore(Arrays.asList(
+                    net.kyori.adventure.text.Component.text("§7* Clique esquerdo para definir a primeira posição."),
+                    net.kyori.adventure.text.Component.text("§7* Clique direito para definir a segunda posição.")
             ));
             axe.setItemMeta(axeMeta);
         }
@@ -1169,10 +1163,10 @@ public final class EventoCommand implements CommandExecutor, TabCompleter {
             ItemStack hoe = new ItemStack(Material.STONE_HOE, 1);
             ItemMeta hoeMeta = hoe.getItemMeta();
             if (hoeMeta != null) {
-                hoeMeta.setDisplayName("§6Enxada de Posições");
-                hoeMeta.setLore(Arrays.asList(
-                        "§7* Clique esquerdo para definir a terceira posição.",
-                        "§7* Clique direito para definir a quarta posição."
+                hoeMeta.displayName(net.kyori.adventure.text.Component.text("§6Enxada de Posições"));
+                hoeMeta.lore(Arrays.asList(
+                        net.kyori.adventure.text.Component.text("§7* Clique esquerdo para definir a terceira posição."),
+                        net.kyori.adventure.text.Component.text("§7* Clique direito para definir a quarta posição.")
                 ));
                 hoe.setItemMeta(hoeMeta);
             }
@@ -1291,8 +1285,8 @@ public final class EventoCommand implements CommandExecutor, TabCompleter {
 
     private boolean handleChatEventCommand(CommandSender sender, String[] args) {
         var evento = AbsolutEventsPlugin.getInstance().getEventoChatManager().getEvento();
+
         if (evento == null) {
-            sender.sendMessage(color(message("Messages.Unknown command")));
             return true;
         }
 
