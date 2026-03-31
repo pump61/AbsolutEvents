@@ -1,7 +1,7 @@
 package com.absolutgg.absolutevents.placeholders;
 
 import com.absolutgg.absolutevents.AbsolutEventsPlugin;
-import com.absolutgg.absolutevents.managers.ParkourRecordManager;
+import com.absolutgg.absolutevents.manager.ParkourRecordManager;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.OfflinePlayer;
 import org.jetbrains.annotations.NotNull;

@@ -17,6 +17,7 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitTask;
+import org.bukkit.attribute.Attribute;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -267,11 +268,15 @@ public final class Torneio extends Evento {
                 clearInventoryAndArmor(fighter2);
                 giveEquipment();
 
-                fighter1.setHealth(fighter1.getMaxHealth());
+                if (fighter1.getAttribute(Attribute.MAX_HEALTH) != null) {
+                    fighter1.setHealth(fighter1.getAttribute(Attribute.MAX_HEALTH).getValue());
+                }
                 fighter1.setFoodLevel(20);
                 fighter1.teleport(fighter1Loc, PlayerTeleportEvent.TeleportCause.PLUGIN);
 
-                fighter2.setHealth(fighter2.getMaxHealth());
+                if (fighter2.getAttribute(Attribute.MAX_HEALTH) != null) {
+                    fighter2.setHealth(fighter2.getAttribute(Attribute.MAX_HEALTH).getValue());
+                }
                 fighter2.setFoodLevel(20);
                 fighter2.teleport(fighter2Loc, PlayerTeleportEvent.TeleportCause.PLUGIN);
 
@@ -367,7 +372,9 @@ public final class Torneio extends Evento {
         winner.getInventory().clear();
         clearArmor(winner);
         winner.teleport(entrance, PlayerTeleportEvent.TeleportCause.PLUGIN);
-        winner.setHealth(winner.getMaxHealth());
+        if (winner.getAttribute(Attribute.MAX_HEALTH) != null) {
+            winner.setHealth(winner.getAttribute(Attribute.MAX_HEALTH).getValue());
+        }
         winner.setFoodLevel(20);
 
         cancelTask(maxTimeTask);
@@ -428,7 +435,7 @@ public final class Torneio extends Evento {
     @Override
     public void winner(Player player) {
         for (String message : config.getStringList("Messages.Winner")) {
-            plugin.getServer().broadcastMessage(
+            Bukkit.broadcastMessage(
                     ColorUtils.colorize(
                             message
                                     .replace("@winner", player.getName())

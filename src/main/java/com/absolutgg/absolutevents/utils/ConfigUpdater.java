@@ -1,6 +1,5 @@
 package com.absolutgg.absolutevents.utils;
 
-import com.absolutgg.absolutevents.AbsolutEventsPlugin;
 import com.absolutgg.absolutevents.api.EventoType;
 import com.absolutgg.absolutevents.utils.converters.config.SerializerConverter;
 import org.bukkit.Bukkit;

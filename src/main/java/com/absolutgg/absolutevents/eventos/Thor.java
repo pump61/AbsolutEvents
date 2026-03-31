@@ -6,7 +6,8 @@ import com.absolutgg.absolutevents.api.events.PlayerLoseEvent;
 import com.absolutgg.absolutevents.discord.DiscordWebhookManager;
 import com.absolutgg.absolutevents.listeners.eventos.ThorListener;
 import com.absolutgg.absolutevents.utils.ColorUtils;
-import com.absolutgg.absolutevents.utils.Cuboid;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -44,7 +45,6 @@ public final class Thor extends Evento {
 
     private final Random random = new Random();
 
-    private final Cuboid arena;
     private final World arenaWorld;
     private final int arenaMinY;
     private final int arenaMaxY;
@@ -109,7 +109,6 @@ public final class Thor extends Evento {
                 config.getDouble("Locations.Pos2.z")
         );
 
-        this.arena = new Cuboid(pos1, pos2);
         this.arenaWorld = world;
         this.arenaMinY = Math.min(pos1.getBlockY(), pos2.getBlockY());
         this.arenaMaxY = Math.max(pos1.getBlockY(), pos2.getBlockY());
@@ -363,10 +362,12 @@ public final class Thor extends Evento {
         }
 
         for (String message : config.getStringList("Messages.Winner")) {
-            Bukkit.broadcastMessage(ColorUtils.colorize(
+            String colorized = ColorUtils.colorize(
                     message.replace("@winner", player.getName())
                             .replace("@name", config.getString("Evento.Title"))
-            ));
+            );
+            Component component = LegacyComponentSerializer.legacySection().deserialize(colorized);
+            Bukkit.getServer().broadcast(component);
         }
 
         DiscordWebhookManager.sendPlayerWinner(player.getName(), config.getString("Evento.Title"));
@@ -381,9 +382,11 @@ public final class Thor extends Evento {
         }
 
         for (String message : config.getStringList("Messages.No winner")) {
-            Bukkit.broadcastMessage(ColorUtils.colorize(
+            String colorized = ColorUtils.colorize(
                     message.replace("@name", config.getString("Evento.Title"))
-            ));
+            );
+            Component component = LegacyComponentSerializer.legacySection().deserialize(colorized);
+            Bukkit.getServer().broadcast(component);
         }
 
         stop();
@@ -424,8 +427,10 @@ public final class Thor extends Evento {
                                     .replace("@name", config.getString("Evento.Title"))
                     );
 
+                    Component component = LegacyComponentSerializer.legacySection().deserialize(parsed);
+                    
                     for (Player player : getPlayers()) {
-                        player.sendActionBar(parsed);
+                        player.sendActionBar(component);
 
                         if (countdown <= 3 && countdown > 0) {
                             player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_HAT, 1.0F, 1.2F);
@@ -433,7 +438,7 @@ public final class Thor extends Evento {
                     }
 
                     for (Player player : getSpectators()) {
-                        player.sendActionBar(parsed);
+                        player.sendActionBar(component);
                     }
                 },
                 0L,

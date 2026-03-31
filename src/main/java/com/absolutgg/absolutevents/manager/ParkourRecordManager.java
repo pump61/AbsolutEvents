@@ -1,4 +1,4 @@
-package com.absolutgg.absolutevents.managers;
+package com.absolutgg.absolutevents.manager;
 
 import com.absolutgg.absolutevents.AbsolutEventsPlugin;
 import org.bukkit.OfflinePlayer;

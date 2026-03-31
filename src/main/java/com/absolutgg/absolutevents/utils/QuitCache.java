@@ -1,5 +1,6 @@
 package com.absolutgg.absolutevents.utils;
 
+
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;

@@ -18,6 +18,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.scheduler.BukkitTask;
+import net.md_5.bungee.api.chat.TextComponent;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -154,12 +155,12 @@ public final class TNTRun extends Evento {
         ending = true;
 
         for (String message : config.getStringList("Messages.Winner")) {
-            plugin.getServer().broadcastMessage(
-                    ColorUtils.colorize(
+            Bukkit.broadcast(
+                    new TextComponent(ColorUtils.colorize(
                             message
                                     .replace("@winner", player.getName())
                                     .replace("@name", config.getString("Evento.Title"))
-                    )
+                    ))
             );
         }
 
