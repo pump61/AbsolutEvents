@@ -5,6 +5,7 @@ import com.absolutgg.absolutevents.api.Evento;
 import com.absolutgg.absolutevents.api.events.PlayerLoseEvent;
 import com.absolutgg.absolutevents.discord.DiscordWebhookManager;
 import com.absolutgg.absolutevents.listeners.eventos.KillerPontoListener;
+import com.absolutgg.absolutevents.manager.TournamentStatsManager;
 import com.absolutgg.absolutevents.utils.ColorUtils;
 import com.absolutgg.absolutevents.utils.EventKitApplier;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
@@ -230,6 +231,9 @@ public final class KillerPonto extends Evento {
                 config.getString("Evento.Title", "KillerPonto"),
                 buildTopEntries()
         );
+
+        // ✅ TOURNAMENT
+        TournamentStatsManager.getInstance().addWin(player.getUniqueId());
 
         for (String command : config.getStringList("Rewards.Commands")) {
             executeConsoleCommand(player, command.replace("@winner", player.getName()));

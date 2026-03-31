@@ -5,6 +5,7 @@ import com.absolutgg.absolutevents.api.Evento;
 import com.absolutgg.absolutevents.api.events.PlayerLoseEvent;
 import com.absolutgg.absolutevents.discord.DiscordWebhookManager;
 import com.absolutgg.absolutevents.listeners.eventos.BlockPartyListener;
+import com.absolutgg.absolutevents.manager.TournamentStatsManager;
 import com.absolutgg.absolutevents.utils.ColorUtils;
 import com.absolutgg.absolutevents.utils.Cuboid;
 import com.cryptomorin.xseries.XSound;
@@ -252,6 +253,9 @@ public final class BlockParty extends Evento {
         for (Player player : winnersPlayers) {
             winnersNames.add(player.getName());
             rewardProtectedWinners.add(player.getUniqueId());
+
+            // ✅ TOURNAMENT
+            TournamentStatsManager.getInstance().addWin(player.getUniqueId());
         }
 
         this.setWinners();

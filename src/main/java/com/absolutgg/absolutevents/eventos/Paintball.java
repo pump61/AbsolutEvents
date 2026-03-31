@@ -5,6 +5,7 @@ import com.absolutgg.absolutevents.api.Evento;
 import com.absolutgg.absolutevents.api.events.PlayerLoseEvent;
 import com.absolutgg.absolutevents.discord.DiscordWebhookManager;
 import com.absolutgg.absolutevents.listeners.eventos.PaintballListener;
+import com.absolutgg.absolutevents.manager.TournamentStatsManager;
 import com.absolutgg.absolutevents.utils.ColorUtils;
 import com.absolutgg.absolutevents.utils.EventKitApplier;
 import net.sacredlabyrinth.phaed.simpleclans.ClanPlayer;
@@ -233,6 +234,11 @@ public final class Paintball extends Evento {
         }
 
         setWinners(new HashSet<>(winnersNow));
+
+        for (Player player : winnersNow) {
+            TournamentStatsManager.getInstance().addWin(player.getUniqueId());
+        }
+
         List<Player> rewardTargets = new ArrayList<>(winnersNow);
 
         String mvpName = getMvpName();

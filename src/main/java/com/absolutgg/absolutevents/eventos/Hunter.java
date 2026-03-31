@@ -5,6 +5,7 @@ import com.absolutgg.absolutevents.api.Evento;
 import com.absolutgg.absolutevents.api.events.PlayerLoseEvent;
 import com.absolutgg.absolutevents.discord.DiscordWebhookManager;
 import com.absolutgg.absolutevents.listeners.eventos.HunterListener;
+import com.absolutgg.absolutevents.manager.TournamentStatsManager;
 import com.absolutgg.absolutevents.utils.ColorUtils;
 import com.cryptomorin.xseries.XEnchantment;
 import net.sacredlabyrinth.phaed.simpleclans.ClanPlayer;
@@ -436,6 +437,10 @@ public final class Hunter extends Evento {
                 config.getString("Evento.Title"),
                 buildTopEntries()
         );
+
+        for (Player player : winners) {
+            TournamentStatsManager.getInstance().addWin(player.getUniqueId());
+        }
 
         for (Player winner : winners) {
             for (String command : config.getStringList("Rewards.Commands")) {

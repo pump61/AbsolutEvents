@@ -5,6 +5,7 @@ import com.absolutgg.absolutevents.api.Evento;
 import com.absolutgg.absolutevents.api.events.PlayerLoseEvent;
 import com.absolutgg.absolutevents.discord.DiscordWebhookManager;
 import com.absolutgg.absolutevents.listeners.eventos.SpleefListener;
+import com.absolutgg.absolutevents.manager.TournamentStatsManager;
 import com.absolutgg.absolutevents.utils.ColorUtils;
 import com.cryptomorin.xseries.XItemStack;
 import org.bukkit.Bukkit;
@@ -112,6 +113,8 @@ public final class Spleef extends Evento {
         DiscordWebhookManager.sendPlayerWinner(player.getName(), config.getString("Evento.Title"));
 
         setWinner(player);
+
+        TournamentStatsManager.getInstance().addWin(player.getUniqueId());
 
         for (String command : config.getStringList("Rewards.Commands")) {
             executeConsoleCommand(player, command.replace("@winner", player.getName()));

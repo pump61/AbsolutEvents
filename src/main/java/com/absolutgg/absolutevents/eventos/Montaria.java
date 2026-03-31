@@ -4,6 +4,7 @@ import com.absolutgg.absolutevents.AbsolutEventsPlugin;
 import com.absolutgg.absolutevents.api.Evento;
 import com.absolutgg.absolutevents.discord.DiscordWebhookManager;
 import com.absolutgg.absolutevents.listeners.eventos.MontariaListener;
+import com.absolutgg.absolutevents.manager.TournamentStatsManager;
 import com.absolutgg.absolutevents.utils.ColorUtils;
 import com.absolutgg.absolutevents.utils.Cuboid;
 import org.bukkit.Bukkit;
@@ -160,6 +161,10 @@ public final class Montaria extends Evento {
         );
 
         setWinner(player);
+
+        // ✅ TOURNAMENT STATS
+        TournamentStatsManager.getInstance().addWin(player.getUniqueId());
+
         stop();
 
         Bukkit.getScheduler().runTaskLater(plugin, () -> {

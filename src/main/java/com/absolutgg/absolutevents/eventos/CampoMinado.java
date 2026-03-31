@@ -5,6 +5,7 @@ import com.absolutgg.absolutevents.api.Evento;
 import com.absolutgg.absolutevents.api.events.PlayerLoseEvent;
 import com.absolutgg.absolutevents.discord.DiscordWebhookManager;
 import com.absolutgg.absolutevents.listeners.eventos.CampoMinadoListener;
+import com.absolutgg.absolutevents.manager.TournamentStatsManager;
 import com.absolutgg.absolutevents.utils.ColorUtils;
 import com.absolutgg.absolutevents.utils.Cuboid;
 import com.absolutgg.absolutevents.utils.Utils;
@@ -124,6 +125,9 @@ public final class CampoMinado extends Evento {
 
         for (Player player : winnersList) {
             winners.add(player.getName());
+
+            // ✅ TOURNAMENT
+            TournamentStatsManager.getInstance().addWin(player.getUniqueId());
         }
 
         for (String message : this.config.getStringList("Messages.Winner")) {

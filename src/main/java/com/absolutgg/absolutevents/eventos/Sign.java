@@ -4,6 +4,7 @@ import com.absolutgg.absolutevents.AbsolutEventsPlugin;
 import com.absolutgg.absolutevents.api.Evento;
 import com.absolutgg.absolutevents.discord.DiscordWebhookManager;
 import com.absolutgg.absolutevents.listeners.eventos.SignListener;
+import com.absolutgg.absolutevents.manager.TournamentStatsManager;
 import com.absolutgg.absolutevents.manager.ParkourRecordManager;
 import com.absolutgg.absolutevents.utils.ColorUtils;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
@@ -122,6 +123,9 @@ public final class Sign extends Evento {
         DiscordWebhookManager.sendPlayerWinner(player.getName(), getConfig().getString("Evento.Title"));
 
         setWinner(player);
+
+        TournamentStatsManager.getInstance().addWin(player.getUniqueId());
+
         stop();
 
         Player rewardTarget = player;

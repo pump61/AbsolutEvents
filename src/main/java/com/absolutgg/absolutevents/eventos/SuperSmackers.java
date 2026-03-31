@@ -4,6 +4,7 @@ import com.absolutgg.absolutevents.AbsolutEventsPlugin;
 import com.absolutgg.absolutevents.api.Evento;
 import com.absolutgg.absolutevents.discord.DiscordWebhookManager;
 import com.absolutgg.absolutevents.listeners.eventos.SuperSmackersListener;
+import com.absolutgg.absolutevents.manager.TournamentStatsManager;
 import com.absolutgg.absolutevents.utils.ColorUtils;
 import com.absolutgg.absolutevents.utils.EventKitApplier;
 import net.sacredlabyrinth.phaed.simpleclans.ClanPlayer;
@@ -306,6 +307,8 @@ public final class SuperSmackers extends Evento {
 
         setWinner(player);
 
+        TournamentStatsManager.getInstance().addWin(player.getUniqueId());
+
         for (String command : config.getStringList("Rewards.Commands")) {
             executeConsoleCommand(player, command.replace("@winner", player.getName()));
         }
@@ -329,6 +332,11 @@ public final class SuperSmackers extends Evento {
 
         if (!team.members.isEmpty()) {
             setWinners(new HashSet<>(team.members));
+        }
+
+        // 🔥 REGISTRA VITÓRIA PARA TODOS DO TIME
+        for (Player player : team.members) {
+            TournamentStatsManager.getInstance().addWin(player.getUniqueId());
         }
 
         DiscordWebhookManager.sendTeamWinner(

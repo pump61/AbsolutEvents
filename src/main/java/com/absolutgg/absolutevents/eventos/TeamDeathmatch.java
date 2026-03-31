@@ -5,6 +5,7 @@ import com.absolutgg.absolutevents.api.Evento;
 import com.absolutgg.absolutevents.api.events.PlayerLoseEvent;
 import com.absolutgg.absolutevents.discord.DiscordWebhookManager;
 import com.absolutgg.absolutevents.listeners.eventos.TDMListener;
+import com.absolutgg.absolutevents.manager.TournamentStatsManager;
 import com.absolutgg.absolutevents.utils.ColorUtils;
 import com.cryptomorin.xseries.XEnchantment;
 import com.cryptomorin.xseries.XMaterial;
@@ -436,6 +437,11 @@ public final class TeamDeathmatch extends Evento {
         }
 
         setWinners(winnersPlayers);
+
+        // 🔥 REGISTRA VITÓRIA PARA TODOS DO TIME
+        for (Player player : winnersPlayers) {
+            TournamentStatsManager.getInstance().addWin(player.getUniqueId());
+        }
 
         List<String> rewardNames = new ArrayList<>();
         for (Player player : winnersPlayers) {

@@ -7,6 +7,7 @@ import com.absolutgg.absolutevents.api.events.PlayerLoseEvent;
 import com.absolutgg.absolutevents.discord.DiscordWebhookManager;
 import com.absolutgg.absolutevents.hooks.BungeecordHook;
 import com.absolutgg.absolutevents.listeners.eventos.GuerraListener;
+import com.absolutgg.absolutevents.manager.TournamentStatsManager;
 import com.absolutgg.absolutevents.utils.ColorUtils;
 import com.absolutgg.absolutevents.utils.EventKitApplier;
 import com.cryptomorin.xseries.messages.ActionBar;
@@ -355,6 +356,10 @@ public final class Guerra extends Evento {
                     config.getString("Evento.Title"),
                     buildTopEntries()
             );
+        }
+
+        for (Player player : currentWinners) {
+            TournamentStatsManager.getInstance().addWin(player.getUniqueId());
         }
 
         startPickupActionbar();

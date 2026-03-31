@@ -7,6 +7,7 @@ import com.absolutgg.absolutevents.listeners.eventos.TorneioListener;
 import com.absolutgg.absolutevents.utils.ColorUtils;
 import com.absolutgg.absolutevents.utils.CustomItemResolver;
 import net.sacredlabyrinth.phaed.simpleclans.ClanPlayer;
+import com.absolutgg.absolutevents.manager.TournamentStatsManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -434,6 +435,8 @@ public final class Torneio extends Evento {
 
     @Override
     public void winner(Player player) {
+        TournamentStatsManager.getInstance().addWin(player.getUniqueId());
+
         for (String message : config.getStringList("Messages.Winner")) {
             Bukkit.broadcastMessage(
                     ColorUtils.colorize(

@@ -80,6 +80,10 @@ public final class AbsolutEventsPlugin extends JavaPlugin {
             return;
         }
 
+        if (getServer().getPluginManager().getPlugin("PlaceholderAPI") != null) {
+            new PlaceholderAPIHook(this).register();
+        }
+
         if (runConverterIfNeeded()) {
             return;
         }

@@ -11,6 +11,7 @@ import com.absolutgg.absolutevents.manager.UpdateDownloader;
 import com.absolutgg.absolutevents.utils.ColorUtils;
 import com.absolutgg.absolutevents.utils.EventoConfigFile;
 import com.absolutgg.absolutevents.utils.NumberFormatter;
+import com.absolutgg.absolutevents.manager.TournamentStatsManager;
 import com.cryptomorin.xseries.XItemStack;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -61,7 +62,8 @@ public final class EventoCommand implements CommandExecutor, TabCompleter {
             "reload",
             "backup",
             "backupinfo",
-            "update"
+            "update",
+            "resettournamentwins"
     );
 
     private static final List<String> SETUP_ACTIONS = Arrays.asList(
@@ -173,6 +175,9 @@ public final class EventoCommand implements CommandExecutor, TabCompleter {
             case "update":
                 return handleUpdate(sender, args);
 
+            case "resettournamentwins":
+                return handleResetTournamentWins(sender);
+
             default:
                 return handleChatEventCommand(sender, args);
         }
@@ -228,6 +233,17 @@ public final class EventoCommand implements CommandExecutor, TabCompleter {
         }
 
         evento.joinBungeecord(player);
+        return true;
+    }
+
+    private boolean handleResetTournamentWins(CommandSender sender) {
+        if (!sender.hasPermission("absolutevents.admin")) {
+            sender.sendMessage(color(message("Messages.No permission")));
+            return true;
+        }
+
+        TournamentStatsManager.getInstance().resetAll();
+        sender.sendMessage(color("&aVitórias do torneio resetadas com sucesso."));
         return true;
     }
 

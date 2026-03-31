@@ -1,6 +1,7 @@
 package com.absolutgg.absolutevents.hooks;
 
 import com.absolutgg.absolutevents.AbsolutEventsPlugin;
+import com.absolutgg.absolutevents.manager.TournamentStatsManager;
 import com.absolutgg.absolutevents.utils.EventoConfigFile;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.entity.Player;
@@ -10,7 +11,6 @@ import org.jetbrains.annotations.Nullable;
 import java.io.File;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -67,6 +67,11 @@ public final class PlaceholderAPIHook extends PlaceholderExpansion {
             case "participations":
             case "participations_total":
                 return String.valueOf(sumValues(participations));
+
+            case "wins_tournament":
+                return String.valueOf(
+                        TournamentStatsManager.getInstance().getWins(player.getUniqueId())
+                );
         }
 
         if (normalized.startsWith("wins_")) {
@@ -97,13 +102,13 @@ public final class PlaceholderAPIHook extends PlaceholderExpansion {
     }
 
     private @NotNull Set<String> getAvailableEventKeys() {
-        List<File> fileList = EventoConfigFile.getAllFiles();
-        if (fileList == null || fileList.isEmpty()) {
+        File[] files = EventoConfigFile.getAllFiles().toArray(new File[0]);
+        if (files == null || files.length == 0) {
             return Collections.emptySet();
         }
 
         Set<String> eventKeys = new HashSet<>();
-        for (File file : fileList) {
+        for (File file : files) {
             String name = file.getName();
             if (!name.toLowerCase(Locale.ROOT).endsWith(".yml")) {
                 continue;

@@ -5,6 +5,7 @@ import com.absolutgg.absolutevents.api.Evento;
 import com.absolutgg.absolutevents.api.events.PlayerLoseEvent;
 import com.absolutgg.absolutevents.discord.DiscordWebhookManager;
 import com.absolutgg.absolutevents.listeners.eventos.FightListener;
+import com.absolutgg.absolutevents.manager.TournamentStatsManager;
 import com.absolutgg.absolutevents.utils.ColorUtils;
 import com.cryptomorin.xseries.XItemStack;
 import net.sacredlabyrinth.phaed.simpleclans.ClanPlayer;
@@ -144,6 +145,8 @@ public final class Fight extends Evento {
                 p.getName(),
                 config.getString("Evento.Title")
         );
+
+        TournamentStatsManager.getInstance().addWin(p.getUniqueId());
 
         this.setWinner(p);
         this.stop();

@@ -5,6 +5,7 @@ import com.absolutgg.absolutevents.api.Evento;
 import com.absolutgg.absolutevents.api.events.PlayerLoseEvent;
 import com.absolutgg.absolutevents.discord.DiscordWebhookManager;
 import com.absolutgg.absolutevents.listeners.eventos.QuizListener;
+import com.absolutgg.absolutevents.manager.TournamentStatsManager;
 import com.absolutgg.absolutevents.utils.ColorUtils;
 import com.absolutgg.absolutevents.utils.Cuboid;
 import org.bukkit.Bukkit;
@@ -208,6 +209,9 @@ public final class Quiz extends Evento {
         DiscordWebhookManager.sendPlayerWinner(player.getName(), config.getString("Evento.Title"));
 
         setWinner(player);
+
+        TournamentStatsManager.getInstance().addWin(player.getUniqueId());
+
         stop();
 
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
@@ -232,6 +236,10 @@ public final class Quiz extends Evento {
         List<String> winners = winnersNow.stream().map(Player::getName).collect(Collectors.toList());
 
         setWinners(new HashSet<>(winnersNow));
+
+        for (Player player : winnersNow) {
+            TournamentStatsManager.getInstance().addWin(player.getUniqueId());
+        }
 
         for (String message : this.config.getStringList("Messages.Winner")) {
             plugin.getServer().broadcastMessage(ColorUtils.colorize(

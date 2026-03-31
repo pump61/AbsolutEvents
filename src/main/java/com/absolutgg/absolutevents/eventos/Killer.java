@@ -4,6 +4,7 @@ import com.absolutgg.absolutevents.AbsolutEventsPlugin;
 import com.absolutgg.absolutevents.api.Evento;
 import com.absolutgg.absolutevents.discord.DiscordWebhookManager;
 import com.absolutgg.absolutevents.listeners.eventos.KillerListener;
+import com.absolutgg.absolutevents.manager.TournamentStatsManager;
 import com.absolutgg.absolutevents.utils.ColorUtils;
 import com.absolutgg.absolutevents.utils.CustomItemResolver;
 import com.absolutgg.absolutevents.utils.EventKitApplier;
@@ -118,6 +119,8 @@ public final class Killer extends Evento {
                 config.getString("Evento.Title", "Killer"),
                 buildTopEntries()
         );
+
+        TournamentStatsManager.getInstance().addWin(player.getUniqueId());
 
         sendTopKills();
         stopKeepingWinner(player);

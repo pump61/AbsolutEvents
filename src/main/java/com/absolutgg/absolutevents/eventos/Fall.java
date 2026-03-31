@@ -4,6 +4,7 @@ import com.absolutgg.absolutevents.AbsolutEventsPlugin;
 import com.absolutgg.absolutevents.api.Evento;
 import com.absolutgg.absolutevents.discord.DiscordWebhookManager;
 import com.absolutgg.absolutevents.listeners.eventos.FallListener;
+import com.absolutgg.absolutevents.manager.TournamentStatsManager;
 import com.absolutgg.absolutevents.utils.ColorUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
@@ -241,9 +242,13 @@ public final class Fall extends Evento {
         this.setWinners();
 
         for (Player player : winnersList) {
+
+            TournamentStatsManager.getInstance().addWin(player.getUniqueId());
+
             for (String command : config.getStringList("Rewards.Commands")) {
                 executeConsoleCommand(player, command.replace("@winner", player.getName()));
             }
+
             winners.add(player.getName());
         }
 

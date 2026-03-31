@@ -4,6 +4,7 @@ import com.absolutgg.absolutevents.AbsolutEventsPlugin;
 import com.absolutgg.absolutevents.api.Evento;
 import com.absolutgg.absolutevents.discord.DiscordWebhookManager;
 import com.absolutgg.absolutevents.listeners.eventos.RainbowRunListener;
+import com.absolutgg.absolutevents.manager.TournamentStatsManager;
 import com.absolutgg.absolutevents.utils.ColorUtils;
 import com.absolutgg.absolutevents.utils.Cuboid;
 import com.cryptomorin.xseries.XMaterial;
@@ -346,6 +347,9 @@ public final class RainbowRun extends Evento {
         );
 
         setWinner(player);
+
+        TournamentStatsManager.getInstance().addWin(player.getUniqueId());
+
         stop();
 
         Player rewardTarget = player;

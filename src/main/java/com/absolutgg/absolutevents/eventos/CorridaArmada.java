@@ -5,6 +5,7 @@ import com.absolutgg.absolutevents.api.Evento;
 import com.absolutgg.absolutevents.api.events.PlayerLoseEvent;
 import com.absolutgg.absolutevents.discord.DiscordWebhookManager;
 import com.absolutgg.absolutevents.listeners.eventos.CorridaArmadaListener;
+import com.absolutgg.absolutevents.manager.TournamentStatsManager;
 import com.absolutgg.absolutevents.utils.ColorUtils;
 import com.cryptomorin.xseries.XMaterial;
 import net.kyori.adventure.text.Component;
@@ -210,6 +211,9 @@ public final class CorridaArmada extends Evento {
                 config.getString("Evento.Title"),
                 buildTopEntries()
         );
+
+        // ✅ TOURNAMENT
+        TournamentStatsManager.getInstance().addWin(player.getUniqueId());
 
         this.setWinner(player);
         this.stop();

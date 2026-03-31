@@ -7,6 +7,7 @@ import com.absolutgg.absolutevents.api.events.PlayerJoinEvent;
 import com.absolutgg.absolutevents.api.events.PlayerLoseEvent;
 import com.absolutgg.absolutevents.discord.DiscordWebhookManager;
 import com.absolutgg.absolutevents.listeners.eventos.BattleRoyaleListener;
+import com.absolutgg.absolutevents.manager.TournamentStatsManager;
 import com.absolutgg.absolutevents.utils.ArenaRestorer;
 import com.absolutgg.absolutevents.utils.ColorUtils;
 import com.absolutgg.absolutevents.utils.Cuboid;
@@ -320,6 +321,9 @@ public final class BattleRoyale extends Evento {
                 config.getString("Evento.Title"),
                 buildTopEntries()
         );
+
+        // ✅ TOURNAMENT
+        TournamentStatsManager.getInstance().addWin(player.getUniqueId());
 
         this.setWinner(player);
         this.stop();

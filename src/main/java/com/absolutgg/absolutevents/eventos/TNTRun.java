@@ -4,6 +4,7 @@ import com.absolutgg.absolutevents.AbsolutEventsPlugin;
 import com.absolutgg.absolutevents.api.Evento;
 import com.absolutgg.absolutevents.discord.DiscordWebhookManager;
 import com.absolutgg.absolutevents.listeners.eventos.TNTRunListener;
+import com.absolutgg.absolutevents.manager.TournamentStatsManager;
 import com.absolutgg.absolutevents.utils.ColorUtils;
 import com.absolutgg.absolutevents.utils.Cuboid;
 import com.cryptomorin.xseries.XMaterial;
@@ -153,6 +154,7 @@ public final class TNTRun extends Evento {
         }
 
         ending = true;
+        TournamentStatsManager.getInstance().addWin(player.getUniqueId());
 
         for (String message : config.getStringList("Messages.Winner")) {
             Bukkit.broadcast(

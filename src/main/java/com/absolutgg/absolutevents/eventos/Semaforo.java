@@ -4,6 +4,7 @@ import com.absolutgg.absolutevents.AbsolutEventsPlugin;
 import com.absolutgg.absolutevents.api.Evento;
 import com.absolutgg.absolutevents.discord.DiscordWebhookManager;
 import com.absolutgg.absolutevents.listeners.eventos.SemaforoListener;
+import com.absolutgg.absolutevents.manager.TournamentStatsManager;
 import com.absolutgg.absolutevents.utils.ColorUtils;
 import com.cryptomorin.xseries.XMaterial;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
@@ -129,6 +130,9 @@ public final class Semaforo extends Evento {
         DiscordWebhookManager.sendPlayerWinner(player.getName(), config.getString("Evento.Title"));
 
         setWinner(player);
+
+        TournamentStatsManager.getInstance().addWin(player.getUniqueId());
+
         stop();
 
         Player rewardTarget = player;

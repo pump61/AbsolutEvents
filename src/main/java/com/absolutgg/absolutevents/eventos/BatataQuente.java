@@ -5,6 +5,7 @@ import com.absolutgg.absolutevents.api.Evento;
 import com.absolutgg.absolutevents.api.events.PlayerLoseEvent;
 import com.absolutgg.absolutevents.discord.DiscordWebhookManager;
 import com.absolutgg.absolutevents.listeners.eventos.BatataQuenteListener;
+import com.absolutgg.absolutevents.manager.TournamentStatsManager;
 import com.absolutgg.absolutevents.utils.ColorUtils;
 import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.Bukkit;
@@ -79,6 +80,8 @@ public final class BatataQuente extends Evento {
                 player.getName(),
                 config.getString("Evento.Title", "Batata Quente")
         );
+
+        TournamentStatsManager.getInstance().addWin(player.getUniqueId());
 
         this.setWinner(player);
         this.stop();
