@@ -64,6 +64,9 @@ public final class InventorySerializer {
 
         synchronized (lock) {
             try {
+                // ANTI-DUPE: remove qualquer snapshot anterior antes de salvar um novo
+                deleteSnapshot(player.getUniqueId());
+
                 PlayerSnapshot snapshot = captureSnapshot(player, eventIdentifier);
 
                 if (!hasAnyData(snapshot)) {
@@ -122,7 +125,9 @@ public final class InventorySerializer {
                 }
 
                 applySnapshot(player, snapshot);
-                SNAPSHOT_CACHE.put(player.getUniqueId(), snapshot);
+
+                // ANTI-DUPE: consome o snapshot após restaurar
+                deleteSnapshot(player.getUniqueId(), snapshot.eventIdentifier());
                 return true;
 
             } catch (Exception exception) {
@@ -163,7 +168,9 @@ public final class InventorySerializer {
                 }
 
                 applySnapshot(player, snapshot);
-                SNAPSHOT_CACHE.put(player.getUniqueId(), snapshot);
+
+                // ANTI-DUPE: consome o snapshot após restaurar
+                deleteSnapshot(player.getUniqueId(), snapshot.eventIdentifier());
                 return true;
 
             } catch (Exception exception) {

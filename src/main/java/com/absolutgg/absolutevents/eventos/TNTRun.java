@@ -157,13 +157,11 @@ public final class TNTRun extends Evento {
         TournamentStatsManager.getInstance().addWin(player.getUniqueId());
 
         for (String message : config.getStringList("Messages.Winner")) {
-            Bukkit.broadcast(
-                    new TextComponent(ColorUtils.colorize(
-                            message
-                                    .replace("@winner", player.getName())
-                                    .replace("@name", config.getString("Evento.Title"))
-                    ))
-            );
+            Bukkit.broadcastMessage(ColorUtils.colorize(
+                    message
+                            .replace("@winner", player.getName())
+                            .replace("@name", config.getString("Evento.Title"))
+            ));
         }
 
         DiscordWebhookManager.sendPlayerWinner(player.getName(), config.getString("Evento.Title"));

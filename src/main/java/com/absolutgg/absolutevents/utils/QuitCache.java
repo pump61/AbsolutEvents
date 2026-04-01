@@ -1,7 +1,7 @@
 package com.absolutgg.absolutevents.utils;
 
-
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,7 +15,7 @@ public final class QuitCache {
     private QuitCache() {
     }
 
-    public static void init(File dataFolder) {
+    public static void init(@NotNull File dataFolder) {
         if (!dataFolder.exists() && !dataFolder.mkdirs()) {
             throw new IllegalStateException("Não foi possível criar a pasta do plugin: " + dataFolder.getAbsolutePath());
         }
@@ -35,27 +35,26 @@ public final class QuitCache {
         config = YamlConfiguration.loadConfiguration(file);
     }
 
-    public static void setQuit(UUID uuid) {
+    public static void setQuit(@NotNull UUID uuid) {
         ensureInit();
-        reload();
-
         config.set(uuid.toString(), true);
         save();
     }
 
-    public static boolean wasInEvent(UUID uuid) {
+    public static boolean wasInEvent(@NotNull UUID uuid) {
         ensureInit();
-        reload();
-
         return config.getBoolean(uuid.toString(), false);
     }
 
-    public static void remove(UUID uuid) {
+    public static void remove(@NotNull UUID uuid) {
         ensureInit();
-        reload();
-
         config.set(uuid.toString(), null);
         save();
+    }
+
+    public static void reload() {
+        ensureInit();
+        config = YamlConfiguration.loadConfiguration(file);
     }
 
     private static void save() {
@@ -64,10 +63,6 @@ public final class QuitCache {
         } catch (IOException exception) {
             throw new RuntimeException("Erro ao salvar quit-cache.yml", exception);
         }
-    }
-
-    private static void reload() {
-        config = YamlConfiguration.loadConfiguration(file);
     }
 
     private static void ensureInit() {

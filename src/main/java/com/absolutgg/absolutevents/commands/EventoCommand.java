@@ -413,7 +413,9 @@ public final class EventoCommand implements CommandExecutor, TabCompleter {
         }
 
         for (String msg : config.getStringList("Messages.Cancelled")) {
-            Bukkit.broadcast(net.kyori.adventure.text.Component.text(color(msg.replace("@name", config.getString("Evento.Title")))));
+            Bukkit.broadcastMessage(color(
+                    msg.replace("@name", config.getString("Evento.Title"))
+            ));
         }
 
         return true;
@@ -806,6 +808,7 @@ public final class EventoCommand implements CommandExecutor, TabCompleter {
                 return true;
         }
     }
+
     private boolean handleSetupPosTool(CommandSender sender, Player player, YamlConfiguration settings) {
         if (!SETUP.get(player).isSet("Locations.Pos1")
                 && EventoType.getEventoType(settings.getString("Evento.Type")) != EventoType.BATTLE_ROYALE) {
@@ -1159,7 +1162,6 @@ public final class EventoCommand implements CommandExecutor, TabCompleter {
         ));
         return true;
     }
-
     private void givePosTools(Player player, YamlConfiguration settings) {
         ItemStack axe = new ItemStack(Material.STONE_AXE, 1);
         ItemMeta axeMeta = axe.getItemMeta();

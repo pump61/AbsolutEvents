@@ -9,8 +9,12 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerDropItemEvent;
 
 public final class NexusListener implements Listener {
@@ -84,6 +88,42 @@ public final class NexusListener implements Listener {
         }
     }
 
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onGenericDamage(EntityDamageEvent event) {
+        Nexus nexus = getEvento();
+        if (nexus == null) {
+            return;
+        }
+
+        if (!(event.getEntity() instanceof Player player)) {
+            return;
+        }
+
+        if (!nexus.getPlayers().contains(player)) {
+            return;
+        }
+
+        if (nexus.getSpectators().contains(player)) {
+            event.setCancelled(true);
+            return;
+        }
+
+        if (nexus.getDeadPlayers().contains(player)) {
+            event.setCancelled(true);
+            return;
+        }
+
+        if (nexus.getInvinciblePlayers().contains(player)) {
+            event.setCancelled(true);
+            return;
+        }
+
+        if ((player.getHealth() - event.getFinalDamage()) <= 0.0D) {
+            event.setCancelled(true);
+            nexus.eliminate(player, null);
+        }
+    }
+
     @EventHandler(priority = EventPriority.LOW)
     public void onDeath(PlayerDeathEvent event) {
         Nexus nexus = getEvento();
@@ -97,7 +137,6 @@ public final class NexusListener implements Listener {
             return;
         }
 
-        event.setCancelled(true);
         event.getDrops().clear();
         event.setDroppedExp(0);
         event.setKeepInventory(true);
@@ -130,6 +169,59 @@ public final class NexusListener implements Listener {
         }
 
         if (!nexus.getPlayers().contains(player)) {
+            return;
+        }
+
+        event.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onArmorRemove(InventoryClickEvent event) {
+        if (!(event.getWhoClicked() instanceof Player player)) {
+            return;
+        }
+
+        Nexus nexus = getEvento();
+        if (nexus == null) {
+            return;
+        }
+
+        if (!nexus.getPlayers().contains(player)) {
+            return;
+        }
+
+        if (nexus.getSpectators().contains(player)) {
+            event.setCancelled(true);
+            return;
+        }
+
+        if (event.getSlotType() == InventoryType.SlotType.ARMOR) {
+            event.setCancelled(true);
+            return;
+        }
+
+        if (event.getClick().isShiftClick()) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onDrag(InventoryDragEvent event) {
+        if (!(event.getWhoClicked() instanceof Player player)) {
+            return;
+        }
+
+        Nexus nexus = getEvento();
+        if (nexus == null) {
+            return;
+        }
+
+        if (!nexus.getPlayers().contains(player)) {
+            return;
+        }
+
+        if (nexus.getSpectators().contains(player)) {
+            event.setCancelled(true);
             return;
         }
 

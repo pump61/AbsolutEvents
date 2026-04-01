@@ -286,14 +286,16 @@ public final class Torneio extends Evento {
                         return;
                     }
 
-                    playerPairs.remove(fighters);
+                    if (!getPlayers().contains(fighters.first()) || !getPlayers().contains(fighters.second())) {
+                        fightHappening = false;
+                        normalizePairs();
+                        return;
+                    }
 
-                    if (fighter1 != null) {
-                        remove(fighter1);
-                    }
-                    if (fighter2 != null) {
-                        remove(fighter2);
-                    }
+                    fighter1 = fighters.first();
+                    fighter2 = fighters.second();
+
+                    playerPairs.remove(fighters);
 
                     for (String message : config.getStringList("Messages.Draw")) {
                         sendToEvent(
@@ -305,10 +307,22 @@ public final class Torneio extends Evento {
                         );
                     }
 
+                    if (fighter1 != null) {
+                        cleanupAndRemove(fighter1);
+                    }
+
+                    if (fighter2 != null) {
+                        cleanupAndRemove(fighter2);
+                    }
+
                     fighter1 = null;
                     fighter2 = null;
                     fightHappening = false;
                     normalizePairs();
+
+                    if (getPlayers().size() == 1) {
+                        winner(getPlayers().get(0));
+                    }
                 }, maxTime * 20L);
             }, firstRoundFight ? 0L : interval * 20L);
 
@@ -370,15 +384,20 @@ public final class Torneio extends Evento {
             return;
         }
 
-        winner.getInventory().clear();
-        clearArmor(winner);
-        winner.teleport(entrance, PlayerTeleportEvent.TeleportCause.PLUGIN);
-        if (winner.getAttribute(Attribute.MAX_HEALTH) != null) {
-            winner.setHealth(winner.getAttribute(Attribute.MAX_HEALTH).getValue());
-        }
-        winner.setFoodLevel(20);
-
         cancelTask(maxTimeTask);
+
+        if (fighter1 == null || fighter2 == null) {
+            fightHappening = false;
+            fighter1 = null;
+            fighter2 = null;
+            normalizePairs();
+            return;
+        }
+
+        Player loser = (winner == fighter1 ? fighter2 : fighter1);
+
+        resetCombatState(winner);
+        winner.teleport(entrance, PlayerTeleportEvent.TeleportCause.PLUGIN);
 
         Iterator<PlayerPair> iterator = playerPairs.iterator();
         while (iterator.hasNext()) {
@@ -387,30 +406,18 @@ public final class Torneio extends Evento {
                 continue;
             }
 
-            Player adversary = pair.other(winner);
-
-            if (adversary == null) {
-                for (String message : config.getStringList("Messages.Fighter leaves the fight")) {
-                    sendToEvent(
-                            ColorUtils.colorize(
-                                    message
-                                            .replace("@name", eventTitle)
-                                            .replace("@player", winner.getName())
-                            )
-                    );
-                }
-
-                iterator.remove();
-                fighter1 = null;
-                fighter2 = null;
-                fightHappening = false;
-                normalizePairs();
-                return;
-            }
-
-            this.remove(adversary);
             iterator.remove();
             break;
+        }
+
+        if (loser != null && getPlayers().contains(loser)) {
+            loser.sendMessage(ColorUtils.colorize(
+                    AbsolutEventsPlugin.getInstance()
+                            .getConfig()
+                            .getString("Messages.Eliminated", "&cVocê foi eliminado.")
+            ));
+
+            cleanupAndRemove(loser);
         }
 
         for (String message : config.getStringList("Messages.Fight winner")) {
@@ -419,6 +426,7 @@ public final class Torneio extends Evento {
                             message
                                     .replace("@name", eventTitle)
                                     .replace("@player", winner.getName())
+                                    .replace("@winner", winner.getName())
                     )
             );
         }
@@ -426,11 +434,44 @@ public final class Torneio extends Evento {
         fighter1 = null;
         fighter2 = null;
         fightHappening = false;
+
         normalizePairs();
 
-        if (lastFight) {
-            winner(winner);
+        if (getPlayers().size() == 1) {
+            winner(getPlayers().get(0));
+            return;
         }
+
+        if (playerPairs.isEmpty()) {
+            roundHappening = false;
+            cancelTask(fightMonitorTask);
+        }
+    }
+
+    private void resetCombatState(Player player) {
+        if (player == null) {
+            return;
+        }
+
+        clearInventoryAndArmor(player);
+
+        if (player.getAttribute(Attribute.MAX_HEALTH) != null) {
+            player.setHealth(player.getAttribute(Attribute.MAX_HEALTH).getValue());
+        }
+
+        player.setFoodLevel(20);
+        player.setFireTicks(0);
+        player.setFallDistance(0F);
+        player.updateInventory();
+    }
+
+    private void cleanupAndRemove(Player player) {
+        if (player == null) {
+            return;
+        }
+
+        resetCombatState(player);
+        remove(player);
     }
 
     @Override
@@ -461,8 +502,12 @@ public final class Torneio extends Evento {
 
     @Override
     public void remove(Player player) {
+        if (player == null) {
+            return;
+        }
+
+        resetCombatState(player);
         super.remove(player);
-        clearArmor(player);
     }
 
     @Override
@@ -472,8 +517,7 @@ public final class Torneio extends Evento {
         cancelTask(maxTimeTask);
 
         for (Player player : new ArrayList<>(getPlayers())) {
-            clearArmor(player);
-            player.getInventory().clear();
+            resetCombatState(player);
         }
 
         for (ClanPlayer clanPlayer : scClans) {
@@ -481,6 +525,13 @@ public final class Torneio extends Evento {
         }
 
         scClans.clear();
+        fighter1 = null;
+        fighter2 = null;
+        roundHappening = false;
+        fightHappening = false;
+        lastFight = false;
+        firstRoundFight = true;
+        playerPairs.clear();
 
         HandlerList.unregisterAll(listener);
         this.removePlayers();

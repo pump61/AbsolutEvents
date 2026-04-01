@@ -24,6 +24,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
@@ -37,6 +38,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 public final class Nexus extends Evento {
@@ -310,7 +312,7 @@ public final class Nexus extends Evento {
             return;
         }
 
-        if (!getPlayers().contains(attacker) || !pvpEnabled) {
+        if (!getPlayers().contains(attacker)) {
             return;
         }
 
@@ -443,13 +445,16 @@ public final class Nexus extends Evento {
             winnersNames.add(player.getName());
         }
 
+        Set<UUID> winnerIds = new HashSet<>();
+        for (Player player : winnersTeam) {
+            winnerIds.add(player.getUniqueId());
+        }
+
         setWinners(new HashSet<>(winnersTeam));
 
         for (Player player : winnersTeam) {
             TournamentStatsManager.getInstance().addWin(player.getUniqueId());
         }
-
-        List<Player> rewardTargets = new ArrayList<>(winnersTeam);
 
         for (String message : config.getStringList("Messages.Winner")) {
             Bukkit.broadcastMessage(ColorUtils.colorize(
@@ -468,8 +473,14 @@ public final class Nexus extends Evento {
         stop();
 
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
-            for (Player player : rewardTargets) {
-                if (!player.isOnline()) {
+            for (UUID uuid : winnerIds) {
+                Player player = Bukkit.getPlayer(uuid);
+                if (player == null || !player.isOnline()) {
+                    continue;
+                }
+
+                // Só premia se o jogador não tiver quitado/saído do evento
+                if (!winnerIds.contains(player.getUniqueId())) {
                     continue;
                 }
 
@@ -837,15 +848,34 @@ public final class Nexus extends Evento {
             default -> Material.WOODEN_AXE;
         };
 
-        ItemStack slot0 = player.getInventory().getItem(0);
-        if (slot0 == null || slot0.getType() == Material.AIR) {
-            player.getInventory().setItem(0, new ItemStack(swordMat));
+        for (int i = 0; i < player.getInventory().getSize(); i++) {
+            ItemStack item = player.getInventory().getItem(i);
+            if (item == null) continue;
+
+            String type = item.getType().name();
+
+            if (type.contains("SWORD")) {
+                player.getInventory().setItem(i, upgradeWeaponKeepingMeta(item, swordMat));
+            }
+
+            if (type.contains("AXE")) {
+                player.getInventory().setItem(i, upgradeWeaponKeepingMeta(item, axeMat));
+            }
+        }
+    }
+
+    private ItemStack upgradeWeaponKeepingMeta(ItemStack current, Material targetMaterial) {
+        if (current == null || current.getType() == Material.AIR) {
+            return new ItemStack(targetMaterial);
         }
 
-        ItemStack slot1 = player.getInventory().getItem(1);
-        if (slot1 == null || slot1.getType() == Material.AIR) {
-            player.getInventory().setItem(1, new ItemStack(axeMat));
+        if (current.getType() == targetMaterial) {
+            return current;
         }
+
+        ItemStack upgraded = current.clone();
+        upgraded.setType(targetMaterial);
+        return upgraded;
     }
 
     private int getUpgradeTier(Player player) {
@@ -914,9 +944,12 @@ public final class Nexus extends Evento {
 
         if (meta != null) {
             meta.setColor(color);
+
             if (protLevel > 0) {
                 meta.addEnchant(Enchantment.PROTECTION, protLevel, true);
             }
+
+            meta.addEnchant(Enchantment.BINDING_CURSE, 1, true);
             item.setItemMeta(meta);
         }
 
@@ -925,11 +958,17 @@ public final class Nexus extends Evento {
 
     private void equipDeadArmor(Player player) {
         ItemStack helmet = new ItemStack(Material.JACK_O_LANTERN, 1);
+        ItemMeta helmetMeta = helmet.getItemMeta();
+        if (helmetMeta != null) {
+            helmetMeta.addEnchant(Enchantment.BINDING_CURSE, 1, true);
+            helmet.setItemMeta(helmetMeta);
+        }
 
         ItemStack chestplate = new ItemStack(Material.LEATHER_CHESTPLATE, 1);
         LeatherArmorMeta chestMeta = (LeatherArmorMeta) chestplate.getItemMeta();
         if (chestMeta != null) {
             chestMeta.setColor(Color.BLACK);
+            chestMeta.addEnchant(Enchantment.BINDING_CURSE, 1, true);
             chestplate.setItemMeta(chestMeta);
         }
 
@@ -937,6 +976,7 @@ public final class Nexus extends Evento {
         LeatherArmorMeta leggingsMeta = (LeatherArmorMeta) leggings.getItemMeta();
         if (leggingsMeta != null) {
             leggingsMeta.setColor(Color.BLACK);
+            leggingsMeta.addEnchant(Enchantment.BINDING_CURSE, 1, true);
             leggings.setItemMeta(leggingsMeta);
         }
 
@@ -944,6 +984,7 @@ public final class Nexus extends Evento {
         LeatherArmorMeta bootsMeta = (LeatherArmorMeta) boots.getItemMeta();
         if (bootsMeta != null) {
             bootsMeta.setColor(Color.BLACK);
+            bootsMeta.addEnchant(Enchantment.BINDING_CURSE, 1, true);
             boots.setItemMeta(bootsMeta);
         }
 

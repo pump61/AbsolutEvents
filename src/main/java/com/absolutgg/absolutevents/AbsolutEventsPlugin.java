@@ -80,10 +80,6 @@ public final class AbsolutEventsPlugin extends JavaPlugin {
             return;
         }
 
-        if (getServer().getPluginManager().getPlugin("PlaceholderAPI") != null) {
-            new PlaceholderAPIHook(this).register();
-        }
-
         if (runConverterIfNeeded()) {
             return;
         }
@@ -334,13 +330,7 @@ public final class AbsolutEventsPlugin extends JavaPlugin {
         }
 
         new PlaceholderAPIHook(this).register();
-
-        try {
-            new com.absolutgg.absolutevents.placeholders.AbsolutEventsExpansion().register();
-        } catch (Throwable throwable) {
-            getLogger().log(Level.WARNING, "Não foi possível registrar a PlaceholderExpansion interna.", throwable);
-        }
-
+        getLogger().info("PlaceholderAPIHook registrado com sucesso.");
         return true;
     }
 

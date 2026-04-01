@@ -1,9 +1,11 @@
 package com.absolutgg.absolutevents.hooks;
 
 import com.absolutgg.absolutevents.AbsolutEventsPlugin;
+import com.absolutgg.absolutevents.manager.ParkourRecordManager;
 import com.absolutgg.absolutevents.manager.TournamentStatsManager;
 import com.absolutgg.absolutevents.utils.EventoConfigFile;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -11,6 +13,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.File;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -35,7 +38,11 @@ public final class PlaceholderAPIHook extends PlaceholderExpansion {
 
     @Override
     public @NotNull String getAuthor() {
-        return String.join(", ", plugin.getDescription().getAuthors());
+        List<String> authors = plugin.getDescription().getAuthors();
+        if (authors == null || authors.isEmpty()) {
+            return "AbsolutEvents";
+        }
+        return String.join(", ", authors);
     }
 
     @Override
@@ -50,38 +57,137 @@ public final class PlaceholderAPIHook extends PlaceholderExpansion {
 
     @Override
     public @Nullable String onPlaceholderRequest(Player player, @NotNull String identifier) {
-        if (player == null) {
-            return "";
-        }
+        return handleRequest(player, identifier);
+    }
 
+    @Override
+    public @Nullable String onRequest(OfflinePlayer player, @NotNull String params) {
+        return handleRequest(player, params);
+    }
+
+    private @Nullable String handleRequest(@Nullable OfflinePlayer player, @NotNull String identifier) {
         final String normalized = normalize(identifier);
 
-        final Map<String, Integer> wins = plugin.getCacheManager().getPlayerWins(player);
-        final Map<String, Integer> participations = plugin.getCacheManager().getPlayerParticipations(player);
+        if (player != null && player.isOnline()) {
+            Player onlinePlayer = player.getPlayer();
 
-        switch (normalized) {
-            case "wins":
-            case "wins_total":
-                return String.valueOf(sumValues(wins));
+            if (onlinePlayer != null) {
+                final Map<String, Integer> wins = plugin.getCacheManager().getPlayerWins(onlinePlayer);
+                final Map<String, Integer> participations = plugin.getCacheManager().getPlayerParticipations(onlinePlayer);
 
-            case "participations":
-            case "participations_total":
-                return String.valueOf(sumValues(participations));
+                switch (normalized) {
+                    case "wins":
+                    case "wins_total":
+                        return String.valueOf(sumValues(wins));
 
-            case "wins_tournament":
-                return String.valueOf(
-                        TournamentStatsManager.getInstance().getWins(player.getUniqueId())
-                );
+                    case "participations":
+                    case "participations_total":
+                        return String.valueOf(sumValues(participations));
+
+                    case "wins_tournament":
+                        return String.valueOf(
+                                TournamentStatsManager.getInstance().getWins(onlinePlayer.getUniqueId())
+                        );
+                }
+
+                if (normalized.startsWith("wins_")) {
+                    String eventKey = normalized.substring("wins_".length());
+                    return String.valueOf(getEventValue(wins, eventKey));
+                }
+
+                if (normalized.startsWith("participations_")) {
+                    String eventKey = normalized.substring("participations_".length());
+                    return String.valueOf(getEventValue(participations, eventKey));
+                }
+            }
         }
 
-        if (normalized.startsWith("wins_")) {
-            String eventKey = normalized.substring("wins_".length());
-            return String.valueOf(getEventValue(wins, eventKey));
+        ParkourRecordManager manager = ParkourRecordManager.getInstance();
+        String lower = normalized;
+
+        if (lower.startsWith("parkour_besttime_raw_")) {
+            String eventKey = identifier.substring("parkour_besttime_raw_".length());
+            if (player == null || player.getUniqueId() == null) {
+                return "0";
+            }
+            return String.valueOf(manager.getRecord(eventKey, player.getUniqueId()));
         }
 
-        if (normalized.startsWith("participations_")) {
-            String eventKey = normalized.substring("participations_".length());
-            return String.valueOf(getEventValue(participations, eventKey));
+        if (lower.startsWith("parkour_besttime_")) {
+            String eventKey = identifier.substring("parkour_besttime_".length());
+            return manager.getFormattedRecord(eventKey, player);
+        }
+
+        if (lower.startsWith("parkour_besttime_player_")) {
+            String rest = identifier.substring("parkour_besttime_player_".length());
+            int split = rest.indexOf('_');
+            if (split == -1) {
+                return "--:--.--";
+            }
+
+            String eventKey = rest.substring(0, split);
+            String target = rest.substring(split + 1);
+            return manager.getFormattedRecord(eventKey, target);
+        }
+
+        if (lower.startsWith("parkour_besttime_raw_player_")) {
+            String rest = identifier.substring("parkour_besttime_raw_player_".length());
+            int split = rest.indexOf('_');
+            if (split == -1) {
+                return "0";
+            }
+
+            String eventKey = rest.substring(0, split);
+            String target = rest.substring(split + 1);
+            return String.valueOf(manager.getRecord(eventKey, target));
+        }
+
+        if (lower.startsWith("parkour_top_name_")) {
+            String rest = identifier.substring("parkour_top_name_".length());
+            int split = rest.lastIndexOf('_');
+            if (split == -1) {
+                return "-";
+            }
+
+            String eventKey = rest.substring(0, split);
+            try {
+                int pos = Integer.parseInt(rest.substring(split + 1));
+                return manager.getTopName(eventKey, pos);
+            } catch (NumberFormatException ignored) {
+                return "-";
+            }
+        }
+
+        if (lower.startsWith("parkour_top_time_raw_")) {
+            String rest = identifier.substring("parkour_top_time_raw_".length());
+            int split = rest.lastIndexOf('_');
+            if (split == -1) {
+                return "0";
+            }
+
+            String eventKey = rest.substring(0, split);
+            try {
+                int pos = Integer.parseInt(rest.substring(split + 1));
+                return String.valueOf(manager.getTopRaw(eventKey, pos));
+            } catch (NumberFormatException ignored) {
+                return "0";
+            }
+        }
+
+        if (lower.startsWith("parkour_top_time_")) {
+            String rest = identifier.substring("parkour_top_time_".length());
+            int split = rest.lastIndexOf('_');
+            if (split == -1) {
+                return "--:--.--";
+            }
+
+            String eventKey = rest.substring(0, split);
+            try {
+                int pos = Integer.parseInt(rest.substring(split + 1));
+                return manager.getTopFormatted(eventKey, pos);
+            } catch (NumberFormatException ignored) {
+                return "--:--.--";
+            }
         }
 
         return null;
@@ -102,8 +208,8 @@ public final class PlaceholderAPIHook extends PlaceholderExpansion {
     }
 
     private @NotNull Set<String> getAvailableEventKeys() {
-        File[] files = EventoConfigFile.getAllFiles().toArray(new File[0]);
-        if (files == null || files.length == 0) {
+        List<File> files = EventoConfigFile.getAllFiles();
+        if (files == null || files.isEmpty()) {
             return Collections.emptySet();
         }
 
