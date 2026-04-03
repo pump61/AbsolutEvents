@@ -432,9 +432,10 @@ public final class Hunter extends Evento {
             ));
         }
 
-        DiscordWebhookManager.sendTeamWinner(
+        DiscordWebhookManager.sendTeamWinnerWithPlayers(
                 winnerTeam,
                 config.getString("Evento.Title"),
+                winners.stream().map(Player::getName).toList(),
                 buildTopEntries()
         );
 

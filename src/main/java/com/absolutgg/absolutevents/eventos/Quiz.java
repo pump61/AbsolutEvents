@@ -249,7 +249,10 @@ public final class Quiz extends Evento {
             ));
         }
 
-        DiscordWebhookManager.sendTeamWinner(String.join(", ", winners), config.getString("Evento.Title"), List.of());
+        DiscordWebhookManager.sendMultipleWinners(
+                winnersNow.stream().map(Player::getName).toList(),
+                config.getString("Evento.Title")
+        );
 
         stop();
 

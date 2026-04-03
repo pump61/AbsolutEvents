@@ -275,10 +275,9 @@ public final class BlockParty extends Evento {
                         config.getString("Evento.Title")
                 );
             } else {
-                DiscordWebhookManager.sendTeamWinner(
-                        String.join(", ", winnersNames),
-                        config.getString("Evento.Title"),
-                        List.of()
+                DiscordWebhookManager.sendMultipleWinners(
+                        winnersPlayers.stream().map(Player::getName).toList(),
+                        config.getString("Evento.Title")
                 );
             }
         }

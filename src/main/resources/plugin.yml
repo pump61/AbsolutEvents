@@ -16,6 +16,7 @@ softdepend:
   - FastAsyncWorldEdit
   - MMOItems
   - ItemsAdder
+  - SkinsRestorer
 
 commands:
   evento:

@@ -2,8 +2,11 @@ package com.absolutgg.absolutevents.discord;
 
 import com.absolutgg.absolutevents.AbsolutEventsPlugin;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 
 import java.io.OutputStream;
+import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -31,8 +34,8 @@ public final class DiscordWebhookManager {
 
         int color = getInt("Discord.Embeds.Winner.Color", 16711880);
         String footer = getString("Discord.Embeds.Winner.Footer", "");
-        String thumbnail = getString("Discord.Embeds.Winner.ThumbnailUrl", "https://mc-heads.net/avatar/%winner%/128")
-                .replace("%winner%", player);
+        String configuredThumbnail = getString("Discord.Embeds.Winner.ThumbnailUrl", "");
+        String thumbnail = resolveConfiguredOrPlayerThumbnail(configuredThumbnail, player);
 
         sendEmbed(title, description, color, thumbnail, footer, topEntries);
     }
@@ -62,7 +65,8 @@ public final class DiscordWebhookManager {
 
         int color = getInt("Discord.Embeds.MultipleWinners.Color", 16711880);
         String footer = getString("Discord.Embeds.MultipleWinners.Footer", "");
-        String thumbnail = getString("Discord.Embeds.MultipleWinners.ThumbnailUrl", "");
+        String configuredThumbnail = getString("Discord.Embeds.MultipleWinners.ThumbnailUrl", "");
+        String thumbnail = resolveConfiguredOrPlayerThumbnail(configuredThumbnail, winners.get(0));
 
         sendEmbed(title, description, color, thumbnail, footer, topEntries);
     }
@@ -84,6 +88,45 @@ public final class DiscordWebhookManager {
         int color = getInt("Discord.Embeds.TeamWinner.Color", 16711880);
         String footer = getString("Discord.Embeds.TeamWinner.Footer", "");
         String thumbnail = getString("Discord.Embeds.TeamWinner.ThumbnailUrl", "");
+
+        sendEmbed(title, description, color, thumbnail, footer, topEntries);
+    }
+
+    public static void sendTeamWinnerWithPlayers(String team, String event, List<String> players) {
+        sendTeamWinnerWithPlayers(team, event, players, List.of());
+    }
+
+    public static void sendTeamWinnerWithPlayers(String team, String event, List<String> players, List<TopEntry> topEntries) {
+        if (!isEnabled()) {
+            return;
+        }
+
+        String title = getString("Discord.Embeds.TeamWinner.Title", "Fim de Papo!");
+
+        String baseDescription = getString(
+                "Discord.Embeds.TeamWinner.Description",
+                "O time %team% venceu o evento %event%!"
+        )
+                .replace("%team%", team)
+                .replace("%event%", event);
+
+        String playersText = "";
+        if (players != null && !players.isEmpty()) {
+            StringBuilder builder = new StringBuilder();
+            for (String name : players) {
+                builder.append("\n• ").append(name);
+            }
+            playersText = "\n\n👥 Jogadores:" + builder;
+        }
+
+        String description = baseDescription + playersText;
+
+        int color = getInt("Discord.Embeds.TeamWinner.Color", 16711880);
+        String footer = getString("Discord.Embeds.TeamWinner.Footer", "");
+        String configuredThumbnail = getString("Discord.Embeds.TeamWinner.ThumbnailUrl", "");
+        String thumbnail = (players != null && !players.isEmpty())
+                ? resolveConfiguredOrPlayerThumbnail(configuredThumbnail, players.get(0))
+                : configuredThumbnail;
 
         sendEmbed(title, description, color, thumbnail, footer, topEntries);
     }
@@ -195,6 +238,58 @@ public final class DiscordWebhookManager {
         }
 
         return builder.toString();
+    }
+
+    private static String resolvePlayerThumbnail(String playerName) {
+        String fallback = "https://mc-heads.net/avatar/" + playerName + "/128";
+
+        try {
+            Plugin srPlugin = Bukkit.getPluginManager().getPlugin("SkinsRestorer");
+            if (srPlugin == null || !srPlugin.isEnabled()) {
+                return fallback;
+            }
+
+            Player player = Bukkit.getPlayerExact(playerName);
+            if (player == null) {
+                return fallback;
+            }
+
+            Class<?> providerClass = Class.forName("net.skinsrestorer.api.SkinsRestorerProvider");
+            Method getMethod = providerClass.getMethod("get");
+            Object skinsRestorer = getMethod.invoke(null);
+
+            Method getPlayerStorageMethod = skinsRestorer.getClass().getMethod("getPlayerStorage");
+            Object playerStorage = getPlayerStorageMethod.invoke(skinsRestorer);
+
+            Method getSkinForPlayerMethod = playerStorage.getClass().getMethod("getSkinForPlayer", java.util.UUID.class, String.class);
+            Object optionalProperty = getSkinForPlayerMethod.invoke(playerStorage, player.getUniqueId(), player.getName());
+
+            if (!(optionalProperty instanceof java.util.Optional<?> optional) || optional.isEmpty()) {
+                return fallback;
+            }
+
+            Object skinProperty = optional.get();
+
+            Class<?> propertyUtilsClass = Class.forName("net.skinsrestorer.api.PropertyUtils");
+            Method getSkinTextureUrlMethod = propertyUtilsClass.getMethod("getSkinTextureUrl", Class.forName("net.skinsrestorer.api.property.SkinProperty"));
+            Object textureUrl = getSkinTextureUrlMethod.invoke(null, skinProperty);
+
+            if (!(textureUrl instanceof String url) || url.isBlank()) {
+                return fallback;
+            }
+
+            return url;
+        } catch (Throwable throwable) {
+            return fallback;
+        }
+    }
+
+    private static String resolveConfiguredOrPlayerThumbnail(String configuredThumbnail, String playerName) {
+        if (configuredThumbnail != null && !configuredThumbnail.isBlank()) {
+            return configuredThumbnail.replace("%winner%", playerName);
+        }
+
+        return resolvePlayerThumbnail(playerName);
     }
 
     private static boolean isEnabled() {

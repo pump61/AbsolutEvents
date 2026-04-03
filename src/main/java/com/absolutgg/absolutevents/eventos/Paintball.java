@@ -254,8 +254,8 @@ public final class Paintball extends Evento {
             ));
         }
 
-        DiscordWebhookManager.sendTeamWinner(
-                String.join(", ", winnerNames),
+        DiscordWebhookManager.sendMultipleWinners(
+                winnersNow.stream().map(Player::getName).toList(),
                 config.getString("Evento.Title"),
                 buildTopEntries()
         );

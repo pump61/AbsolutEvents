@@ -339,10 +339,10 @@ public final class SuperSmackers extends Evento {
             TournamentStatsManager.getInstance().addWin(player.getUniqueId());
         }
 
-        DiscordWebhookManager.sendTeamWinner(
+        DiscordWebhookManager.sendTeamWinnerWithPlayers(
                 team.getDisplayName(),
-                config.getString("Evento.Title", "Super Smackers"),
-                List.of()
+                config.getString("Evento.Title"),
+                team.members.stream().map(Player::getName).toList()
         );
 
         for (Player player : team.members) {

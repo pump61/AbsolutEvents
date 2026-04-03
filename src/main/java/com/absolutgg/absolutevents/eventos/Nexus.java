@@ -464,9 +464,10 @@ public final class Nexus extends Evento {
             ));
         }
 
-        DiscordWebhookManager.sendTeamWinner(
+        DiscordWebhookManager.sendTeamWinnerWithPlayers(
                 team.equalsIgnoreCase("blue") ? blueName : redName,
                 config.getString("Evento.Title"),
+                winnersTeam.stream().map(Player::getName).toList(),
                 buildTopEntries()
         );
 

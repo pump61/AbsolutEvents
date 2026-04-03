@@ -333,7 +333,11 @@ public final class MorteSubita extends Evento {
             ));
         }
 
-        DiscordWebhookManager.sendTeamWinner(teamName, config.getString("Evento.Title"), List.of());
+        DiscordWebhookManager.sendTeamWinnerWithPlayers(
+                teamName,
+                config.getString("Evento.Title"),
+                winners.stream().map(Player::getName).toList()
+        );
 
         setWinners(new HashSet<>(winners));
 

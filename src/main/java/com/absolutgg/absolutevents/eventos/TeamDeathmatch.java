@@ -458,7 +458,12 @@ public final class TeamDeathmatch extends Evento {
 
         sendTopKills();
 
-        DiscordWebhookManager.sendTeamWinner(teamName, config.getString("Evento.Title"), buildTopEntries());
+        DiscordWebhookManager.sendTeamWinnerWithPlayers(
+                teamName,
+                config.getString("Evento.Title"),
+                winnersPlayers.stream().map(Player::getName).toList(),
+                buildTopEntries()
+        );
 
         stop();
 
