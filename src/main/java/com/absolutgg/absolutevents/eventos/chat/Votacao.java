@@ -22,6 +22,12 @@ import java.util.Random;
 
 public final class Votacao extends EventoChat {
 
+    private static final LegacyComponentSerializer LEGACY = LegacyComponentSerializer.builder()
+            .character('§')
+            .hexColors()
+            .useUnusualXRepeatedCharacterHexFormat()
+            .build();
+
     private final YamlConfiguration config;
     private final ConfigurationSection alternativesSection;
 
@@ -95,7 +101,7 @@ public final class Votacao extends EventoChat {
         if (parsed.contains("@alternatives")) {
             String before = parsed.replace("@alternatives", "");
             if (!before.isBlank()) {
-                Bukkit.broadcast(LegacyComponentSerializer.legacySection().deserialize(ColorUtils.colorize(before)));
+                Bukkit.broadcast(LEGACY.deserialize(ColorUtils.colorize(before)));
             }
 
             broadcastAlternativesList();
@@ -130,7 +136,7 @@ public final class Votacao extends EventoChat {
             parsed = parsed.replace("@alternative" + entry.getKey(), entry.getValue().displayName());
         }
 
-        Bukkit.broadcast(LegacyComponentSerializer.legacySection().deserialize(ColorUtils.colorize(parsed)));
+        Bukkit.broadcast(LEGACY.deserialize(ColorUtils.colorize(parsed)));
     }
 
     @Override
@@ -215,14 +221,12 @@ public final class Votacao extends EventoChat {
                     ? 0.0f
                     : (currentVotes * 100.0f) / getTotalVoteWeight();
 
-            String line = ColorUtils.colorize(
-                    format
-                            .replace("@id", String.valueOf(id))
-                            .replace("@alternative", option.displayName())
-                            .replace("@votes", String.valueOf(currentVotes))
-                            .replace("@percentage", String.valueOf((int) Math.floor(percentage)))
-                            .replace("@name", config.getString("Evento.Title", "Votação"))
-            );
+            String line = format
+                    .replace("@id", String.valueOf(id))
+                    .replace("@alternative", option.displayName())
+                    .replace("@votes", String.valueOf(currentVotes))
+                    .replace("@percentage", String.valueOf((int) Math.floor(percentage)))
+                    .replace("@name", config.getString("Evento.Title", "Votação"));
 
             Component component = buildVoteComponent(id, option.displayName(), line);
             Bukkit.broadcast(component);
@@ -230,15 +234,16 @@ public final class Votacao extends EventoChat {
     }
 
     private Component buildVoteComponent(int id, String alternativeName, String line) {
-        Component base = LegacyComponentSerializer.legacySection().deserialize(line);
+        Component base = LEGACY.deserialize(ColorUtils.colorize(line));
 
         String hoverText = ColorUtils.colorize(
                 config.getString("Messages.Hover", "&aClique para votar em @alternative")
                         .replace("@alternative", alternativeName)
                         .replace("@id", String.valueOf(id))
+                        .replace("@name", config.getString("Evento.Title", "Votação"))
         );
 
-        Component hover = LegacyComponentSerializer.legacySection().deserialize(hoverText);
+        Component hover = LEGACY.deserialize(hoverText);
 
         return base.hoverEvent(HoverEvent.showText(hover))
                 .clickEvent(ClickEvent.runCommand("/evento " + id));
