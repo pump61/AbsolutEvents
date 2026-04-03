@@ -488,7 +488,7 @@ public final class Quiz extends Evento {
             player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 1.2F);
         }
 
-        for (Player player : new ArrayList<>(wrongPlayers)) {
+        for (Player player : wrongPlayers) {
             player.sendMessage(ColorUtils.colorize(
                     config.getString("Messages.Player wrong", "&cVocê errou!")
                             .replace("@name", config.getString("Evento.Title"))
@@ -496,38 +496,19 @@ public final class Quiz extends Evento {
             player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 1.0F, 1.0F);
         }
 
-        int aliveAfterRound = getPlayers().size() - wrongPlayers.size();
-
-        if (aliveAfterRound <= 0) {
-            for (Player player : new ArrayList<>(wrongPlayers)) {
-                eliminate(player);
-            }
+        // Se ninguém acertou, ninguém vence.
+        if (correctPlayers.isEmpty()) {
             noWinners();
             return;
         }
 
-        if (aliveAfterRound == 1) {
-            Player futureWinner = null;
-
-            for (Player player : new ArrayList<>(getPlayers())) {
-                if (!wrongPlayers.contains(player)) {
-                    futureWinner = player;
-                    break;
-                }
-            }
-
-            for (Player player : new ArrayList<>(wrongPlayers)) {
-                eliminate(player);
-            }
-
-            if (futureWinner != null) {
-                winner(futureWinner);
-            } else {
-                noWinners();
-            }
+        // Se só um acertou, ele vence diretamente.
+        if (correctPlayers.size() == 1) {
+            winner(correctPlayers.get(0));
             return;
         }
 
+        // Elimina apenas quem errou.
         for (Player player : new ArrayList<>(wrongPlayers)) {
             eliminate(player);
         }

@@ -99,7 +99,7 @@ public final class EventoListener implements Listener {
             }
 
             QuitCache.setQuit(uuid);
-            removePlayerByUuid(evento, uuid);
+            evento.leave(player);
 
             if (!evento.isOpen() && evento.isElimination() && evento.getPlayers().size() == 1) {
                 evento.winner(evento.getPlayers().get(0));

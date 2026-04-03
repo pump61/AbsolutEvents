@@ -87,11 +87,6 @@ public final class Sign extends Evento {
 
         if (getPlayers().isEmpty()) {
             noWinner();
-            return;
-        }
-
-        if (getPlayers().size() == 1) {
-            winner(getPlayers().get(0));
         }
     }
 
@@ -176,11 +171,6 @@ public final class Sign extends Evento {
 
         if (getPlayers().isEmpty()) {
             noWinner();
-            return;
-        }
-
-        if (getPlayers().size() == 1) {
-            winner(getPlayers().get(0));
         }
     }
 

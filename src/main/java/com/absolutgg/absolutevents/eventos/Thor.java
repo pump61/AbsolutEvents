@@ -21,6 +21,7 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -53,6 +54,8 @@ public final class Thor extends Evento {
     private final int maxX;
     private final int minZ;
     private final int maxZ;
+
+    private final List<Location> validStrikeLocations = new ArrayList<>();
 
     private BukkitTask waveTask;
     private BukkitTask actionbarTask;
@@ -118,6 +121,7 @@ public final class Thor extends Evento {
         this.minZ = Math.min(pos1.getBlockZ(), pos2.getBlockZ());
         this.maxZ = Math.max(pos1.getBlockZ(), pos2.getBlockZ());
 
+        buildValidStrikeLocations();
         loadStages();
     }
 
@@ -217,6 +221,26 @@ public final class Thor extends Evento {
             }
 
             stages.sort((a, b) -> Integer.compare(a.time, b.time));
+        }
+    }
+
+    private void buildValidStrikeLocations() {
+        validStrikeLocations.clear();
+
+        if (arenaWorld == null) {
+            return;
+        }
+
+        for (int x = minX; x <= maxX; x++) {
+            for (int z = minZ; z <= maxZ; z++) {
+                int y = findHighestInsideArena(x, z);
+                if (y == Integer.MIN_VALUE) {
+                    continue;
+                }
+
+                Location strike = new Location(arenaWorld, x + 0.5, y + 1.0, z + 0.5);
+                validStrikeLocations.add(strike);
+            }
         }
     }
 
@@ -431,7 +455,7 @@ public final class Thor extends Evento {
                     );
 
                     Component component = LegacyComponentSerializer.legacySection().deserialize(parsed);
-                    
+
                     for (Player player : getPlayers()) {
                         player.sendActionBar(component);
 
@@ -509,81 +533,58 @@ public final class Thor extends Evento {
     }
 
     private List<Location> getUniqueStrikeLocations(int amount) {
-        List<Location> locations = new ArrayList<>();
-        Set<String> usedKeys = new HashSet<>();
+        List<Location> result = new ArrayList<>();
 
-        int maxAttempts = Math.max(20, amount * 25);
-        int attempts = 0;
-
-        while (locations.size() < amount && attempts < maxAttempts) {
-            attempts++;
-
-            Location loc = getRandomStrikeLocation();
-            if (loc == null) {
-                continue;
-            }
-
-            String key = toKey(loc);
-
-            if (usedKeys.contains(key) || pendingStrikeKeys.contains(key)) {
-                continue;
-            }
-
-            usedKeys.add(key);
-            locations.add(loc);
+        if (validStrikeLocations.isEmpty()) {
+            return result;
         }
 
-        return locations;
+        List<Location> pool = new ArrayList<>(validStrikeLocations);
+        Collections.shuffle(pool, random);
+
+        for (Location loc : pool) {
+            String key = toKey(loc);
+
+            if (pendingStrikeKeys.contains(key)) {
+                continue;
+            }
+
+            result.add(loc.clone());
+
+            if (result.size() >= amount) {
+                break;
+            }
+        }
+
+        return result;
     }
 
     private Location getRandomStrikeLocation() {
-        if (arenaWorld == null) {
+        if (validStrikeLocations.isEmpty()) {
             return null;
         }
 
-        for (int tries = 0; tries < 80; tries++) {
-            int x = random.nextInt((maxX - minX) + 1) + minX;
-            int z = random.nextInt((maxZ - minZ) + 1) + minZ;
+        List<Location> pool = new ArrayList<>(validStrikeLocations);
+        Collections.shuffle(pool, random);
 
-            int y = findHighestInsideArena(x, z);
-            if (y == Integer.MIN_VALUE) {
-                continue;
+        for (Location loc : pool) {
+            if (!pendingStrikeKeys.contains(toKey(loc))) {
+                return loc.clone();
             }
-
-            Location loc = new Location(arenaWorld, x + 0.5, y + 1.0, z + 0.5);
-
-            if (pendingStrikeKeys.contains(toKey(loc))) {
-                continue;
-            }
-
-            return loc;
         }
 
-        int centerX = (minX + maxX) / 2;
-        int centerZ = (minZ + maxZ) / 2;
-        int centerY = findHighestInsideArena(centerX, centerZ);
-
-        if (centerY == Integer.MIN_VALUE) {
-            centerY = arenaMinY;
-        }
-
-        return new Location(arenaWorld, centerX + 0.5, centerY + 1.0, centerZ + 0.5);
+        return null;
     }
 
     private int findHighestInsideArena(int x, int z) {
-        int highest = arenaWorld.getHighestBlockYAt(x, z);
-
-        if (highest < arenaMinY) {
+        if (arenaWorld == null) {
             return Integer.MIN_VALUE;
         }
 
-        if (highest > arenaMaxY + 1) {
-            highest = arenaMaxY + 1;
-        }
-
-        for (int y = highest; y >= arenaMinY; y--) {
-            if (!arenaWorld.getBlockAt(x, y - 1, z).getType().isAir()) {
-                return y - 1;
+        for (int y = arenaMaxY; y >= arenaMinY; y--) {
+            if (!arenaWorld.getBlockAt(x, y, z).getType().isAir()
+                    && arenaWorld.getBlockAt(x, y + 1, z).getType().isAir()) {
+                return y;
             }
         }
 

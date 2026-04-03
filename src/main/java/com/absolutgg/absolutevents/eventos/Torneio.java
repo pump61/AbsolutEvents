@@ -541,32 +541,90 @@ public final class Torneio extends Evento {
     public void leave(Player player) {
         boolean wasInPlayers = getPlayers().contains(player);
 
-        if (wasInPlayers) {
-            disableFriendlyFire(player);
+        if (!wasInPlayers) {
+            super.leave(player);
+            return;
+        }
 
-            player.getInventory().clear();
-            clearArmor(player);
+        disableFriendlyFire(player);
 
-            for (PlayerPair pair : new ArrayList<>(playerPairs)) {
-                if (pair.remove(player)) {
-                    if (fighter1 == player) {
-                        fightWinner(fighter2);
-                    } else if (fighter2 == player) {
-                        fightWinner(fighter1);
-                    }
+        boolean wasFighter1 = fighter1 == player;
+        boolean wasFighter2 = fighter2 == player;
+        Player opponent = null;
+
+        if (wasFighter1) {
+            opponent = fighter2;
+        } else if (wasFighter2) {
+            opponent = fighter1;
+        } else {
+            for (PlayerPair pair : playerPairs) {
+                if (pair.contains(player)) {
+                    opponent = pair.other(player);
                     break;
                 }
             }
         }
 
+        resetCombatState(player);
+
+        Iterator<PlayerPair> iterator = playerPairs.iterator();
+        while (iterator.hasNext()) {
+            PlayerPair pair = iterator.next();
+            if (!pair.contains(player)) {
+                continue;
+            }
+
+            iterator.remove();
+            break;
+        }
+
         super.leave(player);
 
-        if (isHappening()) {
-            normalizePairs();
+        if (wasFighter1 || wasFighter2) {
+            cancelTask(maxTimeTask);
 
-            if (!isOpen() && getPlayers().size() == 1) {
-                winner(getPlayers().get(0));
+            fighter1 = null;
+            fighter2 = null;
+            fightHappening = false;
+
+            if (opponent != null && getPlayers().contains(opponent)) {
+                resetCombatState(opponent);
+                opponent.teleport(entrance, PlayerTeleportEvent.TeleportCause.PLUGIN);
+
+                for (String message : config.getStringList("Messages.Players leaves")) {
+                    sendToEvent(
+                            ColorUtils.colorize(
+                                    message
+                                            .replace("@name", eventTitle)
+                                            .replace("@player", player.getName())
+                                            .replace("@adversary", opponent.getName())
+                            )
+                    );
+                }
+
+                for (String message : config.getStringList("Messages.Fight winner")) {
+                    sendToEvent(
+                            ColorUtils.colorize(
+                                    message
+                                            .replace("@name", eventTitle)
+                                            .replace("@player", opponent.getName())
+                                            .replace("@winner", opponent.getName())
+                            )
+                    );
+                }
             }
+        }
+
+        normalizePairs();
+
+        if (!isOpen() && getPlayers().size() == 1) {
+            winner(getPlayers().get(0));
+            return;
+        }
+
+        if (playerPairs.isEmpty()) {
+            roundHappening = false;
+            cancelTask(fightMonitorTask);
         }
     }
 
@@ -668,6 +726,9 @@ public final class Torneio extends Evento {
                 Player survivor = pair.first() != null ? pair.first() : pair.second();
 
                 if (survivor != null && getPlayers().contains(survivor)) {
+                    resetCombatState(survivor);
+                    survivor.teleport(entrance, PlayerTeleportEvent.TeleportCause.PLUGIN);
+
                     for (String message : config.getStringList("Messages.Players leaves")) {
                         sendToEvent(
                                 ColorUtils.colorize(
@@ -675,6 +736,17 @@ public final class Torneio extends Evento {
                                                 .replace("@name", eventTitle)
                                                 .replace("@player", "desconhecido")
                                                 .replace("@adversary", survivor.getName())
+                                )
+                        );
+                    }
+
+                    for (String message : config.getStringList("Messages.Fight winner")) {
+                        sendToEvent(
+                                ColorUtils.colorize(
+                                        message
+                                                .replace("@name", eventTitle)
+                                                .replace("@player", survivor.getName())
+                                                .replace("@winner", survivor.getName())
                                 )
                         );
                     }
@@ -687,6 +759,8 @@ public final class Torneio extends Evento {
         if (playerPairs.isEmpty()) {
             fightHappening = false;
             roundHappening = false;
+            fighter1 = null;
+            fighter2 = null;
             cancelTask(fightMonitorTask);
         }
     }

@@ -401,21 +401,29 @@ public final class EventoCommand implements CommandExecutor, TabCompleter {
 
         if (evento != null) {
             config = evento.getConfig();
-            evento.stop();
+
+            for (String msg : config.getStringList("Messages.Cancelled")) {
+                Bukkit.broadcastMessage(color(
+                        msg.replace("@name", config.getString("Evento.Title", "Evento"))
+                ));
+            }
 
             if (AbsolutEventsPlugin.getInstance().getConfig().getBoolean("Bungeecord.Enabled")
                     && config.getString("Locations.Server") != null) {
                 BungeecordHook.stopEvento("cancelled");
             }
+
+            evento.stop();
         } else {
             config = eventoChat.getConfig();
-            eventoChat.stop();
-        }
 
-        for (String msg : config.getStringList("Messages.Cancelled")) {
-            Bukkit.broadcastMessage(color(
-                    msg.replace("@name", config.getString("Evento.Title"))
-            ));
+            for (String msg : config.getStringList("Messages.Cancelled")) {
+                Bukkit.broadcastMessage(color(
+                        msg.replace("@name", config.getString("Evento.Title", "Evento"))
+                ));
+            }
+
+            eventoChat.stop();
         }
 
         return true;

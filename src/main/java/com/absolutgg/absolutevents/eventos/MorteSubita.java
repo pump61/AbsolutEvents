@@ -6,10 +6,11 @@ import com.absolutgg.absolutevents.api.events.PlayerLoseEvent;
 import com.absolutgg.absolutevents.discord.DiscordWebhookManager;
 import com.absolutgg.absolutevents.listeners.eventos.MorteSubitaListener;
 import com.absolutgg.absolutevents.manager.TournamentStatsManager;
+import com.absolutgg.absolutevents.utils.ColorUtils;
 import com.absolutgg.absolutevents.utils.EventKitApplier;
 import com.cryptomorin.xseries.XEnchantment;
 import com.cryptomorin.xseries.XMaterial;
-import com.iridium.iridiumcolorapi.IridiumColorAPI;
+
 import net.sacredlabyrinth.phaed.simpleclans.ClanPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
@@ -145,10 +146,10 @@ public final class MorteSubita extends Evento {
             setGear(player);
 
             if (blueTeam.contains(player)) {
-                sendTeamMessage(player, "§9" + blueName);
+                sendTeamMessage(player, ColorUtils.colorize(blueName));
                 player.teleport(blueSpawn);
             } else {
-                sendTeamMessage(player, "§c" + redName);
+                sendTeamMessage(player, ColorUtils.colorize(redName));
                 player.teleport(redSpawn);
             }
         }
@@ -156,8 +157,8 @@ public final class MorteSubita extends Evento {
 
     private void sendTeamMessage(Player player, String teamName) {
         for (String message : config.getStringList("Messages.Team")) {
-            player.sendMessage(IridiumColorAPI.process(
-                    message.replace("&", "§")
+            player.sendMessage(ColorUtils.colorize(
+                    message
                             .replace("@name", config.getString("Evento.Title"))
                             .replace("@team", teamName)
                             .replace("@time", String.valueOf(startTime))
@@ -188,8 +189,9 @@ public final class MorteSubita extends Evento {
             pvpEnabled = true;
 
             for (String message : config.getStringList("Messages.Enabled")) {
-                sendToEvent(message.replace("&", "§")
-                        .replace("@name", config.getString("Evento.Title")));
+                sendToEvent(
+                        message.replace("@name", config.getString("Evento.Title"))
+                );
             }
         }, startTime * 20L);
     }
@@ -201,10 +203,9 @@ public final class MorteSubita extends Evento {
             return;
         }
 
-        String leaveMessage = IridiumColorAPI.process(
+        String leaveMessage = ColorUtils.colorize(
                 plugin.getConfig()
                         .getString("Messages.Leave", "&c@player saiu do evento.")
-                        .replace("&", "§")
                         .replace("@player", player.getName())
         );
 
@@ -274,8 +275,8 @@ public final class MorteSubita extends Evento {
         String killerName = killer != null ? killer.getName() : "Desconhecido";
 
         for (String message : config.getStringList("Messages.Eliminado")) {
-            victim.sendMessage(IridiumColorAPI.process(
-                    message.replace("&", "§")
+            victim.sendMessage(ColorUtils.colorize(
+                    message
                             .replace("@name", config.getString("Evento.Title"))
                             .replace("@killer", killerName)
             ));
@@ -324,8 +325,8 @@ public final class MorteSubita extends Evento {
         }
 
         for (String message : config.getStringList("Messages.Winner")) {
-            plugin.getServer().broadcastMessage(IridiumColorAPI.process(
-                    message.replace("&", "§")
+            plugin.getServer().broadcastMessage(ColorUtils.colorize(
+                    message
                             .replace("@team", teamName)
                             .replace("@winner", String.join(", ", winnerNames))
                             .replace("@name", config.getString("Evento.Title"))
@@ -336,7 +337,6 @@ public final class MorteSubita extends Evento {
 
         setWinners(new HashSet<>(winners));
 
-        // ✅ TOURNAMENT STATS
         for (Player player : winners) {
             TournamentStatsManager.getInstance().addWin(player.getUniqueId());
         }
@@ -433,7 +433,7 @@ public final class MorteSubita extends Evento {
     }
 
     private void sendToEvent(String message) {
-        String parsed = IridiumColorAPI.process(message);
+        String parsed = ColorUtils.colorize(message);
 
         for (Player player : getPlayers()) {
             player.sendMessage(parsed);

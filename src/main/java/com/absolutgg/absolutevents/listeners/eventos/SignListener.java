@@ -202,38 +202,21 @@ public final class SignListener implements Listener {
 
         EntityDamageEvent.DamageCause cause = event.getCause();
 
-        switch (cause) {
-            case CONTACT:
-            case LAVA:
-            case FIRE:
-            case FIRE_TICK:
-            case HOT_FLOOR:
-            case VOID:
-            case FALL:
+        if (cause == EntityDamageEvent.DamageCause.LAVA
+                || cause == EntityDamageEvent.DamageCause.VOID) {
 
-                long now = System.currentTimeMillis();
-                long last = damageCooldown.getOrDefault(player.getUniqueId(), 0L);
+            event.setCancelled(true);
 
-                if ((now - last) < 1000L) {
-                    event.setCancelled(true);
-                    return;
-                }
+            if (signEvent.returnsOnDamage()) {
+                returnToCheckpointOrStart(player, signEvent);
+            } else {
+                signEvent.eliminate(player);
+            }
 
-                damageCooldown.put(player.getUniqueId(), now);
-
-                event.setCancelled(true);
-
-                if (signEvent.returnsOnDamage()) {
-                    returnToCheckpointOrStart(player, signEvent);
-                } else {
-                    signEvent.eliminate(player);
-                }
-                break;
-
-            default:
-                event.setCancelled(true);
-                break;
+            return;
         }
+
+        event.setCancelled(true);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)

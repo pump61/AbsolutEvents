@@ -37,9 +37,10 @@ public final class Votacao extends EventoChat {
 
         loadAlternatives();
 
-        if (options.isEmpty()) {
-            Bukkit.getConsoleSender().sendMessage("§c[AbsolutEvents] Nenhuma alternativa válida foi encontrada no evento de votação.");
-        }
+    if (options.isEmpty()) {
+        Bukkit.getConsoleSender().sendMessage(
+                ColorUtils.colorize("&#ff5555[AbsolutEvents] Nenhuma alternativa válida foi encontrada no evento de votação.")
+        );
     }
 
     @Override
@@ -357,17 +358,17 @@ public final class Votacao extends EventoChat {
 
     private void broadcastNoVotesMessage() {
         for (String message : config.getStringList("Messages.No votes")) {
-            Bukkit.broadcast(LegacyComponentSerializer.legacySection().deserialize(
+            Bukkit.broadcastMessage(
                     ColorUtils.colorize(
                             message.replace("@name", config.getString("Evento.Title", "Votação"))
                     )
-            ));
+            );
         }
     }
 
     private void broadcastWinnerMessage(String winnerName, int winnerVotes, float percent) {
         for (String message : config.getStringList("Messages.Winner")) {
-            Bukkit.broadcast(LegacyComponentSerializer.legacySection().deserialize(
+            Bukkit.broadcastMessage(
                     ColorUtils.colorize(
                             message
                                     .replace("@winner", winnerName)
@@ -375,7 +376,7 @@ public final class Votacao extends EventoChat {
                                     .replace("@percentage", String.valueOf((int) Math.floor(percent)))
                                     .replace("@name", config.getString("Evento.Title", "Votação"))
                     )
-            ));
+            );
         }
     }
 

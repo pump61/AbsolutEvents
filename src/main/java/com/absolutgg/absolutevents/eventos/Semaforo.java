@@ -235,7 +235,7 @@ public final class Semaforo extends Evento {
         allowWalking();
         currentColorKey = "GREEN";
         broadcastMessages(config.getStringList("Messages.Green"));
-        updateHotbar(XMaterial.LIME_TERRACOTTA, greenName);
+        updateHotbar(XMaterial.LIME_CONCRETE, greenName);
         playSound("Sounds.Green");
 
         greenTask = Bukkit.getScheduler().runTaskLater(
@@ -247,7 +247,7 @@ public final class Semaforo extends Evento {
 
                     currentColorKey = "YELLOW";
                     broadcastMessages(config.getStringList("Messages.Yellow"));
-                    updateHotbar(XMaterial.YELLOW_TERRACOTTA, yellowName);
+                    updateHotbar(XMaterial.YELLOW_CONCRETE, yellowName);
                     playSound("Sounds.Yellow");
                 },
                 green * 20L
@@ -263,7 +263,7 @@ public final class Semaforo extends Evento {
                     denyWalking();
                     currentColorKey = "RED";
                     broadcastMessages(config.getStringList("Messages.Red"));
-                    updateHotbar(XMaterial.RED_TERRACOTTA, redName);
+                    updateHotbar(XMaterial.RED_CONCRETE, redName);
                     playSound("Sounds.Red");
                 },
                 (green + yellow) * 20L

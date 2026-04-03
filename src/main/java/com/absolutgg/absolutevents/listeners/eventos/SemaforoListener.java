@@ -34,7 +34,9 @@ public final class SemaforoListener implements Listener {
             return;
         }
 
-        if (!semaforo.getPlayers().contains(event.getPlayer())) {
+        Player player = event.getPlayer();
+
+        if (!semaforo.getPlayers().contains(player)) {
             return;
         }
 
@@ -56,17 +58,33 @@ public final class SemaforoListener implements Listener {
             return;
         }
 
-        if (!sign.getLine(0).equals(ColorUtils.colorize(victory.get(0)))) {
+        String line0 = ColorUtils.strip(sign.getLine(0)).trim();
+        String line1 = ColorUtils.strip(sign.getLine(1)).trim();
+        String line2 = ColorUtils.strip(sign.getLine(2)).trim();
+        String line3 = ColorUtils.strip(sign.getLine(3)).trim();
+
+        String expected0 = ColorUtils.strip(victory.get(0)).trim();
+        String expected1 = ColorUtils.strip(victory.get(1)).trim();
+        String expected2 = ColorUtils.strip(victory.get(2)).trim();
+        String expected3 = ColorUtils.strip(victory.get(3)).trim();
+
+        if (!line0.equalsIgnoreCase(expected0)) {
             return;
         }
 
-        for (int i = 1; i < 4; i++) {
-            if (!sign.getLine(i).equals(ColorUtils.colorize(victory.get(i)))) {
-                return;
-            }
+        if (!line1.equalsIgnoreCase(expected1)) {
+            return;
         }
 
-        semaforo.winner(event.getPlayer());
+        if (!line2.equalsIgnoreCase(expected2)) {
+            return;
+        }
+
+        if (!line3.equalsIgnoreCase(expected3)) {
+            return;
+        }
+
+        semaforo.winner(player);
     }
 
     @EventHandler

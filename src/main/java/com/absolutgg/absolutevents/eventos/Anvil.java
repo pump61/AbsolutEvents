@@ -6,6 +6,8 @@ import com.absolutgg.absolutevents.discord.DiscordWebhookManager;
 import com.absolutgg.absolutevents.listeners.eventos.AnvilListener;
 import com.absolutgg.absolutevents.manager.TournamentStatsManager;
 import com.absolutgg.absolutevents.utils.ColorUtils;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -16,14 +18,19 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitTask;
+import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 
 public final class Anvil extends Evento {
 
@@ -35,6 +42,7 @@ public final class Anvil extends Evento {
     private final int height;
     private final int time;
     private final int delay;
+    private final int strikesPerWave;
 
     private final Random random = new Random();
 
@@ -44,6 +52,7 @@ public final class Anvil extends Evento {
 
     private final List<Block> anvils = new ArrayList<>();
     private final List<Stage> stages = new ArrayList<>();
+    private final List<Block> arenaBlocks = new ArrayList<>();
 
     private int minX;
     private int maxX;
@@ -60,10 +69,12 @@ public final class Anvil extends Evento {
     private static final class Stage {
         private final int time;
         private final int interval;
+        private final int strikes;
 
-        private Stage(int time, int interval) {
+        private Stage(int time, int interval, int strikes) {
             this.time = time;
             this.interval = interval;
+            this.strikes = strikes;
         }
     }
 
@@ -73,6 +84,7 @@ public final class Anvil extends Evento {
         this.height = Math.max(1, config.getInt("Evento.Height"));
         this.time = Math.max(1, config.getInt("Evento.Time"));
         this.delay = Math.max(1, config.getInt("Evento.Delay"));
+        this.strikesPerWave = Math.max(1, config.getInt("Evento.Strikes per wave", 1));
         this.started = false;
         this.ending = false;
         this.countdown = time;
@@ -80,6 +92,7 @@ public final class Anvil extends Evento {
 
         loadArena();
         loadStages();
+        buildArenaBlocks();
     }
 
     @Override
@@ -144,19 +157,24 @@ public final class Anvil extends Evento {
                                 }
 
                                 if (countdown <= 0) {
-                                    Block target = getRandomFreeBlock();
-                                    if (target == null) {
+                                    int strikes = getCurrentStrikesPerWave();
+                                    List<Block> targets = getUniqueFreeBlocks(strikes);
+
+                                    if (targets.isEmpty()) {
                                         if (getPlayers().isEmpty()) {
                                             noWinner();
                                         } else if (getPlayers().size() == 1) {
                                             winner(getPlayers().get(0));
                                         } else {
-                                            noWinner();
+                                            winners(new ArrayList<>(getPlayers()));
                                         }
                                         return;
                                     }
 
-                                    spawnAnvil(target);
+                                    for (Block target : targets) {
+                                        spawnAnvil(target);
+                                    }
+
                                     countdown = getCurrentInterval();
                                 } else {
                                     countdown--;
@@ -194,13 +212,28 @@ public final class Anvil extends Evento {
         this.floorY = Math.max(y1, y2);
     }
 
+    private void buildArenaBlocks() {
+        arenaBlocks.clear();
+
+        if (world == null) {
+            return;
+        }
+
+        for (int x = minX; x <= maxX; x++) {
+            for (int z = minZ; z <= maxZ; z++) {
+                arenaBlocks.add(world.getBlockAt(x, floorY, z));
+            }
+        }
+    }
+
     private void loadStages() {
         List<Map<?, ?>> mapList = config.getMapList("Evento.Stages");
         if (!mapList.isEmpty()) {
             for (Map<?, ?> map : mapList) {
                 int timeValue = toInt(map.get("Time"), 0);
                 int intervalValue = Math.max(1, toInt(map.get("Interval"), delay));
-                stages.add(new Stage(timeValue, intervalValue));
+                int strikesValue = Math.max(1, toInt(map.get("Strikes"), strikesPerWave));
+                stages.add(new Stage(timeValue, intervalValue, strikesValue));
             }
             stages.sort((a, b) -> Integer.compare(a.time, b.time));
             return;
@@ -211,7 +244,8 @@ public final class Anvil extends Evento {
             for (String key : section.getKeys(false)) {
                 int timeValue = section.getInt(key + ".Time", 0);
                 int intervalValue = Math.max(1, section.getInt(key + ".Interval", delay));
-                stages.add(new Stage(timeValue, intervalValue));
+                int strikesValue = Math.max(1, section.getInt(key + ".Strikes", strikesPerWave));
+                stages.add(new Stage(timeValue, intervalValue, strikesValue));
             }
             stages.sort((a, b) -> Integer.compare(a.time, b.time));
         }
@@ -233,20 +267,13 @@ public final class Anvil extends Evento {
     }
 
     private int getCurrentInterval() {
-        if (stages.isEmpty()) {
-            return delay;
-        }
+        Stage stage = getCurrentStage();
+        return stage != null ? stage.interval : delay;
+    }
 
-        Stage current = stages.get(0);
-        for (Stage stage : stages) {
-            if (runningSeconds >= stage.time) {
-                current = stage;
-            } else {
-                break;
-            }
-        }
-
-        return current.interval;
+    private int getCurrentStrikesPerWave() {
+        Stage stage = getCurrentStage();
+        return stage != null ? stage.strikes : strikesPerWave;
     }
 
     private int getCurrentStageIndex() {
@@ -266,6 +293,23 @@ public final class Anvil extends Evento {
         return index;
     }
 
+    private Stage getCurrentStage() {
+        if (stages.isEmpty()) {
+            return null;
+        }
+
+        Stage current = stages.get(0);
+        for (Stage stage : stages) {
+            if (runningSeconds >= stage.time) {
+                current = stage;
+            } else {
+                break;
+            }
+        }
+
+        return current;
+    }
+
     private void spawnAnvil(Block targetBlock) {
         if (world == null || targetBlock == null) {
             return;
@@ -282,33 +326,49 @@ public final class Anvil extends Evento {
                 spawn,
                 Bukkit.createBlockData(Material.ANVIL)
         );
+
         fallingBlock.setDropItem(false);
-        fallingBlock.setHurtEntities(false);
+        fallingBlock.setHurtEntities(true);
+        fallingBlock.setGravity(true);
+        fallingBlock.setVelocity(new Vector(0.0, -0.35, 0.0));
+        fallingBlock.getPersistentDataContainer().set(
+                listener.getAnvilKey(),
+                PersistentDataType.BYTE,
+                (byte) 1
+        );
 
         anvils.add(targetBlock);
     }
 
-    private Block getRandomFreeBlock() {
-        if (world == null) {
-            return null;
+    private List<Block> getUniqueFreeBlocks(int amount) {
+        if (world == null || arenaBlocks.isEmpty()) {
+            return Collections.emptyList();
         }
 
         List<Block> freeBlocks = new ArrayList<>();
+        Set<Block> occupied = new HashSet<>(anvils);
 
-        for (int x = minX; x <= maxX; x++) {
-            for (int z = minZ; z <= maxZ; z++) {
-                Block block = world.getBlockAt(x, floorY, z);
-                if (!anvils.contains(block)) {
-                    freeBlocks.add(block);
-                }
+        for (Block block : arenaBlocks) {
+            if (!occupied.contains(block)) {
+                freeBlocks.add(block);
             }
         }
 
         if (freeBlocks.isEmpty()) {
-            return null;
+            return Collections.emptyList();
         }
 
-        return freeBlocks.get(random.nextInt(freeBlocks.size()));
+        Collections.shuffle(freeBlocks, random);
+
+        List<Block> result = new ArrayList<>();
+        for (Block block : freeBlocks) {
+            result.add(block);
+            if (result.size() >= amount) {
+                break;
+            }
+        }
+
+        return result;
     }
 
     private void startActionbar() {
@@ -335,19 +395,27 @@ public final class Anvil extends Evento {
                                     .replace("@time", countdown + "s")
                                     .replace("@players", String.valueOf(getPlayers().size()))
                                     .replace("@stage", String.valueOf(getCurrentStageIndex()))
+                                    .replace("@strikes", String.valueOf(getCurrentStrikesPerWave()))
+                                    .replace("@interval", String.valueOf(getCurrentInterval()))
                                     .replace("@name", config.getString("Evento.Title"))
                     );
 
+                    Component component = LegacyComponentSerializer.legacySection().deserialize(parsed);
+
                     for (Player player : getPlayers()) {
-                        player.sendActionBar(parsed);
+                        player.sendActionBar(component);
+
+                        if (!started && countdown <= 3 && countdown > 0) {
+                            player.playSound(player.getLocation(), org.bukkit.Sound.BLOCK_NOTE_BLOCK_HAT, 1.0F, 1.2F);
+                        }
                     }
 
                     for (Player player : getSpectators()) {
-                        player.sendActionBar(parsed);
+                        player.sendActionBar(component);
                     }
                 },
                 0L,
-                20L
+                10L
         );
     }
 
@@ -357,8 +425,7 @@ public final class Anvil extends Evento {
         }
 
         player.sendMessage(ColorUtils.colorize(
-                plugin.getConfig()
-                        .getString("Messages.Eliminated", "&cVocê foi eliminado.")
+                plugin.getConfig().getString("Messages.Eliminated", "&cVocê foi eliminado.")
         ));
 
         player.removePotionEffect(PotionEffectType.JUMP_BOOST);
@@ -376,6 +443,10 @@ public final class Anvil extends Evento {
 
     public List<Block> getAnvils() {
         return anvils;
+    }
+
+    public void markAnvilResolved(Block block) {
+        anvils.remove(block);
     }
 
     public void winner(Player player) {
@@ -408,6 +479,8 @@ public final class Anvil extends Evento {
         stop();
     }
 
+    
+
     public void noWinner() {
         if (ending) {
             return;
@@ -419,6 +492,52 @@ public final class Anvil extends Evento {
             Bukkit.broadcastMessage(ColorUtils.colorize(
                     message.replace("@name", config.getString("Evento.Title"))
             ));
+        }
+
+        stop();
+    }
+
+    public void winners(List<Player> players) {
+        if (ending || players == null || players.isEmpty()) {
+            return;
+        }
+
+        ending = true;
+
+        List<String> names = new ArrayList<>();
+        for (Player player : players) {
+            names.add(player.getName());
+            TournamentStatsManager.getInstance().addWin(player.getUniqueId());
+        }
+
+        String joinedNames = String.join(", ", names);
+        String winnersCount = String.valueOf(players.size());
+
+        List<String> messages = config.getStringList("Messages.Winners");
+        if (messages == null || messages.isEmpty()) {
+            messages = config.getStringList("Messages.Winner");
+        }
+
+        for (String message : messages) {
+            Bukkit.broadcastMessage(ColorUtils.colorize(
+                    message
+                            .replace("@winner", joinedNames)
+                            .replace("@winners", joinedNames)
+                            .replace("@winners_count", winnersCount)
+                            .replace("@name", config.getString("Evento.Title"))
+            ));
+        }
+
+        DiscordWebhookManager.sendTeamWinner(
+                joinedNames,
+                config.getString("Evento.Title"),
+                List.of()
+        );
+
+        for (Player player : players) {
+            for (String command : config.getStringList("Rewards.Commands")) {
+                executeConsoleCommand(player, command.replace("@winner", player.getName()));
+            }
         }
 
         stop();

@@ -3,9 +3,10 @@ package com.absolutgg.absolutevents.listeners.eventos;
 import com.absolutgg.absolutevents.AbsolutEventsPlugin;
 import com.absolutgg.absolutevents.api.events.PlayerLoseEvent;
 import com.absolutgg.absolutevents.eventos.Anvil;
-import com.iridium.iridiumcolorapi.IridiumColorAPI;
+import com.absolutgg.absolutevents.utils.ColorUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.Tag;
 import org.bukkit.block.Block;
 import org.bukkit.entity.EntityType;
@@ -15,14 +16,17 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.persistence.PersistentDataType;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public final class AnvilListener implements Listener {
 
+    private final NamespacedKey anvilKey = new NamespacedKey(AbsolutEventsPlugin.getInstance(), "absolutevents_anvil");
     private Anvil evento;
 
     @EventHandler(priority = EventPriority.LOWEST)
@@ -37,17 +41,16 @@ public final class AnvilListener implements Listener {
         }
 
         FallingBlock fallingBlock = (FallingBlock) event.getEntity();
-        Material material = fallingBlock.getBlockData().getMaterial();
+        if (!fallingBlock.getPersistentDataContainer().has(anvilKey, PersistentDataType.BYTE)) {
+            return;
+        }
 
+        Material material = fallingBlock.getBlockData().getMaterial();
         if (!Tag.ANVIL.isTagged(material)) {
             return;
         }
 
         Block landedBlock = event.getBlock();
-
-        if (!anvilEvent.getAnvils().contains(landedBlock)) {
-            return;
-        }
 
         event.setCancelled(true);
         fallingBlock.setDropItem(false);
@@ -62,14 +65,8 @@ public final class AnvilListener implements Listener {
         }
 
         for (Player player : eliminate) {
-            player.sendMessage(IridiumColorAPI.process(
-                    AbsolutEventsPlugin.getInstance()
-                            .getConfig()
-                            .getString("Messages.Eliminated", "&cVocê foi eliminado.")
-                            .replace("&", "§")
-            ));
+            anvilEvent.eliminate(player);
 
-            anvilEvent.remove(player);
             Bukkit.getPluginManager().callEvent(
                     new PlayerLoseEvent(
                             player,
@@ -79,7 +76,7 @@ public final class AnvilListener implements Listener {
             );
         }
 
-        anvilEvent.getAnvils().remove(landedBlock);
+        anvilEvent.markAnvilResolved(landedBlock);
 
         if (anvilEvent.getPlayers().isEmpty()) {
             anvilEvent.noWinner();
@@ -89,6 +86,44 @@ public final class AnvilListener implements Listener {
         if (anvilEvent.getPlayers().size() == 1) {
             anvilEvent.winner(anvilEvent.getPlayers().get(0));
         }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onAnvilDirectHit(EntityDamageByEntityEvent event) {
+        Anvil anvilEvent = getEvento();
+        if (anvilEvent == null) {
+            return;
+        }
+
+        if (!(event.getEntity() instanceof Player player)) {
+            return;
+        }
+
+        if (!(event.getDamager() instanceof FallingBlock fallingBlock)) {
+            return;
+        }
+
+        if (!fallingBlock.getPersistentDataContainer().has(anvilKey, PersistentDataType.BYTE)) {
+            return;
+        }
+
+        if (!anvilEvent.getPlayers().contains(player)) {
+            return;
+        }
+
+        event.setCancelled(true);
+
+        anvilEvent.eliminate(player);
+
+        Bukkit.getPluginManager().callEvent(
+                new PlayerLoseEvent(
+                        player,
+                        anvilEvent.getConfig().getString("filename", "").replace(".yml", ""),
+                        anvilEvent.getType()
+                )
+        );
+
+        fallingBlock.remove();
     }
 
     @EventHandler
@@ -134,9 +169,13 @@ public final class AnvilListener implements Listener {
         double dx = Math.abs(px - bx);
         double dz = Math.abs(pz - bz);
 
-        return dx <= 0.65D
-                && dz <= 0.65D
-                && py <= block.getY() + 1.5D;
+        return dx <= 0.75D
+                && dz <= 0.75D
+                && py <= block.getY() + 2.2D;
+    }
+
+    public NamespacedKey getAnvilKey() {
+        return anvilKey;
     }
 
     public void setEvento() {
