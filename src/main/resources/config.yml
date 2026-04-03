@@ -71,8 +71,8 @@ Broadcast:
   Global:
     - ''
     - '&#ff69f0Evento &f@name &#ff69f0Clique @join_button &#ff69f0para participar!'
-    - '&#ff69f0Prêmio: @reward'
-    - '&#ff69f0Jogadores: &#0088ff@players &#ff69f0Restantes: &#0088ff@broadcasts'
+    - '&#ff69f0Prêmio: @rewards'
+    - '&#ff69f0Jogadores no evento: &#0088ff@players &#ff69f0Chamadas Restantes: &#0088ff@broadcasts'
     - ''
 
 # =====================================================
@@ -109,6 +109,43 @@ Bungeecord:
 # =====================================================
 
 UpdateChecker: true
+
+# =====================================================
+# INTERGRAÇÃO COM DISCORD
+# =====================================================
+
+Discord:
+  Enabled: true
+  Webhook:
+    Url: "https://discord.com/api/webhooks/1487373674804809818/ynyEzBjKBiGWkf5SL3hQ9nLacdHMo5zcbQUz5vjZXaRa1UbjTMVqBKe0o6BzELqRD-5J"
+    Username: "Eventos"
+    AvatarUrl: ""
+  Embeds:
+    Winner:
+      Title: "Evento Finalizado!"
+      Description: "**%winner%** venceu o evento **%event%**!"
+      Color: 16711880
+      Footer: ""
+      ThumbnailUrl: ""
+
+    MultipleWinners:
+      Title: "Evento Finalizado!"
+      Description: "Os vencedores do evento **%event%** foram:%winners%"
+      Color: 16711880
+      Footer: ""
+      ThumbnailUrl: ""
+
+    TeamWinner:
+      Title: "Evento Finalizado!"
+      Description: "O time **%team%** venceu o evento **%event%**!"
+      Color: 16711880
+      Footer: ""
+      ThumbnailUrl: ""
+
+    ClanWinner:
+      Title: "Evento Finalizado!"
+      Description: "O clã **%clan%** venceu o evento **%event%**!"
+      Color: 9109504
 
 # =====================================================
 # FORMATAÇÃO DE DINHEIRO
