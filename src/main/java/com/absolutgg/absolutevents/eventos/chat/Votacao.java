@@ -37,10 +37,11 @@ public final class Votacao extends EventoChat {
 
         loadAlternatives();
 
-    if (options.isEmpty()) {
-        Bukkit.getConsoleSender().sendMessage(
-                ColorUtils.colorize("&#ff5555[AbsolutEvents] Nenhuma alternativa válida foi encontrada no evento de votação.")
-        );
+        if (options.isEmpty()) {
+            Bukkit.getConsoleSender().sendMessage(
+                    ColorUtils.colorize("&#ff5555[AbsolutEvents] Nenhuma alternativa válida foi encontrada no evento de votação.")
+            );
+        }
     }
 
     @Override
