@@ -1,0 +1,127 @@
+Evento:
+  Title: Rainbow Run
+  Type: rainbowrun
+  Calls: 10
+  Calls interval: 15
+  Mininum players: 2
+  Eliminate on quit: true
+  Empty inventory: true
+  Spectator mode: true
+  Permission: absolutevents.evento
+  Count participation: true
+  Count victory: true
+  Start: 10
+  Max time: 2
+
+Messages:
+  Broadcast:
+    - ''
+    - '&#ff69f0Evento &f@name &#ff69f0Clique @join_button &#ff69f0para participar!'
+    - '&#ff69f0Prêmio: &#0088ff$&f25.000 &f+ &#0088ff+&f15 PDC &f+ Insígnia de Eventos &f+ &fՉ&#4dd3ff'
+    - '&#ff69f0Jogadores: &#0088ff@players &#ff69f0Chamadas restantes: &#0088ff@broadcasts'
+    - ''
+
+  Start:
+    - ''
+    - '&#ff69f0Iniciando evento...'
+    - ''
+
+  Winner:
+    - ''
+    - '&#ff69f0O evento &f@name &#ff69f0foi finalizado!'
+    - '&#ff69f0O vencedor foi &f@winner&#ff69f0!'
+    - '&#ff69f0Blocos pintados: &#0088ff@blocks'
+    - '&#ff69f0Top 3:'
+    - '&#0088ff@top1'
+    - '&#0088ff@top2'
+    - '&#0088ff@top3'
+    - ''
+
+  No winner:
+    - ''
+    - '&#ff69f0O evento &f@name &#ff69f0foi finalizado!'
+    - '&#ff69f0Não houveram vencedores.'
+    - '&#ff69f0Top 3:'
+    - '&#0088ff@top1'
+    - '&#0088ff@top2'
+    - '&#0088ff@top3'
+    - ''
+
+  No players:
+    - ''
+    - '&#ff69f0Evento cancelado.'
+    - '&#ff69f0A quantidade mínima de jogadores não foi atingida.'
+    - ''
+
+  Cancelled:
+    - ''
+    - '&#ff69f0O evento foi cancelado manualmente.'
+    - ''
+
+  Start evento:
+    - ''
+    - '&#ff69f0O evento começará em &#0088ff@time &#ff69f0segundos!'
+    - ''
+
+  Actionbar: '&#ffffffBlocos: &#0088ff@blocks &8| &#ffffffPosição: &#0088ff@position &8| &#ffffffTempo: &#0088ff@time'
+
+Rewards:
+  Money: 0
+  Commands:
+    - "# adicione seus comandos aqui"
+  Broadcast:
+    - '&#0088ff$&f25.000 &f+ &#0088ff+&f15 PDC &f+ Insígnia de Eventos &f+ &fՉ&#4dd3ff'
+
+Locations:
+  Lobby:
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
+
+  Entrance:
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
+
+  Spectator:
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
+
+  Exit:
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
+
+  Pos1:
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
+
+  Pos2:
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
+
+  Server: 'null'
+
+Itens:
+  Inventory: ''

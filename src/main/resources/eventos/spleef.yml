@@ -1,0 +1,136 @@
+Evento:
+  Title: Spleef
+  Type: spleef
+  Calls: 10
+  Calls interval: 15
+  Mininum players: 2
+  Eliminate on quit: true
+  Empty inventory: true
+  Spectator mode: true
+  Permission: absolutevents.evento
+  Count participation: true
+  Count victory: true
+  Delay: 5
+  Kick: true
+  Kick time: 20
+
+Itens:
+  Armor:
+    Helmet: {}
+    Chestplate: {}
+    Leggings: {}
+    Boots: {}
+  Inventory:
+    '0':
+      material: DIAMOND_SHOVEL
+      enchants:
+        DIG_SPEED: 5
+        DURABILITY: 3
+
+Messages:
+  Broadcast:
+  - ''
+  - '&#ff69f0Evento &f@name &#ff69f0Clique @join_button &#ff69f0para participar!'
+  - '&#ff69f0Prêmio: &#0088ff$&f70.000 &f+ &#0088ff+&f15 PDC &a+&f100 PDL &f+ &#fbfbfb[&#fbfbfbS&#fbfbfbp&#fcfcfcl&#fcfcfce&#fcfcfce&#fcfcfcf&#fdfdfd]'
+  - '&#ff69f0Jogadores: &#0088ff@players &#ff69f0Chamadas restantes: &#0088ff@broadcasts'
+  - ''
+  
+  Start:
+  - ''
+  - '&#ff69f0Iniciando evento...'
+  - ''
+  
+  Winner:
+  - ''
+  - '&#ff69f0O evento &f@name &#ff69f0foi finalizado!'
+  - '&#ff69f0O vencedor foi &f@winner&#ff69f0!'
+  - ''
+  
+  No winner:
+  - ''
+  - '&#ff69f0O evento &f@name &#ff69f0foi finalizado!'
+  - '&#ff69f0Não houveram vencedores.'
+  - ''
+  
+  No players:
+  - ''
+  - '&#ff69f0Evento cancelado.'
+  - '&#ff69f0A quantidade mínima de jogadores não foi atingida.'
+  - ''
+  
+  Cancelled:
+  - ''
+  - '&#ff69f0O evento foi cancelado manualmente.'
+  - ''
+  
+  Enabling breaking:
+  - '&#ff69f0Ativando quebra de blocos em &#0088ff@time &#ff69f0segundos...'
+  
+  Breaking allowed:
+  - '&#ff69f0Agora vocês podem quebrar blocos!'
+  
+  Kick:
+  - '&#ff69f0Como você está parado, você será eliminado do evento em &#0088ff@time
+    &#ff69f0segundos.'
+
+Rewards:
+  Tag:
+    Enabled: true
+    Name: aeventos_spleef
+    Style: '&#ff69f0[Spleef] '
+  Commands:
+  - "# adicione seus comandos aqui"
+  Money: 0
+  Broadcast:
+  - '&#0088ff$&f70.000 &f+ &#0088ff+&f15 PDC &a+&f100 PDL &f+ &#fbfbfb[&#fbfbfbS&#fbfbfbp&#fcfcfcl&#fcfcfce&#fcfcfce&#fcfcfcf&#fdfdfd]'
+
+Locations:
+  Lobby:
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
+  
+  Entrance:
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
+  
+  Spectator:
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
+  
+  Exit:
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
+  
+  Pos1:
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
+  
+  Pos2:
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
+  
+  Server: 'null'

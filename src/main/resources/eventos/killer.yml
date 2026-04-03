@@ -1,0 +1,142 @@
+Evento:
+  Title: Killer
+  Type: killer
+  Calls: 10
+  Calls interval: 15
+  Mininum players: 2
+  Eliminate on quit: true
+  Empty inventory: true
+  Spectator mode: true
+  Permission: absolutevents.evento
+  Count participation: true
+  Count victory: true
+  Time: 30
+  Pickup time: 20
+
+Itens:
+  Enabled: true
+  Helmet:
+    material: DIAMOND_HELMET
+    damage: 0
+    enchants:
+      PROTECTION_ENVIRONMENTAL: 4
+      DURABILITY: 4
+  Chestplate:
+    material: DIAMOND_CHESTPLATE
+    damage: 0
+    enchants:
+      PROTECTION_ENVIRONMENTAL: 4
+      DURABILITY: 4
+  Leggings:
+    material: DIAMOND_LEGGINGS
+    damage: 0
+    enchants:
+      PROTECTION_ENVIRONMENTAL: 4
+      DURABILITY: 4
+  Boots:
+    material: DIAMOND_BOOTS
+    damage: 0
+    enchants:
+      PROTECTION_ENVIRONMENTAL: 4
+      DURABILITY: 4
+  Inventory:
+    '0':
+      material: DIAMOND_SWORD
+      damage: 0
+      enchants:
+        DAMAGE_ALL: 5
+    '1':
+      material: GOLDEN_APPLE
+      amount: 64
+      damage: 1
+    '2':
+      material: POTION
+      damage: 41
+      name: '&5Poção de Força'
+      level: 2
+      base-effect: STRENGTH, false, false
+
+Messages:
+  Broadcast:
+    - ''
+    - '&#ff69f0Evento &f@name &#ff69f0Clique @join_button &#ff69f0para participar!'
+    - '&#ff69f0Prêmio: &#0088ff$&f@money &#ff69f0+ &5[Killer]'
+    - '&#ff69f0Jogadores: &#0088ff@players &#ff69f0Chamadas restantes: &#0088ff@broadcasts'
+    - ''
+
+  Start:
+    - ''
+    - '&#ff69f0Iniciando evento...'
+    - ''
+
+  Winner:
+    - ''
+    - '&#ff69f0O evento &f@name &#ff69f0foi finalizado!'
+    - '&#ff69f0O vencedor foi &f@winner&#ff69f0!'
+    - ''
+
+  No winner:
+    - ''
+    - '&#ff69f0O evento &f@name &#ff69f0foi finalizado!'
+    - '&#ff69f0Não houveram vencedores.'
+    - ''
+
+  No players:
+    - ''
+    - '&#ff69f0Evento cancelado.'
+    - '&#ff69f0A quantidade mínima de jogadores não foi atingida.'
+    - ''
+
+  Cancelled:
+    - ''
+    - '&#ff69f0O evento foi cancelado manualmente.'
+    - ''
+
+  Enabling:
+    - '&#ff69f0O PvP será ativado em &f@time &#ff69f0segundos!'
+
+  Enabled:
+    - ''
+    - '&#ff69f0O PvP foi ativado. Boa sorte a todos!'
+    - ''
+
+  Pickup:
+    - '&#ff69f0Você tem &f@time &#ff69f0segundos para pegar os drops.'
+
+Rewards:
+  Money: 1000
+  Commands:
+  - "# adicione seus comandos aqui"
+  Broadcast:
+    - '&#0088ff$&f@money &#ff69f0+ &5[Killer]'
+
+Locations:
+  Lobby:
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
+  Entrance:
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
+  Spectator:
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
+  Exit:
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
+  Server: 'null'

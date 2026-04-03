@@ -1,0 +1,155 @@
+Evento:
+  Title: Team Deathmatch
+  Type: teamdeathmatch
+  Calls: 10
+  Calls interval: 15
+  Mininum players: 2
+  Eliminate on quit: true
+  Empty inventory: true
+  Spectator mode: true
+  Permission: absolutevents.evento
+  Count participation: true
+  Count victory: true
+  Blue: Azul
+  Red: Vermelho
+  Enable PvP: 10
+  Points: 1
+  Max points: 0
+  Dead time: 5
+  Invincibility: 5
+  Hearts added: 20
+
+Messages:
+  Broadcast:
+  - ''
+  - '&#ff69f0Evento &f@name &#ff69f0Clique @join_button &#ff69f0para participar!'
+  - '&#ff69f0Prêmio: &#0088ff$&f70.000 &f+ &#0088ff+&f10 PDC &#0088ff+&f50 PDL'
+  - '&#ff69f0Jogadores: &#0088ff@players &#ff69f0Chamadas restantes: &#0088ff@broadcasts'
+  - ''
+  
+  Start:
+  - ''
+  - '&#ff69f0Iniciando evento...'
+  - ''
+  
+  Winner:
+  - ''
+  - '&#ff69f0O evento &f@name &#ff69f0foi finalizado!'
+  - '&#ff69f0O vencedor foi &f@winner&#ff69f0!'
+  - ''
+  
+  No winner:
+  - ''
+  - '&#ff69f0O evento &f@name &#ff69f0foi finalizado!'
+  - '&#ff69f0Não houveram vencedores.'
+  - ''
+  
+  No players:
+  - ''
+  - '&#ff69f0Evento cancelado.'
+  - '&#ff69f0A quantidade mínima de jogadores não foi atingida.'
+  - ''
+  
+  Cancelled:
+  - ''
+  - '&#ff69f0O evento foi cancelado manualmente.'
+  - ''
+  
+  Team:
+  - ''
+  - '&#ff69f0Você faz parte do &f@team&#ff69f0.'
+  - '&#ff69f0Ativando PvP em &#0088ff@time &#ff69f0segundos.'
+  - ''
+  
+  Enabled:
+  - '&#ff69f0PvP ativado! Boa sorte á todos.'
+  
+  Eliminated:
+  - '&#ff69f0@player &#ff69f0foi morto por &f@killer&#ff69f0!'
+  - '&#ff69f0Pontuação: &#0088ff@blueteam &#ff69f0á &#0088ff@redteam&#ff69f0.'
+  
+  Killed:
+  - '&#ff69f0Você foi morto! Aguarde &f@time&#ff69f0 segundos para voltar a jogar.'
+  
+  Win:
+  - '&#ff69f0Com &#0088ff@points &#ff69f0pontos, o &f@team &#ff69f0venceu!'
+
+Actionbar:
+  Enabled: true
+  Message: '&9Azul: &f@blueteam/@maxpoints &8| &cVermelho: &f@redteam/@maxpoints'
+
+Top kills:
+  Enabled: true
+  Format:
+  - ''
+  - '&#ff69f0Top abates do evento:'
+  - '&f1. @top1 &7- &f@kills1'
+  - '&f2. @top2 &7- &f@kills2'
+  - '&f3. @top3 &7- &f@kills3'
+  - ''
+
+Rewards:
+  Commands:
+  - "# adicione seus comandos aqui"
+  Money: 0
+  Broadcast:
+  - '&#0088ff$&f70.000 &f+ &#0088ff+&f10 PDC &#0088ff+&f50 PDL'
+
+Anti camper:
+  Enabled: true
+  Radius: 18
+  Time: 5
+
+Locations:
+  Lobby:
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
+  
+  Entrance:
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
+  
+  Spectator:
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
+  
+  Exit:
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
+  
+  Pos1:
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
+  
+  Pos2:
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
+  
+  Server: 'null'
+
+Itens:
+  Inventory: ''

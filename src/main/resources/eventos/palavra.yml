@@ -1,0 +1,46 @@
+Evento:
+  Title: 'Palavra'
+  Type: 'palavra'
+  Calls: 5
+  Calls interval: 15
+  Permission: 'absolutevents.evento'
+  Count participation: true
+  Count victory: true
+  Reward: 10000
+
+Messages:
+  Broadcast:
+    - ''
+    - '&#ff69f0Evento &f@name &#ff69f0Digite a seguinte palavra no chat: &f@word'
+    - '&#ff69f0Prêmio: &#0088ff$&f@reward &#ff69f0+ &3[Palavra]'
+    - '&#ff69f0Chamadas restantes: &#0088ff@broadcasts'
+    - ''
+
+  Winner:
+    - ''
+    - '&#ff69f0O evento &f@name &#ff69f0foi finalizado!'
+    - '&#ff69f0O vencedor foi &f@winner&#ff69f0!'
+    - '&#ff69f0A resposta era: &f@result&#ff69f0!'
+    - ''
+
+  No winner:
+    - ''
+    - '&#ff69f0O evento &f@name &#ff69f0foi finalizado!'
+    - '&#ff69f0Não houveram vencedores.'
+    - ''
+
+  Cancelled:
+    - ''
+    - '&#ff69f0O evento foi cancelado manualmente.'
+    - ''
+
+Words:
+  - 'aEventos'
+  - 'Teste'
+  - ''
+
+Rewards:
+  Commands:
+    - "# adicione seus comandos aqui"
+  Broadcast:
+    - '&#0088ff$&f@reward &#ff69f0+ &3[Palavra]'

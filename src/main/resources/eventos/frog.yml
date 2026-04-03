@@ -1,0 +1,136 @@
+Evento:
+  Title: Sapo
+  Type: frog
+  Calls: 10
+  Calls interval: 15
+  Mininum players: 2
+  Eliminate on quit: true
+  Empty inventory: true
+  Spectator mode: true
+  Permission: absolutevents.evento
+  Count participation: false
+  Count victory: false
+  Start: 5
+  Time: 4
+  Snow: 2
+
+Actionbar:
+  Enabled: true
+  Waiting:
+    Message: '&#ff69f0Próxima remoção em &f@time'
+  Final:
+    Message: '&#ff0000Pise na lã vermelha para vencer!'
+
+Title:
+  Enabled: false
+  FadeIn: 5
+  Stay: 20
+  FadeOut: 5
+  Remove:
+    Title: '&cATENÇÃO!'
+    Subtitle: '&fA cor &c@color &fvai cair!'
+  Final:
+    Title: '&cCORRA!'
+    Subtitle: '&fPise na lã vermelha para vencer!'
+
+Messages:
+  Broadcast:
+    - ''
+    - '&#ff69f0Evento &f@name &#ff69f0Clique @join_button &#ff69f0para participar!'
+    - '&#ff69f0Prêmio: &#0088ff$&f35.000 &f+ &#0088ff+&f15 PDC &f+ Insígnia de Eventos &f+ &fԿ&#f28cff'
+    - '&#ff69f0Jogadores: &#0088ff@players &#ff69f0Chamadas restantes: &#0088ff@broadcasts'
+    - ''
+
+  Start:
+    - ''
+    - '&#ff69f0Iniciando evento...'
+    - ''
+
+  Winner:
+    - ''
+    - '&#ff69f0O evento &f@name &#ff69f0foi finalizado!'
+    - '&#ff69f0O vencedor foi &f@winner&#ff69f0!'
+    - ''
+
+  No winner:
+    - ''
+    - '&#ff69f0O evento &f@name &#ff69f0foi finalizado!'
+    - '&#ff69f0Não houveram vencedores.'
+    - ''
+
+  No players:
+    - ''
+    - '&#ff69f0Evento cancelado.'
+    - '&#ff69f0A quantidade mínima de jogadores não foi atingida.'
+    - ''
+
+  Cancelled:
+    - ''
+    - '&#ff69f0O evento foi cancelado manualmente.'
+    - ''
+
+  Wool:
+    - ''
+    - '&#ff69f0Suba na &clã vermelha &#ff69f0para vencer!'
+    - ''
+
+Rewards:
+  Commands:
+  - "# adicione seus comandos aqui"
+  Money: 0
+  Broadcast:
+    - '&#0088ff$&f35.000 &f+ &#0088ff+&f15 PDC &f+ Insígnia de Eventos &f+ &fԿ&#f28cff'
+
+Locations:
+  Lobby:
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
+
+  Entrance:
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
+
+  Spectator:
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
+
+  Exit:
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
+
+  Pos1:
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
+
+  Pos2:
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
+
+  Server: 'null'
+
+Itens:
+  Inventory: ''

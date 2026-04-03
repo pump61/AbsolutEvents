@@ -1,0 +1,179 @@
+Evento:
+  Title: Montaria
+  Type: montaria
+  Calls: 10
+  Calls interval: 15
+  Mininum players: 1
+  Eliminate on quit: true
+  Empty inventory: true
+  Spectator mode: true
+  Permission: absolutevents.evento
+  Count participation: true
+  Count victory: true
+  Countdown: 5
+  Jump: 0.9
+  Speed: 0.3
+
+Boost:
+  Block: MAGENTA_GLAZED_TERRACOTTA
+  Amplifier: 2
+  Duration: 60
+  Cooldown: 2
+
+Race:
+  Require checkpoints: true
+
+  StartPos1:
+    world: Horse
+    x: 29.468548844132943
+    y: -12.0
+    z: 524.4877337483492
+    Yaw: 92.24993
+    Pitch: -2.7000127
+
+  StartPos2:
+    world: Horse
+    x: 29.824097586238313
+    y: -12.0
+    z: 504.4868894085762
+    Yaw: 90.14999
+    Pitch: 0.29998678
+
+  FinishPos1:
+    world: Horse
+    x: 31.51369473928593
+    y: -12.0
+    z: 524.5157072715388
+
+  FinishPos2:
+    world: Horse
+    x: 31.532510460054425
+    y: -9.0
+    z: 504.52588092313727
+
+Messages:
+  Broadcast:
+    - ''
+    - '&#ff69f0Evento &f@name &#ff69f0Clique @join_button &#ff69f0para participar!'
+    - '&#ff69f0Prêmio: &#0088ff$&f100.000 &f+ &#0088ff+&f20 PDC &f+ &#0088ff+&f300 PDL'
+    - '&#ff69f0Jogadores: &#0088ff@players &#ff69f0Chamadas restantes: &#0088ff@broadcasts'
+    - ''
+
+  Start:
+    - ''
+    - '&#ff69f0Iniciando evento...'
+    - ''
+
+  Winner:
+    - ''
+    - '&#ff69f0O evento &f@name &#ff69f0foi finalizado!'
+    - '&#ff69f0O vencedor foi &f@winner&#ff69f0!'
+    - ''
+
+  No winner:
+    - ''
+    - '&#ff69f0O evento &f@name &#ff69f0foi finalizado!'
+    - '&#ff69f0Não houveram vencedores.'
+    - ''
+
+  No players:
+    - ''
+    - '&#ff69f0Evento cancelado.'
+    - '&#ff69f0A quantidade mínima de jogadores não foi atingida.'
+    - ''
+
+  Cancelled:
+    - ''
+    - '&#ff69f0O evento foi cancelado manualmente.'
+    - ''
+
+  Eliminated:
+    - '&#ff69f0Perdeu.'
+
+  Boost:
+    - '&#ff69f0Boost ativado!'
+
+  Checkpoint:
+    - '&#ff69f0Checkpoint &#0088ff@checkpoint &#ff69f0alcançado!'
+
+Rewards:
+  Money: 1000
+  Commands:
+  - "# adicione seus comandos aqui"
+  Broadcast:
+    - '&#0088ff$&f100.000 &f+ &#0088ff+&f20 PDC &f+ &#0088ff+&f300 PDL'
+
+Locations:
+  Lobby:
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
+
+  Entrance:
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
+
+  Spectator:
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
+
+  Exit:
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
+
+  Server: 'null'
+
+Checkpoints:
+  '1':
+    Pos1:
+      world: Horse
+      x: 28.30000001192093
+      y: -1.0
+      z: 574.9499999880791
+    Pos2:
+      world: Horse
+      x: 34.69999998807907
+      y: 1.0
+      z: 575.8243344223081
+
+  '2':
+    Pos1:
+      world: Horse
+      x: -42.574456964266105
+      y: -12.0
+      z: 612.4188746450936
+    Pos2:
+      world: Horse
+      x: -37.50953448506362
+      y: -10.0
+      z: 613.3638475067502
+
+  '3':
+    Pos1:
+      world: Horse
+      x: -98.78698516320199
+      y: 1.0
+      z: 640.6579675281178
+    Pos2:
+      world: Horse
+      x: -97.3148243797616
+      y: 3.0
+      z: 634.3920434830306
+
+Itens:
+  Inventory: ''

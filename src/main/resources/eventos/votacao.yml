@@ -1,0 +1,88 @@
+Evento:
+  Title: "Votação"
+  Type: "votacao"
+  Calls: 5
+  Calls interval: 15
+  Permission: "absolutevents.evento"
+  Alternatives: 3
+
+Messages:
+  Broadcast:
+    - ""
+    - "&#ff69f0Evento &f@name &#ff69f0Vote em qual evento você quer que inicie agora!"
+    - "&#ff69f0* &f@alternative1 &#ff69f0- &#0088ff@votes &#ff69f0votos (&f@percentage&#ff69f0%)"
+    - "&#ff69f0* &f@alternative2 &#ff69f0- &#0088ff@votes &#ff69f0votos (&f@percentage&#ff69f0%)"
+    - "&#ff69f0* &f@alternative3 &#ff69f0- &#0088ff@votes &#ff69f0votos (&f@percentage&#ff69f0%)"
+    - "&#ff69f0Chamadas restantes: &#0088ff@broadcasts"
+    - ""
+
+  Voted: "&#ff69f0Você votou no evento &f@alternative&#ff69f0!"
+  Already voted: "&#ff69f0Você já votou!"
+  Invalid: "&#ff69f0Esta alternativa é inválida."
+
+  Winner:
+    - ""
+    - "&#ff69f0A votação foi encerrada!"
+    - "&#ff69f0Com &#0088ff@votes &#ff69f0votos (&f@percentage&#ff69f0%), o evento vencedor foi &f@winner&#ff69f0!"
+    - ""
+
+  No votes:
+    - ""
+    - "&#ff69f0A votação foi encerrada!"
+    - "&#ff69f0Não houveram votos. Iniciando evento aleatório..."
+    - ""
+
+  Hover: "&#ff69f0* Clique para votar no evento &f@alternative&#ff69f0."
+
+  Cancelled:
+    - ""
+    - "&#ff69f0A votação foi cancelada manualmente."
+    - ""
+
+Alternatives:
+  parkour:
+    Name: "Parkour"
+  corrida:
+    Name: "Corrida"
+  campominado:
+    Name: "Campo Minado"
+  spleef:
+    Name: "Spleef"
+  semaforo:
+    Name: "Semáforo"
+  batataquente:
+    Name: "Batata Quente"
+  frog:
+    Name: "Frog"
+  fight:
+    Name: "Fight"
+  killer:
+    Name: "Killer"
+  sumo:
+    Name: "Sumo"
+  astronauta:
+    Name: "Astronauta"
+  paintball:
+    Name: "Paintball"
+  hunter:
+    Name: "Hunter"
+  quiz:
+    Name: "Quiz"
+  anvil:
+    Name: "Anvil"
+  loteria:
+    Name: "Loteria"
+  bolao:
+    Name: "Bolão"
+  gladiador:
+    Name: "Gladiador"
+  matematica:
+    Name: "Matemática"
+  palavra:
+    Name: "Palavra"
+  fastclick:
+    Name: "FastClick"
+  nexus:
+    Name: "Nexus"
+  thor:
+    Name: "Thor"
