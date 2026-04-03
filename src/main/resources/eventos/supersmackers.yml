@@ -1,7 +1,7 @@
 Evento:
   Title: Super Smackers
   Type: supersmackers
-  Mode: SOLO
+  Mode: SOLO # DUO
   Calls: 10
   Calls interval: 15
   Mininum players: 2
@@ -11,14 +11,12 @@ Evento:
   Permission: absolutevents.evento
   Count participation: true
   Count victory: true
-
   Round countdown: 3
   Round max time: 60
   Total rounds: 5
-
+  Next round delay: 10
   Knockback horizontal: 1.35
   Knockback vertical: 0.55
-
   Duo auto pair: true
   Duo prefer clans: true
   Duo eliminate odd player: true
@@ -26,10 +24,13 @@ Evento:
 Itens:
   Enabled: true
   Inventory:
-    "0":
+    '0':
       Type: MMOITEMS
-      Id: SWORD:BOXING_GLOVE
+      Id: GLOVES:B_GLOVE
       Amount: 1
+    '1':
+      material: ENDER_PEARL
+      Amount: 8
 
 Messages:
   Broadcast:
@@ -58,14 +59,14 @@ Messages:
   Round:
     - ''
     - '&#ff69f0Arena sorteada: &f@arena'
-    - '&#ff69f0Confronto: &f@player1 &#ff69f0vs &f@player2'
+    - '&#ff69f0Confronto: @player1 &#ff69f0vs @player2'
     - ''
 
   Countdown:
-    Three: '&#ff69f03'
-    Two: '&#fff0002'
-    One: '&#ff88001'
-    Start: '&#00ff88Valendo!'
+    Three: '&#ff69f0&l3'
+    Two: '&#fff000&l2'
+    One: '&#ff8800&l1'
+    Start: '&#00ff88&lValendo!'
 
   Round winner:
     - ''
@@ -111,10 +112,33 @@ Messages:
   Actionbar duo:
     - '&#ff69f0Rodada: &f@round/@total_rounds &#ff69f0Pontos do time: &f@points'
 
+  Lobby wait:
+    - ''
+    - '&#ff69f0Próxima rodada: @player1 &#ff69f0vs @player2'
+    - '&#ff69f0A luta começa em &#0088ff@time &#ff69f0segundos.'
+    - ''
+
+  Round winner title:
+    Title: '@winner'
+    Subtitle: '&#ff69f0venceu a rodada!'
+
+  Standings header:
+    - '&8&m-----------------------------'
+    - '&#ff69f0Pontuação atual:'
+
+  Standings line solo:
+    - '@color@player &7- &f@points'
+
+  Standings line duo:
+    - '@color@team &7- &f@points'
+
+  Standings footer:
+    - '&8&m-----------------------------'
+
 Rewards:
   Money: 1000
   Commands:
-    - give @winner diamond 1
+    - "# adicione seus comandos aqui"
   Broadcast:
     - '&#0088ff$&f@money'
 
@@ -123,7 +147,6 @@ Pads:
     Enabled: true
     Materials:
       - LIGHT_BLUE_WOOL
-      - DIAMOND_BLOCK
     Power: 1.25
     Cooldown: 8
 
@@ -131,107 +154,244 @@ Pads:
     Enabled: true
     Materials:
       - LIME_WOOL
-      - EMERALD_BLOCK
     Amplifier: 2
     Duration: 4
     Cooldown: 10
 
 Team colors:
-  - BLUE
-  - RED
-  - GREEN
-  - YELLOW
-  - PURPLE
-  - AQUA
-  - GOLD
-  - PINK
+  - "&#ff8a00"
+  - "&#00ff66"
+  - "&#00aaff"
+  - "&#ff44cc"
+  - "&#aa66ff"
+  - "&#ffee00"
+  - "&#ff4444"
+  - "&#00ffee"
 
 Arenas:
-  arena1:
-    Display: "Arena Clássica"
-
+  Construcao:
+    Display: Construção
     Spawn1:
-      world: pvp
-      x: 250.5
-      y: 100.0
-      z: -249.5
-      Yaw: -89.66676
-      Pitch: 23.156382
-
+      world: world
+      x:  0.0
+      y:  0.0
+      z:  0.0
+      Yaw:  0.0
+      Pitch:  0.0
     Spawn2:
-      world: pvp
-      x: 270.5
-      y: 100.0
-      z: -249.5
-      Yaw: 89.66676
-      Pitch: 23.156382
-
+      world: world
+      x:  0.0
+      y:  0.0
+      z:  0.0
+      Yaw:  0.0
+      Pitch:  0.0
     Spectator:
-      world: pvp
-      x: 260.5
-      y: 109.0
-      z: -222.5
-      Yaw: 177.6332
-      Pitch: 20.456457
+      world: world
+      x:  0.0
+      y:  0.0
+      z:  0.0
+      Yaw:  0.0
+      Pitch:  0.0
 
-  arena2:
-    Display: "Arena Ponte"
-
+  Carvalho:
+    Display: Carvalho
     Spawn1:
-      world: pvp
-      x: 300.5
-      y: 100.0
-      z: -249.5
-      Yaw: -89.0
-      Pitch: 0.0
-
+      world: world
+      x:  0.0
+      y:  0.0
+      z:  0.0
+      Yaw:  0.0
+      Pitch:  0.0
     Spawn2:
-      world: pvp
-      x: 320.5
-      y: 100.0
-      z: -249.5
-      Yaw: 89.0
-      Pitch: 0.0
-
+      world: world
+      x:  0.0
+      y:  0.0
+      z:  0.0
+      Yaw:  0.0
+      Pitch:  0.0
     Spectator:
-      world: pvp
-      x: 310.5
-      y: 110.0
-      z: -230.5
-      Yaw: 180.0
-      Pitch: 15.0
+      world: world
+      x:  0.0
+      y:  0.0
+      z:  0.0
+      Yaw:  0.0
+      Pitch:  0.0
+
+  Nether:
+    Display: Nether
+    Spectator:
+      world: world
+      x:  0.0
+      y:  0.0
+      z:  0.0
+      Yaw:  0.0
+      Pitch:  0.0
+    Spawn1:
+      world: world
+      x:  0.0
+      y:  0.0
+      z:  0.0
+      Yaw:  0.0
+      Pitch:  0.0
+    Spawn2:
+      world: world
+      x:  0.0
+      y:  0.0
+      z:  0.0
+      Yaw:  0.0
+      Pitch:  0.0
+
+  Fossil:
+    Display: Fóssil
+    Spawn1:
+      world: world
+      x:  0.0
+      y:  0.0
+      z:  0.0
+      Yaw:  0.0
+      Pitch:  0.0
+    Spawn2:
+      world: world
+      x:  0.0
+      y:  0.0
+      z:  0.0
+      Yaw:  0.0
+      Pitch:  0.0
+    Spectator:
+      world: world
+      x:  0.0
+      y:  0.0
+      z:  0.0
+      Yaw:  0.0
+      Pitch:  0.0
+
+  Neve:
+    Display: Neve
+    Spectator:
+      world: world
+      x:  0.0
+      y:  0.0
+      z:  0.0
+      Yaw:  0.0
+      Pitch:  0.0
+    Spawn1:
+      world: world
+      x:  0.0
+      y:  0.0
+      z:  0.0
+      Yaw:  0.0
+      Pitch:  0.0
+    Spawn2:
+      world: world
+      x:  0.0
+      y:  0.0
+      z:  0.0
+      Yaw:  0.0
+      Pitch:  0.0
+
+  Deserto:
+    Display: Deserto
+    Spectator:
+      world: world
+      x:  0.0
+      y:  0.0
+      z:  0.0
+      Yaw:  0.0
+      Pitch:  0.0
+    Spawn2:
+      world: world
+      x:  0.0
+      y:  0.0
+      z:  0.0
+      Yaw:  0.0
+      Pitch:  0.0
+    Spawn1:
+      world: world
+      x:  0.0
+      y:  0.0
+      z:  0.0
+      Yaw:  0.0
+      Pitch:  0.0
+
+  Oriental:
+    Display: Oriental
+    Spawn1:
+      world: world
+      x:  0.0
+      y:  0.0
+      z:  0.0
+      Yaw:  0.0
+      Pitch:  0.0
+    Spawn2:
+      world: world
+      x:  0.0
+      y:  0.0
+      z:  0.0
+      Yaw:  0.0
+      Pitch:  0.0
+    Spectator:
+      world: world
+      x:  0.0
+      y:  0.0
+      z:  0.0
+      Yaw:  0.0
+      Pitch:  0.0
+
+  Ponte:
+    Display: Ponte
+    Spawn1:
+      world: world
+      x:  0.0
+      y:  0.0
+      z:  0.0
+      Yaw:  0.0
+      Pitch:  0.0
+    Spawn2:
+      world: world
+      x:  0.0
+      y:  0.0
+      z:  0.0
+      Yaw:  0.0
+      Pitch:  0.0
+    Spectator:
+      world: world
+      x:  0.0
+      y:  0.0
+      z:  0.0
+      Yaw:  0.0
+      Pitch:  0.0
 
 Locations:
   Lobby:
-    world: pvp
-    x: 0.5
-    y: 100.0
-    z: 0.5
-    Yaw: -2.3652446
-    Pitch: 27.749992
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
 
   Entrance:
-    world: pvp
-    x: 0.5
-    y: 100.0
-    z: 0.5
-    Yaw: -2.3652446
-    Pitch: 27.749992
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
 
   Spectator:
-    world: pvp
-    x: 0.5
-    y: 100.0
-    z: 0.5
-    Yaw: -2.3652446
-    Pitch: 27.749992
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
 
   Exit:
     world: world
-    x: 2.5
-    y: 70.0
-    z: -119.5
-    Yaw: -8.518799
-    Pitch: 5.2499814
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
 
   Server: 'null'

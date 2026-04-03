@@ -1,84 +1,134 @@
 Evento:
-  Title: "Anvil"
-  Type: "anvil"
+  Title: Anvil
+  Type: anvil
   Calls: 5
   Calls interval: 15
   Mininum players: 2
   Eliminate on quit: true
-  Empty inventory: false
-  Permission: "absolutevents.evento"
+  Empty inventory: true
+  Spectator mode: true
+  Permission: absolutevents.evento
   Count participation: true
   Count victory: true
-  Eliminate on quit: true
-
   Height: 20
   Time: 10
-  Delay: 3
+  Delay: 2
 
+  Time: 10
+  Delay: 5
+  Strikes per wave: 1
   Stages:
     - Time: 0
-      Interval: 3
+      Interval: 4
+      Strikes: 4
     - Time: 20
-      Interval: 2
+      Interval: 3
+      Strikes: 6
     - Time: 40
+      Interval: 2
+      Strikes: 10
+    - Time: 60
       Interval: 1
-    - Time: 70
+      Strikes: 16
+    - Time: 90
       Interval: 1
+      Strikes: 24
 
 Messages:
   Broadcast:
-    - ""
-    - "&3[@name] &bIniciando evento &f@name"
-    - "&3[@name] &bPara participar, digite &f/evento"
-    - "&3[@name] &bPrêmio: &2$&f@money &b+ &8[Anvil]"
-    - "&3[@name] &bJogadores no evento: &f@players"
-    - "&3[@name] &bChamadas restantes: &f@broadcasts"
-    - ""
-
+  - ''
+  - '&#ff69f0Evento &f@name &#ff69f0Clique @join_button &#ff69f0para participar!'
+  - '&#ff69f0Prêmio: &#0088ff$&f25.000 &f+ &8[Anvil]'
+  - '&#ff69f0Jogadores: &#0088ff@players &#ff69f0Chamadas restantes: &#0088ff@broadcasts'
+  - ''
+  
   Start:
-    - ""
-    - "&3[@name] &bIniciando evento..."
-    - ""
-
-  Starting:
-    - "&3[@name] &bAs bigornas começarão a cair em &f@time &bsegundos."
-
+  - ''
+  - '&#ff69f0Iniciando evento...'
+  - ''
+  
   Winner:
-    - ""
-    - "&3[@name] &bO evento &f@name &bfoi finalizado!"
-    - "&3[@name] &bO vencedor foi &f@winner&b!"
-    - ""
-
+  - ''
+  - '&#ff69f0O evento &f@name &#ff69f0foi finalizado!'
+  - '&#ff69f0O vencedor foi &f@winner&#ff69f0!'
+  - ''
+  
   No winner:
-    - ""
-    - "&3[@name] &bO evento &f@name &bfoi finalizado!"
-    - "&3[@name] &bNão houveram vencedores."
-    - ""
-
+  - ''
+  - '&#ff69f0O evento &f@name &#ff69f0foi finalizado!'
+  - '&#ff69f0Não houveram vencedores.'
+  - ''
+  
   No players:
-    - ""
-    - "&3[@name] &bEvento cancelado."
-    - "&3[@name] &bA quantidade mínima de jogadores não foi atingida."
-    - ""
-
+  - ''
+  - '&#ff69f0Evento cancelado.'
+  - '&#ff69f0A quantidade mínima de jogadores não foi atingida.'
+  - ''
+  
   Cancelled:
-    - ""
-    - "&3[@name] &bO evento foi cancelado manualmente."
-    - ""
-
-  Actionbar starting: '&8Bigornas em: &f@time &8| &fVivos: &7@players'
-  Actionbar running: '&8Stage: &f@stage &8| &8Próxima: &f@time &8| &fVivos: &7@players'
+  - ''
+  - '&#ff69f0O evento foi cancelado manualmente.'
+  - ''
+  
+  Starting:
+  - ''
+  - '&#ff69f0As bigornas começarão a cair em &#0088ff@time &#ff69f0segundos.'
+  - ''
+  
+  Actionbar starting: '&8Bigornas em: &f@time &8| &fVivos: &8@players'
+  Actionbar running: '&8Próxima chuva em: &f@time &8| &fVivos: &8@players &8| &fStage: &8@stage &8| &fBigornas: &8@strikes'
 
 Rewards:
-  Money: 1000
+  Money: 0
   Commands:
-    - "give @winner diamond 1"
+  - "# adicione seus comandos aqui"
+  Broadcast:
+  - '&#0088ff$&f25.000 &f+ &8[Anvil]'
 
 Locations:
-  Lobby: []
-  Entrance: []
-  Spectator: []
-  Exit: []
-  Pos1: []
-  Pos2: []
-  Server: null
+  Lobby:
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
+  Entrance:
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
+  Spectator:
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
+  Exit:
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
+  Pos1:
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
+  Pos2:
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
+  Server: 'null'
+
+Itens:
+  Inventory: ''

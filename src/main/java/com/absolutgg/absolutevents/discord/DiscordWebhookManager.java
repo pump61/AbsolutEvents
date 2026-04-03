@@ -201,7 +201,7 @@ public final class DiscordWebhookManager {
         json.append("\"description\":\"").append(escape(description)).append("\",");
         json.append("\"color\":").append(color);
 
-        if (!thumbnail.isBlank()) {
+        if (thumbnail != null && !thumbnail.isBlank()) {
             json.append(",\"thumbnail\":{\"url\":\"").append(escape(thumbnail)).append("\"}");
         }
 
@@ -217,8 +217,8 @@ public final class DiscordWebhookManager {
             for (int i = 0; i < safeTopEntries.size(); i++) {
                 TopEntry entry = safeTopEntries.get(i);
                 fieldJson.add(
-                        "{\"name\":\"" + escape("Top " + (i + 1)) + "\",\"value\":\"" +
-                                escape(entry.name() + " - " + entry.value()) + "\",\"inline\":true}"
+                        "{\"name\":\"" + escape("Top " + (i + 1)) + "\",\"value\":\""
+                                + escape(entry.name() + " - " + entry.value()) + "\",\"inline\":true}"
                 );
             }
 
@@ -245,43 +245,75 @@ public final class DiscordWebhookManager {
 
         try {
             Plugin srPlugin = Bukkit.getPluginManager().getPlugin("SkinsRestorer");
-            if (srPlugin == null || !srPlugin.isEnabled()) {
-                return fallback;
+
+            if (srPlugin != null && srPlugin.isEnabled()) {
+                Player player = Bukkit.getPlayerExact(playerName);
+
+                if (player != null) {
+                    Class<?> providerClass = Class.forName("net.skinsrestorer.api.SkinsRestorerProvider");
+                    Method getMethod = providerClass.getMethod("get");
+                    Object skinsRestorer = getMethod.invoke(null);
+
+                    Method getPlayerStorageMethod = skinsRestorer.getClass().getMethod("getPlayerStorage");
+                    Object playerStorage = getPlayerStorageMethod.invoke(skinsRestorer);
+
+                    Method getSkinForPlayerMethod = playerStorage.getClass().getMethod(
+                            "getSkinForPlayer",
+                            java.util.UUID.class,
+                            String.class
+                    );
+                    Object optionalProperty = getSkinForPlayerMethod.invoke(
+                            playerStorage,
+                            player.getUniqueId(),
+                            player.getName()
+                    );
+
+                    if (optionalProperty instanceof java.util.Optional<?> optional && optional.isPresent()) {
+                        Object skinProperty = optional.get();
+
+                        Class<?> propertyUtilsClass = Class.forName("net.skinsrestorer.api.PropertyUtils");
+                        Method getSkinTextureUrlMethod = propertyUtilsClass.getMethod(
+                                "getSkinTextureUrl",
+                                Class.forName("net.skinsrestorer.api.property.SkinProperty")
+                        );
+
+                        Object textureUrl = getSkinTextureUrlMethod.invoke(null, skinProperty);
+
+                        if (textureUrl instanceof String url && !url.isBlank()) {
+                            String textureHash = extractTextureHash(url);
+                            if (textureHash != null && !textureHash.isBlank()) {
+                                return "https://mc-heads.net/avatar/" + textureHash + "/128";
+                            }
+                        }
+                    }
+                }
             }
-
-            Player player = Bukkit.getPlayerExact(playerName);
-            if (player == null) {
-                return fallback;
-            }
-
-            Class<?> providerClass = Class.forName("net.skinsrestorer.api.SkinsRestorerProvider");
-            Method getMethod = providerClass.getMethod("get");
-            Object skinsRestorer = getMethod.invoke(null);
-
-            Method getPlayerStorageMethod = skinsRestorer.getClass().getMethod("getPlayerStorage");
-            Object playerStorage = getPlayerStorageMethod.invoke(skinsRestorer);
-
-            Method getSkinForPlayerMethod = playerStorage.getClass().getMethod("getSkinForPlayer", java.util.UUID.class, String.class);
-            Object optionalProperty = getSkinForPlayerMethod.invoke(playerStorage, player.getUniqueId(), player.getName());
-
-            if (!(optionalProperty instanceof java.util.Optional<?> optional) || optional.isEmpty()) {
-                return fallback;
-            }
-
-            Object skinProperty = optional.get();
-
-            Class<?> propertyUtilsClass = Class.forName("net.skinsrestorer.api.PropertyUtils");
-            Method getSkinTextureUrlMethod = propertyUtilsClass.getMethod("getSkinTextureUrl", Class.forName("net.skinsrestorer.api.property.SkinProperty"));
-            Object textureUrl = getSkinTextureUrlMethod.invoke(null, skinProperty);
-
-            if (!(textureUrl instanceof String url) || url.isBlank()) {
-                return fallback;
-            }
-
-            return url;
-        } catch (Throwable throwable) {
-            return fallback;
+        } catch (Throwable ignored) {
         }
+
+        return fallback;
+    }
+
+    private static String extractTextureHash(String textureUrl) {
+        if (textureUrl == null || textureUrl.isBlank()) {
+            return null;
+        }
+
+        String cleaned = textureUrl.trim();
+
+        int lastSlash = cleaned.lastIndexOf('/');
+        if (lastSlash == -1 || lastSlash >= cleaned.length() - 1) {
+            return null;
+        }
+
+        String hash = cleaned.substring(lastSlash + 1).trim();
+
+        int queryIndex = hash.indexOf('?');
+        if (queryIndex != -1) {
+            hash = hash.substring(0, queryIndex);
+        }
+
+        return hash.isBlank() ? null : hash;
     }
 
     private static String resolveConfiguredOrPlayerThumbnail(String configuredThumbnail, String playerName) {

@@ -1,48 +1,46 @@
 Evento:
-  # Configurações do evento.
-  Title: "Sorteio" # O nome do evento. Será usado na placeholder @name.
-  Type: "sorteio" # O tipo do evento. Não modifique!
-  Calls: 5 # Quantas chamadas o evento terá?
-  Calls interval: 15 # O intervalo (em segundos) entre as chamadas.
-  Permission: "absolutevents.evento" # A permissão necessária para poder participar do evento.
-  Count participation: true # Esse evento contará participação?
-  Count victory: true # Esse evento contará vitória?
-  Cost: 10000 # O custo para participar do sorteio.
+  Title: "Sorteio"
+  Type: "sorteio"
+  Calls: 5
+  Calls interval: 15
+  Permission: "absolutevents.evento"
+  Count participation: true
+  Count victory: true
+  Cost: 10000
 
-# Mensagens
 Messages:
   Broadcast:
     - ""
-    - "&3[@name] &bIniciando evento &f@name"
-    - "&3[@name] &bPara participar, digite &f/evento entrar"
-    - "&3[@name] &bPrêmio: &2$&f10.485,96"
-    - "&3[@name] &bCusto: &2$&f@cost"
-    - "&3[@name] &bJogadores no sorteio: &f@players"
-    - "&3[@name] &bChamadas restantes: &f@broadcasts"
+    - "&#ff69f0Evento &f@name &#ff69f0Clique @join_button &#ff69f0para participar!"
+    - "&#ff69f0Prêmio: &#0088ff$&f10.485,96"
+    - "&#ff69f0Custo: &#0088ff$&f@cost"
+    - "&#ff69f0Jogadores: &#0088ff@players"
+    - "&#ff69f0Chamadas restantes: &#0088ff@broadcasts"
     - ""
 
   Winner:
     - ""
-    - "&3[@name] &bO evento &f@name &bfoi finalizado!"
-    - "&3[@name] &bO vencedor foi &f@winner&b!"
+    - "&#ff69f0O evento &f@name &#ff69f0foi finalizado!"
+    - "&#ff69f0O vencedor foi &f@winner&#ff69f0!"
     - ""
 
   No winner:
     - ""
-    - "&3[@name] &bO evento &f@name &bfoi finalizado!"
-    - "&3[@name] &bNão houveram vencedores."
+    - "&#ff69f0O evento &f@name &#ff69f0foi finalizado!"
+    - "&#ff69f0Não houveram vencedores."
     - ""
 
   Cancelled:
     - ""
-    - "&3[@name] &bO evento foi cancelado manualmente."
+    - "&#ff69f0O evento foi cancelado manualmente."
     - ""
 
-  No money: "&3[@name] &bVocê não tem dinheiro suficiente para participar do sorteio. &f(@cost)"
-  Joined: "&3[@name] &bVocê entrou no sorteio. Que a sorte esteja ao seu lado."
-  Already joined: "&3[@name] &bVocê já está no sorteio."
+  No money: "&#ff69f0Você não tem dinheiro suficiente para participar do sorteio. &f(@cost)"
+  Joined: "&#ff69f0Você entrou no sorteio. Que a sorte esteja ao seu lado."
+  Already joined: "&#ff69f0Você já está no sorteio."
 
-# Recompensas. Elas serão dadas ao vencedor.
 Rewards:
   Commands:
-    - "give @winner diamond 1"
+    - "# adicione seus comandos aqui"
+  Broadcast:
+    - "&#0088ff$&f10.485,96"

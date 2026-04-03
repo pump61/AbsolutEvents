@@ -1,69 +1,124 @@
 Evento:
-  Title: "Splegg"
-  Type: "splegg"
+  Title: Splegg
+  Type: splegg
   Calls: 5
   Calls interval: 15
   Mininum players: 2
   Eliminate on quit: true
   Empty inventory: true
-  Permission: "absolutevents.evento"
-  Count participation: false
-  Count victory: false
+  Spectator mode: true
+  Permission: absolutevents.evento
+  Count participation: true
+  Count victory: true
   Delay: 5
   Kick: false
   Kick time: 20
   Breakable materials:
-    - SNOW_BLOCK
+  - SNOW_BLOCK
 
 Messages:
   Broadcast:
-    - ""
-    - "&e[@name] &fEvento iniciado!"
-    - "&eDigite &f/evento &epara participar!"
-    - ""
-
+  - ''
+  - '&#ff69f0Evento &f@name &#ff69f0Clique @join_button &#ff69f0para participar!'
+  - '&#ff69f0Prêmio: &#0088ff$&f25.000 &f+ &#0088ff+&f15 PDC &f+ Insígnia de Eventos
+    &f+ &fՍ&#68ccff'
+  - '&#ff69f0Jogadores: &#0088ff@players &#ff69f0Chamadas restantes: &#0088ff@broadcasts'
+  - ''
+  
   Start:
-    - ""
-    - "&e[@name] &fIniciando evento..."
-    - ""
-
+  - ''
+  - '&#ff69f0Iniciando evento...'
+  - ''
+  
   Winner:
-    - ""
-    - "&e[@name] &fO vencedor foi &a@winner&f!"
-    - ""
-
+  - ''
+  - '&#ff69f0O evento &f@name &#ff69f0foi finalizado!'
+  - '&#ff69f0O vencedor foi &f@winner&#ff69f0!'
+  - ''
+  
   No winner:
-    - ""
-    - "&e[@name] &fEvento finalizado sem vencedor."
-    - ""
-
+  - ''
+  - '&#ff69f0O evento &f@name &#ff69f0foi finalizado!'
+  - '&#ff69f0Não houveram vencedores.'
+  - ''
+  
   No players:
-    - ""
-    - "&e[@name] &fEvento cancelado por falta de jogadores."
-    - ""
-
+  - ''
+  - '&#ff69f0Evento cancelado.'
+  - '&#ff69f0A quantidade mínima de jogadores não foi atingida.'
+  - ''
+  
   Cancelled:
-    - ""
-    - "&e[@name] &fEvento cancelado."
-    - ""
-
+  - ''
+  - '&#ff69f0O evento foi cancelado manualmente.'
+  - ''
+  
   Enabling breaking:
-    - "&e[@name] &fAtivando quebra em &a@time &fsegundos..."
-
+  - '&#ff69f0Ativando quebra de blocos em &#0088ff@time &#ff69f0segundos...'
+  
   Breaking allowed:
-    - "&e[@name] &fAgora vocês podem quebrar!"
+  - '&#ff69f0Agora vocês podem quebrar blocos!'
+  
+  Kick: '&#ff69f0Como você está parado, você será eliminado do evento em &#0088ff@time
+    &#ff69f0segundos.'
 
 Rewards:
-  Commands: []
+  Commands:
+  - "# adicione seus comandos aqui"
   Money: 0
+  Broadcast:
+  - '&#0088ff$&f25.000 &f+ &#0088ff+&f15 PDC &f+ Insígnia de Eventos &f+ &fՍ&#68ccff'
 
 Locations:
-  Lobby: []
-  Entrance: []
-  Spectator: []
-  Exit: []
+  Lobby:
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
+  
+  Entrance:
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
+  
+  Spectator:
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
+  
+  Exit:
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
+  
+  Pos1:
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
+  
+  Pos2:
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
+  
+  Server: 'null'
 
-  Pos1: []
-  Pos2: []
-
-  Server: null
+Itens:
+  Inventory: ''

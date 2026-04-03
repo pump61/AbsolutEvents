@@ -1,161 +1,221 @@
 Evento:
-  # Configurações do evento.
-  Title: "Guerra" # O nome do evento. Será usado na placeholder @name.
-  Type: "guerra" # O tipo do evento. Não modifique!
-  Calls: 5 # Quantas chamadas o evento terá.
-  Calls interval: 15 # O intervalo (em segundos) entre as chamadas.
-  Mininum players: 2 # O mínimo de jogadores para iniciar o evento.
-  Eliminate on quit: true # Este evento possui camarote?
-  Empty inventory: false # Esse evento requer que você esteja com o inventário vazio?
-  Permission: "absolutevents.evento" # A permissão necessária para participar do evento.
-  Count participation: true # Esse evento contará participação?
-  Count victory: true # Esse evento contará vitória?
-  Minimum guilds: 2 # O mínimo de clãs ou facções que devem estar presentes no evento para ele começar.
-  Maximum per guild: 10 # O número máximo de jogadores por clã ou facção.
-  Time: 20 # Tempo em segundos antes do PvP ser ativado.
-  Pickup time: 20 # Tempo em segundos que os vencedores terão para coletar os itens.
-  FFA: false # O Friendly Fire do evento deve ser ativado?
+  Title: Guerra de Clãs
+  Type: guerra
+  Calls: 10
+  Calls interval: 20
+  Mininum players: 2
+  Eliminate on quit: true
+  Empty inventory: true
+  Spectator mode: true
+  Permission: absolutevents.evento
+  Count participation: true
+  Count victory: true
+  Minimum guilds: 2
+  Maximum per guild: 4
+  Time: 60
+  Pickup time: 20
+  FFA: true
 
-# Configurações da Actionbar
 Actionbar:
-  Enabled: true # Ativar a actionbar no evento?
-  Enabling PvP: "&aAtivando PvP em @time segundos."
-  Normal: "&aJogadores restantes: @remeaning | Inimigos restantes: @enemies | Clans restantes: @guilds"
-  Spectator: "&aJogadores restantes: @remeaning | Clans restantes: @guilds"
-  Pickup: "&aVocê possui @time segundos para coletar os itens."
+  Enabled: true
+  Enabling PvP: '&aAtivando PvP em @time segundos.'
+  Normal: '&aJogadores restantes: @remeaning | Inimigos restantes: @enemies | Clans restantes: @guilds'
+  Spectator: '&aJogadores restantes: @remeaning | Clans restantes: @guilds'
+  Pickup: '&aVocê possui @time segundos para coletar os itens.'
 
-# Configurações da Borda
 Border:
-  Enabled: false # Caso esteja ativado, a borda do mundo diminuirá com o passar do tempo.
-  Size: 20000 # O tamanho em blocos da borda.
-  Time: 200 # Em quanto tempo a borda deve diminuir?
-  Damage: 2 # Quanto dano a borda deve dar?
-  Delay: 10 # A borda deve começar a diminuir depois de quantos segundos do início do evento?
+  Enabled: false
+  Size: 2500
+  Time: 3600
+  Damage: 1
+  Delay: 60
 
 Itens:
-  # Itens definidos do evento. Você pode defini-los automaticamente com o comando /evento setup kit
-  Enabled: false # Caso esteja ativado, o evento será com os itens setados abaixo.
-  Helmet:
-    material: "DIAMOND_HELMET"
-    damage: 0
-    enchants:
-      PROTECTION_ENVIRONMENTAL: 4
-      DURABILITY: 4
-  Chestplate:
-    material: "DIAMOND_CHESTPLATE"
-    damage: 0
-    enchants:
-      PROTECTION_ENVIRONMENTAL: 4
-      DURABILITY: 4
-  Leggings:
-    material: "DIAMOND_LEGGINGS"
-    damage: 0
-    enchants:
-      PROTECTION_ENVIRONMENTAL: 4
-      DURABILITY: 4
-  Boots:
-    material: "DIAMOND_BOOTS"
-    damage: 0
-    enchants:
-      PROTECTION_ENVIRONMENTAL: 4
-      DURABILITY: 4
-  Inventory:
-    0:
-      material: "DIAMOND_SWORD"
-      damage: 0
-      enchants:
-        DAMAGE_ALL: 5
-    1:
-      material: "GOLDEN_APPLE"
-      amount: 64
-      damage: 1
-    2:
-      material: "POTION"
-      damage: 41
-      name: "&5Poção de Força"
-      level: 2
-      base-effect: "STRENGTH, false, false"
+  Enabled: true
 
-# Mensagens
+  Helmet:
+    material: DIAMOND_HELMET
+    enchants:
+      MENDING: 1
+      PROTECTION: 4
+      UNBREAKING: 3
+
+  Chestplate:
+    material: DIAMOND_CHESTPLATE
+    enchants:
+      MENDING: 1
+      PROTECTION: 4
+      UNBREAKING: 3
+
+  Leggings:
+    material: DIAMOND_LEGGINGS
+    enchants:
+      MENDING: 1
+      PROTECTION: 4
+      UNBREAKING: 3
+
+  Boots:
+    material: DIAMOND_BOOTS
+    enchants:
+      MENDING: 1
+      PROTECTION: 4
+      UNBREAKING: 3
+
+  Inventory:
+    '0':
+      material: DIAMOND_SWORD
+      enchants:
+        MENDING: 1
+        SHARPNESS: 4
+        UNBREAKING: 3
+
+    '1':
+      material: BOW
+      enchants:
+        POWER: 2
+        UNBREAKING: 3
+
+    '2':
+      material: SHIELD
+
+    '3':
+      material: COOKED_BEEF
+      amount: 32
+
+    '4':
+      material: GOLDEN_APPLE
+      amount: 16
+
+    '5':
+      material: ENCHANTED_GOLDEN_APPLE
+      amount: 5
+
+    '7':
+      material: EXPERIENCE_BOTTLE
+      amount: 64
+
+    '8':
+      material: ARROW
+      amount: 64
+
+    '31':
+      material: SPLASH_POTION
+      base-type: STRONG_TURTLE_MASTER
+
+    '32':
+      material: SPLASH_POTION
+      base-type: STRONG_HEALING
+
+    '33':
+      material: SPLASH_POTION
+      base-type: STRONG_HEALING
+
+    '34':
+      material: SPLASH_POTION
+      base-type: STRONG_HEALING
+
+    '35':
+      material: SPLASH_POTION
+      base-type: STRONG_HEALING
+
 Messages:
   Broadcast:
-    - ""
-    - "&3[@name] &bIniciando evento &f@name"
-    - "&3[@name] &bPara participar, digite &f/evento"
-    - "&3[@name] &bPrêmio: &2$&f@money &b+ &6[Guerra]"
-    - "&3[@name] &bJogadores no evento: &f@players"
-    - "&3[@name] &bChamadas restantes: &f@broadcasts"
-    - ""
+    - ''
+    - '&#ff69f0Evento &f@name &#ff69f0Clique @join_button &#ff69f0para participar!'
+    - '&#ff69f0Prêmio: &#0088ff$&f250.000 &f+ &#0088ff+&f25 PDC &a+&f1500 Cash &f+ &aInsígnia de Eventos &f+ &fՏ&#ff0000'
+    - '&#ff69f0Jogadores: &#0088ff@players &#ff69f0Chamadas restantes: &#0088ff@broadcasts'
+    - ''
 
   Start:
-    - ""
-    - "&3[@name] &bIniciando evento..."
-    - ""
+    - ''
+    - '&#ff69f0Iniciando evento...'
+    - ''
 
   Winner:
-    - ""
-    - "&3[@name] &bO evento &f@name &bfoi finalizado!"
-    - "&3[@name] &bO clã vencedor foi: &f@guild&b!"
-    - "&3[@name] &bOs sobreviventes restantes foram: &f@winner&b!"
-    - ""
+    - ''
+    - '&#ff69f0O evento &f@name &#ff69f0foi finalizado!'
+    - '&#ff69f0O vencedor foi &f@winner&#ff69f0!'
+    - ''
 
   No winner:
-    - ""
-    - "&3[@name] &bO evento &f@name &bfoi finalizado!"
-    - "&3[@name] &bNão houveram vencedores."
-    - ""
+    - ''
+    - '&#ff69f0O evento &f@name &#ff69f0foi finalizado!'
+    - '&#ff69f0Não houveram vencedores.'
+    - ''
 
   No players:
-    - ""
-    - "&3[@name] &bEvento cancelado."
-    - "&3[@name] &bA quantidade mínima de jogadores não foi atingida."
-    - ""
-
-  No guilds:
-    - ""
-    - "&3[@name] &bEvento cancelado."
-    - "&3[@name] &bA quantidade mínima de clans não foi atingida."
-    - ""
+    - ''
+    - '&#ff69f0Evento cancelado.'
+    - '&#ff69f0A quantidade mínima de jogadores não foi atingida.'
+    - ''
 
   Cancelled:
-    - ""
-    - "&3[@name] &bO evento foi cancelado manualmente."
-    - ""
+    - ''
+    - '&#ff69f0O evento foi cancelado manualmente.'
+    - ''
 
   Enabling:
-    - "&3[@name] &bO PvP será ativado em &f@time &bsegundos!"
+    - '&#ff69f0O PvP será ativado em &f@time &#ff69f0segundos!'
 
   Enabled:
-    - ""
-    - "&3[@name] &bO PvP foi ativado. Boa sorte a todos!"
-    - ""
+    - '&#ff69f0O PvP foi ativado. Boa sorte á todos!'
 
   Pickup:
-    - "&3[@name] &bVocê tem &f@time &bsegundos para pegar os drops."
+    - '&#ff69f0Você tem &f@time &#ff69f0segundos para pegar os drops.'
 
-  Maximum: "&3[@name] &bO seu clan já bateu a quantidade máxima de jogadores!"
-  No guild: "&3[@name] &bVocê precisa ser membro de um clã para participar do evento!"
+  Maximum: '&#ff69f0O seu clan já bateu a quantidade máxima de jogadores!'
+  No guild: '&#ff69f0Você precisa ser membro de um clã para participar do evento!'
 
-# Recompensas
 Rewards:
-  Money: 1000 # Dinheiro ganho ao vencer o evento (Vault)
+  Tag:
+    Enabled: false
+    Name: absolutevents_gladiador
+    Style: '&6[Gladiador] '
+
+  Money: 0
 
   Commands:
-    - "give @winner diamond 1"
+  - "# adicione seus comandos aqui"
+
+  Broadcast:
+    - '&#0088ff$&f250.000 &f+ &#0088ff+&f25 PDC &a+&f1500 Cash &f+ &aInsígnia de Eventos &f+ &fՏ&#ff0000'
 
   Top kills:
-    Winner guild: false # Se ativado, apenas membros do clã vencedor entram no top kills
-    1:
-      - "give @topkiller diamond 3"
-    2:
-      - "give @topkiller diamond 2"
-    3:
-      - "give @topkiller diamond 1"
+    Winner guild: false
+    '1':
+      - \"# adicione seus comandos aqui\"
 
-# Localizações
 Locations:
-  Lobby: []
-  Entrance: []
-  Spectator: []
-  Exit: []
-  Server: null # Coloque aqui o nome do servidor do Bungeecord que o evento deve ocorrer.
+  Lobby:
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
+
+  Entrance:
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
+
+  Spectator:
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
+
+  Exit:
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
+
+  Server: 'null'

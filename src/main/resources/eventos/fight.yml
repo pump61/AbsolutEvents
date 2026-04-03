@@ -6,127 +6,159 @@ Evento:
   Mininum players: 2
   Eliminate on quit: true
   Empty inventory: true
+  Spectator mode: true
   Permission: absolutevents.evento
-  Count participation: false
-  Count victory: false
+  Count participation: true
+  Count victory: true
   Time: 5
   Fight time: 120
 
 Kit:
   Normal:
     Armor:
-      Helmet: {}
-      Chestplate: {}
-      Leggings: {}
-      Boots: {}
-    Inventory: {}
-
+      Helmet:
+        material: IRON_HELMET
+      Chestplate:
+        material: IRON_CHESTPLATE
+      Leggings:
+        material: IRON_LEGGINGS
+      Boots:
+        material: IRON_BOOTS
+    Inventory:
+      '0':
+        material: STONE_SWORD
+        damage: 0
+      '1':
+        material: COOKED_BEEF
+        amount: 2
+  
   Last fight:
     Armor:
-      Helmet: {}
-      Chestplate: {}
-      Leggings: {}
-      Boots: {}
-    Inventory: {}
+      Helmet:
+        material: IRON_HELMET
+      Chestplate:
+        material: IRON_CHESTPLATE
+      Leggings:
+        material: IRON_LEGGINGS
+      Boots:
+        material: IRON_BOOTS
+    Inventory:
+      '0':
+        material: STONE_SWORD
+        damage: 0
+      '1':
+        material: COOKED_BEEF
+        amount: 2
 
 Messages:
   Broadcast:
-    - ''
-    - '&eEvento &f@name &eaberto! Digite &f/evento'
-    - '&eJogadores: &f@players &7| &eChamadas restantes: &f@broadcasts'
-    - '&ePrêmio: &a$@money'
-    - ''
-
+  - ''
+  - '&#ff69f0Evento &f@name &#ff69f0Clique @join_button &#ff69f0para participar!'
+  - '&#ff69f0Prêmio: &#0088ff$&f70.000 &f+ &#0088ff+&f25 PDC &a+&f100 PDL &f+ &#0f23fb[&#1f1efbK&#2f19fbn&#3f14fci&#4f0ffcg&#5f0afch&#6f05fct&#7f01fd]'
+  - '&#ff69f0Jogadores: &#0088ff@players &#ff69f0Chamadas restantes: &#0088ff@broadcasts'
+  - ''
+  
   Start:
-    - ''
-    - '&e[@name] &fO evento iniciou!'
-    - ''
-
+  - ''
+  - '&#ff69f0Iniciando evento...'
+  - ''
+  
   Winner:
-    - ''
-    - '&e[@name] &fO vencedor foi &a@winner'
-    - ''
-
+  - ''
+  - '&#ff69f0O evento &f@name &#ff69f0foi finalizado!'
+  - '&#ff69f0O vencedor foi &f@winner&#ff69f0!'
+  - ''
+  
   No winner:
-    - ''
-    - '&e[@name] &cO evento terminou sem vencedores.'
-    - ''
-
+  - ''
+  - '&#ff69f0O evento &f@name &#ff69f0foi finalizado!'
+  - '&#ff69f0Não houveram vencedores.'
+  - ''
+  
   No players:
-    - ''
-    - '&e[@name] &cEvento cancelado por falta de jogadores.'
-    - ''
-
+  - ''
+  - '&#ff69f0Evento cancelado.'
+  - '&#ff69f0A quantidade mínima de jogadores não foi atingida.'
+  - ''
+  
   Cancelled:
-    - ''
-    - '&e[@name] &cEvento cancelado.'
-    - ''
-
+  - ''
+  - '&#ff69f0O evento foi cancelado manualmente.'
+  - ''
+  
   Starting fights:
-    - ''
-    - '&e[@name] &fA próxima luta começa em &e@time &fsegundos.'
-    - ''
-
+  - ''
+  - '&#ff69f0Iniciando próxima luta em &f@time &#ff69f0segundos.'
+  - ''
+  
   Bracket info:
-    - '&e[@name] &f@first &eVS &f@second'
-
+  - ''
+  - '&#ff69f0&f@first &#ff69f0VS &f@second&#ff69f0!'
+  - ''
+  
   Fight winner:
-    - '&e[@name] &f@winner &evenceu a luta!'
-
+  - '&#ff69f0&f@winner &#ff69f0venceu a luta!'
+  
   Draw:
-    - '&e[@name] &cEmpate!'
+  - '&#ff69f0Empate!'
 
 Rewards:
   Money: 0
-  Commands: []
+  Commands:
+  - "# adicione seus comandos aqui"
+  Broadcast:
+  - '&#0088ff$&f70.000 &f+ &#0088ff+&f25 PDC &a+&f100 PDL &f+ &#0f23fb[&#1f1efbK&#2f19fbn&#3f14fci&#4f0ffcg&#5f0afch&#6f05fct&#7f01fd]'
 
 Locations:
   Lobby:
     world: world
-    x: 0
-    y: 0
-    z: 0
-    yaw: 0
-    pitch: 0
-
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
+  
   Entrance:
     world: world
-    x: 0
-    y: 0
-    z: 0
-    yaw: 0
-    pitch: 0
-
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
+  
   Spectator:
     world: world
-    x: 0
-    y: 0
-    z: 0
-    yaw: 0
-    pitch: 0
-
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
+  
   Exit:
     world: world
-    x: 0
-    y: 0
-    z: 0
-    yaw: 0
-    pitch: 0
-
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
+  
   Pos1:
     world: world
-    x: 0
-    y: 0
-    z: 0
-    yaw: 0
-    pitch: 0
-
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
+  
   Pos2:
     world: world
-    x: 0
-    y: 0
-    z: 0
-    yaw: 0
-    pitch: 0
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
+  
+  Server: 'null'
 
-  Server: null
+Itens:
+  Inventory: ''

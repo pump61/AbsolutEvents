@@ -6,6 +6,7 @@ Evento:
   Mininum players: 2
   Eliminate on quit: true
   Empty inventory: true
+  Spectator mode: true
   Permission: absolutevents.evento
   Count participation: false
   Count victory: false
@@ -18,9 +19,9 @@ Evento:
   Time away: 5
 
 BossBar:
-  Idle: "&6KOTH &7- Aguardando captura"
-  Capturing: "&6KOTH &7- &e@player &fcapturando"
-  Contested: "&6KOTH &7- &cÁrea em disputa"
+  Idle: '&6KOTH &7- Aguardando captura'
+  Capturing: '&6KOTH &7- &e@player &fcapturando'
+  Contested: '&6KOTH &7- &cÁrea em disputa'
 
 Title:
   Enabled: true
@@ -29,106 +30,141 @@ Title:
   FadeOut: 5
 
   Capturing:
-    Title: '&6CAPTURA'
-    Subtitle: '&f@player está dominando a área'
+    Title: '&#ff69f0CAPTURA'
+    Subtitle: '&f@player &#ff69f0está dominando a área!'
 
   Contested:
     Title: '&cEM DISPUTA'
-    Subtitle: '&fHá mais de um jogador na zona'
+    Subtitle: '&fHá mais de um jogador na zona!'
 
 Messages:
-
   Broadcast:
     - ''
-    - '&6Evento &f@name &6digite &f/evento'
-    - '&6Jogadores no evento: &a@players'
+    - '&#ff69f0Evento &f@name &#ff69f0Clique @join_button &#ff69f0para participar!'
+    - '&#ff69f0Prêmio: &#0088ff$&f35.000 &f+ &#0088ff+&f20 PDC &f+ Insígnia de Eventos'
+    - '&#ff69f0Jogadores: &#0088ff@players &#ff69f0Chamadas restantes: &#0088ff@broadcasts'
     - ''
 
   Start:
     - ''
-    - '&6[@name] Iniciando evento...'
+    - '&#ff69f0Iniciando evento...'
     - ''
 
   Winner:
     - ''
-    - '&6[@name] O vencedor foi &f@winner'
+    - '&#ff69f0O evento &f@name &#ff69f0foi finalizado!'
+    - '&#ff69f0O vencedor foi &f@winner&#ff69f0!'
+    - ''
+
+  Enabling:
+    - '&#ff69f0O PvP será ativado em &f@time &#ff69f0segundos!'
+
+  Enabled:
+    - ''
+    - '&#ff69f0O PvP foi ativado.'
+    - '&#ff69f0Permaneça sozinho na zona por &f@time &#ff69f0segundos para vencer!'
     - ''
 
   In the zone:
-    - '&6Você entrou na zona de dominação.'
+    - ''
+    - '&#ff69f0Você entrou na zona de dominação.'
+    - '&#ff69f0Permaneça sozinho para capturar!'
+    - ''
 
   Capturing:
-    - '&e@player está capturando a área.'
+    - ''
+    - '&#ff69f0@player está capturando a zona!'
+    - ''
 
   Contested:
-    - '&cÁrea em disputa!'
+    - ''
+    - '&#ff69f0A área está em disputa!'
+    - '&#ff69f0Seu temporizador foi pausado.'
+    - ''
 
   Away from the zone:
-    - '&cVocê saiu da zona.'
+    - ''
+    - '&#ff69f0Você tem &f@time &#ff69f0segundos para voltar!'
+    - ''
 
   Time dead:
-    - '&cVocê ficará @time segundos morto.'
+    - ''
+    - '&#ff69f0Você ficará &f@time &#ff69f0segundos morto!'
+    - ''
 
 Rewards:
   Money: 0
-  Commands: []
+  Commands:
+  - "# adicione seus comandos aqui"
+  Broadcast:
+    - '&#0088ff$&f35.000 &f+ &#0088ff+&f20 PDC &f+ Insígnia de Eventos'
 
 Locations:
-
   Lobby:
-    world: ''
-    x: 0
-    y: 0
-    z: 0
-    Yaw: 0
-    Pitch: 0
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
 
   Entrance:
-    world: ''
-    x: 0
-    y: 0
-    z: 0
-    Yaw: 0
-    Pitch: 0
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
 
   Spectator:
-    world: ''
-    x: 0
-    y: 0
-    z: 0
-    Yaw: 0
-    Pitch: 0
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
 
   Exit:
-    world: ''
-    x: 0
-    y: 0
-    z: 0
-    Yaw: 0
-    Pitch: 0
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
 
   Pos1:
-    world: ''
-    x: 0
-    y: 0
-    z: 0
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
 
   Pos2:
-    world: ''
-    x: 0
-    y: 0
-    z: 0
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
 
   Pos3:
-    world: ''
-    x: 0
-    y: 0
-    z: 0
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
 
   Pos4:
-    world: ''
-    x: 0
-    y: 0
-    z: 0
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
 
   Server: 'null'
+
+Itens:
+  Inventory: ''

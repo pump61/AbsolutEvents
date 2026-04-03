@@ -1,14 +1,15 @@
 Evento:
-  Title: Semáforo
+  Title: Batatinha Frita 1, 2, 3!
   Type: semaforo
-  Calls: 5
+  Calls: 10
   Calls interval: 15
   Mininum players: 2
   Eliminate on quit: true
   Empty inventory: true
+  Spectator mode: true
   Permission: absolutevents.evento
-  Count participation: false
-  Count victory: false
+  Count participation: true
+  Count victory: true
   Show on hotbar: true
   Green: 8
   Yellow: 3
@@ -17,68 +18,106 @@ Evento:
 Messages:
   Broadcast:
     - ''
-    - '&aEvento &f@name &aaberto! Digite &f/evento'
+    - '&#ff69f0Evento &f@name &#ff69f0Clique @join_button &#ff69f0para participar!'
+    - '&#ff69f0Prêmio: &#0088ff$&f35.000 &f+ &#0088ff+&f15 PDC &f+ Insígnia de Eventos &f+ &fԵ&#ffd700'
+    - '&#ff69f0Jogadores: &#0088ff@players &#ff69f0Chamadas restantes: &#0088ff@broadcasts'
     - ''
-
+  
   Start:
     - ''
-    - '&a[@name] Iniciando evento...'
+    - '&#ff69f0Iniciando evento...'
     - ''
-
+  
   Winner:
     - ''
-    - '&a[@name] Evento finalizado!'
-    - '&aVencedor: &f@winner'
+    - '&#ff69f0O evento &f@name &#ff69f0foi finalizado!'
+    - '&#ff69f0O vencedor foi &f@winner&#ff69f0!'
     - ''
-
+  
   No winner:
     - ''
-    - '&c[@name] Evento finalizado sem vencedor.'
+    - '&#ff69f0O evento &f@name &#ff69f0foi finalizado!'
+    - '&#ff69f0Não houveram vencedores.'
     - ''
-
+  
   No players:
     - ''
-    - '&cEvento cancelado por falta de jogadores.'
+    - '&#ff69f0Evento cancelado.'
+    - '&#ff69f0A quantidade mínima de jogadores não foi atingida.'
     - ''
-
+  
   Cancelled:
     - ''
-    - '&cEvento cancelado.'
+    - '&#ff69f0O evento foi cancelado manualmente.'
     - ''
-
+  
   Green:
     - ''
-    - '&a&lVÁ!'
+    - '&#00ff00&lVÁ!'
     - ''
-
+  
   Yellow:
     - ''
-    - '&e&lATENÇÃO!'
+    - '&#ffff00&lATENÇÃO!'
     - ''
-
+  
   Red:
     - ''
-    - '&c&lPARE!'
+    - '&#ff0000&lPARE!'
     - ''
-
+  
   Sign:
-    - '&4&l[Semáforo]'
-    - '&cClique aqui'
-    - '&cpara ganhar o'
-    - '&cevento.'
-
-  Green item: '&a&lVÁ!'
-  Yellow item: '&e&lATENÇÃO!'
-  Red item: '&c&lPARE!'
-  Actionbar: '&fSemáforo: @color'
+    - '&#ff0000&l[Semáforo]'
+    - '&#ff0000Clique aqui'
+    - '&#ff0000para ganhar o'
+    - '&#ff0000evento.'
+  
+  Green item: '&#00ff00&lVÁ!'
+  Yellow item: '&#ffff00&lATENÇÃO!'
+  Red item: '&#ff0000&lPARE!'
+  Actionbar: '&#ffffffSemáforo: &#0088ff@color'
 
 Rewards:
+  Commands:
+    - "# adicione seus comandos aqui"
   Money: 0
-  Commands: []
+  Broadcast:
+    - '&#0088ff$&f35.000 &f+ &#0088ff+&f15 PDC &f+ Insígnia de Eventos &f+ &fԵ&#ffd700'
 
 Locations:
-  Lobby: []
-  Entrance: []
-  Spectator: []
-  Exit: []
+  Lobby:
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
+  
+  Entrance:
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
+  
+  Spectator:
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
+  
+  Exit:
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
+  
   Server: 'null'
+
+Itens:
+  Inventory: ''

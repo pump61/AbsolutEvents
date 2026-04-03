@@ -1,95 +1,140 @@
 Evento:
-  # Configurações do evento.
-  Title: "Campo Minado" # O nome do evento. Será usado na placeholder @name.
-  Type: "campominado" # O tipo do evento. Não modifique!
-  Calls: 5 # Quantas chamadas o evento terá.
-  Calls interval: 15 # O intervalo (em segundos) entre as chamadas.
-  Mininum players: 2 # O mínimo de jogadores para iniciar o evento.
-  Eliminate on quit: true # Este evento possui camarote?
-  Empty inventory: true # Esse evento requer que você esteja com o inventário vazio?
-  Permission: "absolutevents.evento" # A permissão necessária para participar do evento.
-  Count participation: true # Esse evento contará participação?
-  Count victory: true # Esse evento contará vitória?
-  Last player win: false # O evento deve ser encerrado caso reste apenas um jogador? Se estiver como false, o evento apenas acabará quando todos os níveis terminarem.
-  Levels: 20 # A quantidade de níveis que o Campo Minado terá.
-  Difficulty: 4.5 # A porcentagem de blocos que serão removidos a cada nível. No nível 20, será de 90%.
-  Time: 20 # Tempo em segundos que os jogadores tem para passar o campo minado.
-  Delay: 5 # Tempo em segundos para o intervalo entre os níveis.
+  Title: Campo Minado
+  Type: campominado
+  Calls: 10
+  Calls interval: 15
+  Mininum players: 2
+  Eliminate on quit: true
+  Empty inventory: true
+  Spectator mode: true
+  Permission: absolutevents.evento
+  Count participation: true
+  Count victory: true
+  Levels: 18
+  Difficulty: 4.5
+  Time: 20
+  Delay: 5
 
 Actionbar:
   Enabled: true
-  Message: "&eNível: &f@level &8| &eTempo: &f@time"
+  Message: '&#ff69f0Nível: &f@level &8| &#ff69f0Tempo: &f@time'
 
 Pressure:
   Enabled: true
   Remaining multiplier: 0.2
   Minimum time: 3
 
-# Mensagens
 Messages:
   Broadcast:
-    - ""
-    - "&3[@name] &bIniciando evento &f@name"
-    - "&3[@name] &bPara participar, digite &f/evento"
-    - "&3[@name] &bPrêmio: &2$&f@money"
-    - "&3[@name] &bJogadores no evento: &f@players"
-    - "&3[@name] &bChamadas restantes: &f@broadcasts"
-    - ""
+    - ''
+    - '&#ff69f0Evento &f@name &#ff69f0Clique @join_button &#ff69f0para participar!'
+    - '&#ff69f0Prêmio: &#0088ff$&f35.000 &f+ &#0088ff+&f15 PDC &f+ Insígnia de Eventos &f+ &fՁ&#ffea74'
+    - '&#ff69f0Jogadores: &#0088ff@players &#ff69f0Chamadas restantes: &#0088ff@broadcasts'
+    - ''
+
   Start:
-    - ""
-    - "&3[@name] &bIniciando evento..."
-    - ""
+    - ''
+    - '&#ff69f0Iniciando evento...'
+    - ''
+
   Winner:
-    - ""
-    - "&3[@name] &bO evento &f@name &bfoi finalizado!"
-    - "&3[@name] &bO(s) vencedor(es) foi(foram): &f@winner&b!"
-    - ""
+    - ''
+    - '&#ff69f0O evento &f@name &#ff69f0foi finalizado!'
+    - '&#ff69f0O vencedor foi &f@winner&#ff69f0!'
+    - ''
+
   No winner:
-    - ""
-    - "&3[@name] &bO evento &f@name &bfoi finalizado!"
-    - "&3[@name] &bNão houveram vencedores."
-    - ""
+    - ''
+    - '&#ff69f0O evento &f@name &#ff69f0foi finalizado!'
+    - '&#ff69f0Não houveram vencedores.'
+    - ''
+
   No players:
-    - ""
-    - "&3[@name] &bEvento cancelado."
-    - "&3[@name] &bA quantidade mínima de jogadores não foi atingida."
-    - ""
+    - ''
+    - '&#ff69f0Evento cancelado.'
+    - '&#ff69f0A quantidade mínima de jogadores não foi atingida.'
+    - ''
+
   Cancelled:
-    - ""
-    - "&3[@name] &bO evento foi cancelado manualmente."
-    - ""
+    - ''
+    - '&#ff69f0O evento foi cancelado manualmente.'
+    - ''
+
   Starting level:
-    - "&3[@name] &bIniciando o próximo nível em &f@time&b segundos..."
+    - '&#ff69f0Iniciando o próximo nível em &f@time &#ff69f0segundos...'
+
   Next level:
-    - ""
-    - "&3[@name] &bNível @level!"
-    - ""
-  Eliminated player:
-    - ""
-    - "&3[@name] &f@player &bfoi eliminado!"
-    - ""
+    - ''
+    - '&#ff69f0Nível @level!'
+    - ''
+
   First finish:
-    - ""
-    - "&e[@name] &f@player &echegou primeiro! Tempo reduzido para &f@time&e segundos."
-    - ""
+    - ''
+    - '&#ff69f0@player chegou primeiro! Tempo reduzido para &f@time &#ff69f0segundos.'
+    - ''
+
   Eliminated player:
-    - ""
-    - "&e[@name] &f@player &efoi eliminado!"
-    - ""
+    - ''
+    - '&#ff69f0@player foi eliminado!'
+    - ''
 
-
-# Recompensas. Elas serão dadas ao(s) vencedor(es).
 Rewards:
-  Money: 1000 # A quantidade de dinheiro que o jogador ganhará ao vencer o evento. (Requer Vault)
-  Commands: # Lista de comandos que serão executados no(s) vencedor(es).
-    - "give @winner diamond 1"
+  Commands:
+  - "# adicione seus comandos aqui"
+  Money: 0
+  Broadcast:
+    - '&#0088ff$&f35.000 &f+ &#0088ff+&f15 PDC &f+ Insígnia de Eventos &f+ &fՁ&#ffea74'
 
-# Localizações. Você configurará essa seção usando o comando /evento setup campominado
 Locations:
-  Lobby: []
-  Entrance: []
-  Spectator: []
-  Exit: []
-  Pos1: []
-  Pos2: []
-  Server: null # Coloque aqui o nome do servidor do Bungecoord que o evento deve ocorrer.
+  Lobby:
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
+
+  Entrance:
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
+
+  Spectator:
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
+
+  Exit:
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
+
+  Pos1:
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
+
+  Pos2:
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
+
+  Server: 'null'
+
+Itens:
+  Inventory: ''

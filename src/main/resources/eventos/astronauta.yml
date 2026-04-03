@@ -1,87 +1,66 @@
 Evento:
-  Title: "Astronauta"
-  Type: "fall"
+  Title: Astronauta
+  Type: fall
   Calls: 5
   Calls interval: 15
   Mininum players: 2
   Eliminate on quit: true
   Empty inventory: true
-  Permission: "absolutevents.evento"
+  Spectator mode: true
+  Permission: absolutevents.evento
   Count participation: true
   Count victory: true
   Time: 15
 
-# 🎬 Titles
-Title:
-  Enabled: true
-  FadeIn: 10
-  Stay: 40
-  FadeOut: 10
-
-  Start:
-    Title: '&b&lASTRONAUTA'
-    Subtitle: '&fSobreviva por @time segundos'
-
-  Final:
-    Title: '&e&lFASE FINAL'
-    Subtitle: '&fSegure por mais alguns segundos!'
-
-# 🌌 Efeitos da queda
-Effects:
-  Enabled: true
-  Levitation ticks: 30
-  Slow falling ticks: 220
-
-# 💬 Mensagens
 Messages:
   Broadcast:
-    - ""
-    - "&3[@name] &bIniciando evento &f@name"
-    - "&3[@name] &bPara participar, digite &f/evento"
-    - "&3[@name] &bPrêmio: &2$&f@money &b+ &b[Astronauta]"
-    - "&3[@name] &bJogadores no evento: &f@players"
-    - "&3[@name] &bChamadas restantes: &f@broadcasts"
-    - ""
+    - ''
+    - '&#ff69f0Evento &f@name &#ff69f0Clique @join_button &#ff69f0para participar!'
+    - '&#ff69f0Prêmio: &#0088ff$&f@money &#ff69f0+ &b[Astronauta]'
+    - '&#ff69f0Jogadores: &#0088ff@players &#ff69f0Chamadas restantes: &#0088ff@broadcasts'
+    - ''
 
   Start:
-    - ""
-    - "&3[@name] &bIniciando evento..."
-    - ""
+    - ''
+    - '&#ff69f0Iniciando evento...'
+    - ''
 
   Winner:
-    - ""
-    - "&3[@name] &bO evento &f@name &bfoi finalizado!"
-    - "&3[@name] &bSobreviveram: &f@winner"
-    - ""
+    - ''
+    - '&#ff69f0O evento &f@name &#ff69f0foi finalizado!'
+    - '&#ff69f0O vencedor foi &f@winner&#ff69f0!'
+    - ''
 
   No winner:
-    - ""
-    - "&3[@name] &bO evento &f@name &bfoi finalizado!"
-    - "&3[@name] &cTodos falharam na queda!"
-    - ""
+    - ''
+    - '&#ff69f0O evento &f@name &#ff69f0foi finalizado!'
+    - '&#ff69f0Não houveram vencedores.'
+    - ''
+
+  No players:
+    - ''
+    - '&#ff69f0Evento cancelado.'
+    - '&#ff69f0A quantidade mínima de jogadores não foi atingida.'
+    - ''
 
   Cancelled:
-    - ""
-    - "&3[@name] &bO evento foi cancelado manualmente."
-    - ""
+    - ''
+    - '&#ff69f0O evento foi cancelado manualmente.'
+    - ''
 
-  # Actionbar durante o evento
-  Actionbar: '&bTempo restante: &f@time &8| &fJogadores vivos: &b@players'
-
-  # Quando alguém é eliminado
-  Player eliminated:
-    - '&b[@name] &f@player &cfalhou na queda!'
-
-# 💰 Recompensas
 Rewards:
-  Money: 1000
+  Money: 0
   Commands:
-    - "give @winner diamond 1"
+  - "# adicione seus comandos aqui"
+  Broadcast:
+    - '&#0088ff$&f@money &#ff69f0+ &b[Astronauta]'
 
-# 📍 Localizações
 Locations:
   Lobby: []
   Entrance: []
   Spectator: []
   Exit: []
-  Server: null
+  Server: 'null'
+
+Itens:
+  Inventory: ''

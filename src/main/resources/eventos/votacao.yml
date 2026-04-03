@@ -1,52 +1,45 @@
 Evento:
-  # Configurações do evento.
-  Title: "Votação" # O nome da votação. Será usado na placeholder @name.
-  Type: "votacao" # O tipo do evento. Não modifique!
-  Calls: 3 # Quantas chamadas a votação terá?
-  Calls interval: 15 # O intervalo (em segundos) entre as chamadas.
-  Permission: "absolutevents.evento" # A permissão necessária para poder votar.
-  Alternatives: 3 # Quantos eventos os jogadores poderão escolher por votação.
+  Title: "Votação"
+  Type: "votacao"
+  Calls: 5
+  Calls interval: 15
+  Permission: "absolutevents.evento"
+  Alternatives: 3
 
-# Mensagens
 Messages:
   Broadcast:
     - ""
-    - "&3[@name] &bVote em qual evento você quer que inicie agora!"
-    - "&3[@name] &b* &f@alternative1 &b- &f@votes &bvotos (&f@percentage&b%)"
-    - "&3[@name] &b* &f@alternative2 &b- &f@votes &bvotos (&f@percentage&b%)"
-    - "&3[@name] &b* &f@alternative3 &b- &f@votes &bvotos (&f@percentage&b%)"
-    - "&3[@name] &bChamadas restantes: &f@broadcasts"
+    - "&#ff69f0Evento &f@name &#ff69f0Vote em qual evento você quer que inicie agora!"
+    - "&#ff69f0* &f@alternative1 &#ff69f0- &#0088ff@votes &#ff69f0votos (&f@percentage&#ff69f0%)"
+    - "&#ff69f0* &f@alternative2 &#ff69f0- &#0088ff@votes &#ff69f0votos (&f@percentage&#ff69f0%)"
+    - "&#ff69f0* &f@alternative3 &#ff69f0- &#0088ff@votes &#ff69f0votos (&f@percentage&#ff69f0%)"
+    - "&#ff69f0Chamadas restantes: &#0088ff@broadcasts"
     - ""
 
-  Voted: "&3[@name] &bVocê votou no evento &f@alternative&b!"
-  Already voted: "&3[@name] &bVocê já votou!"
-  Invalid: "&3[@name] &bEsta alternativa é inválida."
+  Voted: "&#ff69f0Você votou no evento &f@alternative&#ff69f0!"
+  Already voted: "&#ff69f0Você já votou!"
+  Invalid: "&#ff69f0Esta alternativa é inválida."
 
   Winner:
     - ""
-    - "&3[@name] &bA votação foi encerrada!"
-    - "&3[@name] &bCom &f@votes &bvotos (&f@percentage&b%), o evento vencedor foi &f@winner&b!"
+    - "&#ff69f0A votação foi encerrada!"
+    - "&#ff69f0Com &#0088ff@votes &#ff69f0votos (&f@percentage&#ff69f0%), o evento vencedor foi &f@winner&#ff69f0!"
     - ""
 
   No votes:
     - ""
-    - "&3[@name] &bA votação foi encerrada!"
-    - "&3[@name] &bNão houveram votos. Iniciando evento aleatório..."
+    - "&#ff69f0A votação foi encerrada!"
+    - "&#ff69f0Não houveram votos. Iniciando evento aleatório..."
     - ""
 
-  Hover: "&b* Clique para votar no evento &f@alternative&b."
+  Hover: "&#ff69f0* Clique para votar no evento &f@alternative&#ff69f0."
 
   Cancelled:
     - ""
-    - "&3[@name] &bA votação foi cancelada manualmente."
+    - "&#ff69f0A votação foi cancelada manualmente."
     - ""
 
-# Alternativas
 Alternatives:
-  # Formato:
-  # nome_do_arquivo_de_configuração:
-  #   Name: "Nome do evento"
-
   parkour:
     Name: "Parkour"
   corrida:

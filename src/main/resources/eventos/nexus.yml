@@ -1,12 +1,12 @@
 Evento:
-  # Configurações do evento.
   Title: Nexus
   Type: nexus
-  Calls: 5
+  Calls: 10
   Calls interval: 15
   Mininum players: 2
   Eliminate on quit: true
   Empty inventory: true
+  Spectator mode: true
   Permission: absolutevents.evento
   Count participation: true
   Count victory: true
@@ -18,7 +18,7 @@ Evento:
   Health: 1000
   Damage: 5
   Nexus name: '&d&lNEXUS &f- @team_color&l@team_uppercase &f(&aHP: &f@health&f)'
-  Map name: SeuMapa
+  Map name: Howling Abyss
 
 Towers:
   Enabled: true
@@ -35,15 +35,15 @@ Title:
   FadeIn: 10
   Stay: 50
   FadeOut: 10
-
+  
   Welcome:
     Title: '&bBoas-vindas a'
     Subtitle: '&f@map'
-
+  
   Tower destroyed:
     Title: '&cTORRE DESTRUÍDA'
     Subtitle: '&f@team - Torre @tower'
-
+  
   Nexus unlocked:
     Title: '&4NEXUS LIBERADO'
     Subtitle: '&fO Nexus da equipe @team agora pode ser destruído!'
@@ -68,101 +68,189 @@ Itens:
 
 Messages:
   Broadcast:
-    - ''
-    - '&eEvento &f@name &edigite &f/evento'
-    - '&eJogadores no evento: &a@players &eChamadas restantes: &a@broadcasts'
-    - ''
-
+  - ''
+  - '&#ff69f0Evento &f@name &#ff69f0Clique @join_button &#ff69f0para participar!'
+  - '&#ff69f0Prêmio: &#0088ff$&f35.000 &f+ &#0088ff+&f15 PDC'
+  - '&#ff69f0Jogadores: &#0088ff@players &#ff69f0Chamadas restantes: &#0088ff@broadcasts'
+  - ''
+  
   Start:
-    - ''
-    - '&3[@name] &bIniciando evento...'
-    - ''
-
+  - ''
+  - '&#ff69f0Iniciando evento...'
+  - ''
+  
   Winner:
-    - ''
-    - '&3[@name] &bO evento &f@name &bfoi finalizado!'
-    - '&3[@name] &bO vencedor foi &f@winner&b!'
-    - ''
-
+  - ''
+  - '&#ff69f0O evento &f@name &#ff69f0foi finalizado!'
+  - '&#ff69f0O vencedor foi &f@winner&#ff69f0!'
+  - ''
+  
   No winner:
-    - ''
-    - '&3[@name] &bO evento &f@name &bfoi finalizado!'
-    - '&3[@name] &bNão houveram vencedores.'
-    - ''
-
+  - ''
+  - '&#ff69f0O evento &f@name &#ff69f0foi finalizado!'
+  - '&#ff69f0Não houveram vencedores.'
+  - ''
+  
   No players:
-    - ''
-    - '&3[@name] &bEvento cancelado.'
-    - '&3[@name] &bA quantidade mínima de jogadores não foi atingida.'
-    - ''
-
+  - ''
+  - '&#ff69f0Evento cancelado.'
+  - '&#ff69f0A quantidade mínima de jogadores não foi atingida.'
+  - ''
+  
   Cancelled:
-    - ''
-    - '&3[@name] &bO evento foi cancelado manualmente.'
-    - ''
-
+  - ''
+  - '&#ff69f0O evento foi cancelado manualmente.'
+  - ''
+  
   Team:
-    - ''
-    - '&3[@name] &bVocê faz parte do &f@team&b.'
-    - '&3[@name] &bAtivando PvP em &f@time &bsegundos.'
-    - ''
-
+  - ''
+  - '&#ff69f0Você faz parte do &f@team&#ff69f0.'
+  - '&#ff69f0Ativando PvP em &#0088ff@time &#ff69f0segundos.'
+  - ''
+  
   Enabled:
-    - '&3[@name] &bPvP ativado! Boa sorte a todos.'
-
+  - '&#ff69f0PvP ativado! Boa sorte a todos.'
+  
   Died:
-    - '&3[@name] &bVocê morreu. Aguarde &f@time &bsegundos para voltar a jogar.'
-
+  - '&#ff69f0Você morreu. Aguarde &#0088ff@time &#ff69f0segundos para voltar a jogar.'
+  
   Kill:
-    - '&3[@name] &f@killer &beliminou &f@victim'
-
+  - '&#ff69f0&f@killer &#ff69f0eliminou &f@victim'
+  
   Killstreak:
-    3:
-      - '&6[@name] &f@player &eestá DOMINANDO!'
-    5:
-      - '&c[@name] &f@player &cESTÁ ENFURECIDO!'
-    7:
-      - '&4[@name] &f@player &4IMPARÁVEL!'
-    10:
-      - '&5[@name] &f@player &5DESTRUIDOR!'
-
+    '3':
+    - '&6@player &eestá DOMINANDO!'
+    '5':
+    - '&c@player &cESTÁ ENFURECIDO!'
+    '7':
+    - '&4@player &4IMPARÁVEL!'
+    '10':
+    - '&5@player &5DESTRUIDOR!'
+  
   Tower kill:
-    - '&c[@name] &f@player &efoi eliminado pela TORRE!'
-
+  - '&c@player &efoi eliminado pela TORRE!'
+  
   Same hit:
-    - '&3[@name] &bVocê não pode bater na estrutura do seu time!'
-
+  - '&#ff69f0Você não pode bater na estrutura do seu time!'
+  
   Destroyed:
-    - '&3[@name] &bO Nexus do time @team1 &bfoi destruído. @team2 &bvenceu!'
-
+  - '&#ff69f0O Nexus do time @team1 &#ff69f0foi destruído. @team2 &#ff69f0venceu!'
+  
   Tower destroyed:
-    - '&3[@name] &bA torre @tower da equipe @team foi destruída por &f@player&b!'
-
+  - '&#ff69f0A torre @tower da equipe @team foi destruída por &f@player&#ff69f0!'
+  
   Nexus unlocked:
-    - '&3[@name] &bAs torres da equipe @team foram destruídas!'
-    - '&3[@name] &bO Nexus agora pode ser atacado!'
-
+  - '&#ff69f0As torres da equipe @team foram destruídas!'
+  - '&#ff69f0O Nexus agora pode ser atacado!'
+  
   Nexus protected:
-    - '&3[@name] &bO Nexus da equipe @team ainda está protegido pelas torres!'
-
+  - '&#ff69f0O Nexus da equipe @team ainda está protegido pelas torres!'
+  
   Upgrade:
-    - '&3[@name] &bSeus equipamentos evoluíram! &f(Nível @level)'
+  - '&#ff69f0Seus equipamentos evoluíram! &f(Nível @level)'
 
 Rewards:
-  Money: 0
-  Commands: []
+  Money: 1000
+  Commands:
+  - "# adicione seus comandos aqui"
+  Broadcast:
+  - '&#0088ff$&f35.000 &f+ &#0088ff+&f15 PDC'
 
 Locations:
-  Lobby: []
-  Entrance: []
-  Spectator: []
-  Exit: []
-  Pos1: []
-  Pos2: []
-  Pos3: []
-  Pos4: []
-  Tower1: []
-  Tower2: []
-  Tower3: []
-  Tower4: []
+  Lobby:
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
+  
+  Entrance:
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
+  
+  Spectator:
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
+  
+  Exit:
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
+  
+  Pos1:
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
+  
+  Pos2:
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
+  
+  Pos3:
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
+  
+  Pos4:
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
+  
+  Tower1:
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
+  
+  Tower2:
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
+  
+  Tower3:
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
+  
+  Tower4:
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
+  
   Server: 'null'

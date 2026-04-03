@@ -1,131 +1,148 @@
 Evento:
   Title: Thor
   Type: thor
-  Calls: 5
+  Calls: 10
   Calls interval: 15
   Mininum players: 2
   Eliminate on quit: true
   Empty inventory: true
+  Spectator mode: true
   Permission: absolutevents.evento
   Count participation: true
   Count victory: true
-
+  
   Time: 10
   Delay: 5
-
   Warning ticks: 30
   Strikes per wave: 1
   Strike radius: 2.5
-
-  # evita repetir raio no mesmo lugar
   Recent strike memory: 15
-
   Final phase:
     Enabled: true
     At players: 3
     Interval: 2
     Strikes: 4
-
-  # 🔥 PROGRESSÃO (ESSA PARTE É O MAIS IMPORTANTE)
+  
   Stages:
-    - Time: 0
-      Interval: 5
-      Strikes: 1
+  - Time: 0
+    Interval: 4
+    Strikes: 4
+  - Time: 20
+    Interval: 3
+    Strikes: 6
+  - Time: 40
+    Interval: 2
+    Strikes: 8
+  - Time: 60
+    Interval: 1
+    Strikes: 10
+  - Time: 90
+    Interval: 1
+    Strikes: 12
 
-    - Time: 20
-      Interval: 4
-      Strikes: 2
-
-    - Time: 40
-      Interval: 3
-      Strikes: 3
-
-    - Time: 60
-      Interval: 2
-      Strikes: 4
-
-    - Time: 90
-      Interval: 1
-      Strikes: 6
-
-# =========================
-# MENSAGENS
-# =========================
 Messages:
   Broadcast:
-    - ""
-    - "&3[@name] &bIniciando evento &f@name"
-    - "&3[@name] &bDigite &f/evento &bpara participar"
-    - "&3[@name] &bJogadores: &f@players"
-    - "&3[@name] &bChamadas restantes: &f@broadcasts"
-    - ""
-
+  - ''
+  - '&#ff69f0Evento &f@name &#ff69f0Clique @join_button &#ff69f0para participar!'
+  - '&#ff69f0Prêmio: &#0088ff1 Diamante'
+  - '&#ff69f0Jogadores: &#0088ff@players &#ff69f0Chamadas restantes: &#0088ff@broadcasts'
+  - ''
+  
   Start:
-    - ""
-    - "&3[@name] &bIniciando evento..."
-    - ""
-
+  - ''
+  - '&#ff69f0Iniciando evento...'
+  - ''
+  
   Starting:
-    - "&5[@name] &dOs raios começarão em &f@time &dsegundos"
-
+  - '&#ff69f0Os raios começarão em &#0088ff@time &#ff69f0segundos'
+  
   Enabled:
-    - "&5[@name] &d⚡ Os raios começaram! CORRA! ⚡"
-
+  - '&#ff69f0⚡ Os raios começaram! CORRA! ⚡'
+  
   Winner:
-    - ""
-    - "&5[@name] &dO vencedor foi &f@winner"
-    - ""
-
+  - ''
+  - '&#ff69f0O vencedor foi &f@winner'
+  - ''
+  
   No winner:
-    - ""
-    - "&5[@name] &dNinguém sobreviveu..."
-    - ""
-
+  - ''
+  - '&#ff69f0Ninguém sobreviveu...'
+  - ''
+  
   No players:
-    - ""
-    - "&5[@name] &dEvento cancelado (sem jogadores)"
-    - ""
-
+  - ''
+  - '&#ff69f0Evento cancelado.'
+  - '&#ff69f0A quantidade mínima de jogadores não foi atingida.'
+  - ''
+  
   Cancelled:
-    - ""
-    - "&5[@name] &dEvento cancelado"
-    - ""
-
-  Eliminated: "&cVocê foi eliminado pelo raio!"
-
+  - ''
+  - '&#ff69f0O evento foi cancelado manualmente.'
+  - ''
+  
+  Eliminated: '&cVocê foi eliminado pelo raio!'
+  
   Struck:
-    - "&5[@name] &f@player &cfoi fulminado ⚡"
+  - '&#ff69f0&f@player &#ff69f0foi fulminado ⚡'
+  
+  Actionbar starting: '&5Raios em: &f@time'
+  Actionbar running: '&5Próximo raio em: &f@time &8| &fVivos: &5@players &8| &dStage:
+    &5@stage'
 
-  Actionbar starting: "&5Começa em: &f@time"
-  Actionbar running: "&5Raios em: &f@time &8| &fVivos: &5@players"
-
-# =========================
-# RECOMPENSAS
-# =========================
 Rewards:
   Money: 1000
   Commands:
-    - "give @winner diamond 1"
+  - "# adicione seus comandos aqui"
+  Broadcast:
+  - '&#0088ff1 Diamante'
 
-# =========================
-# LOCALIZAÇÕES
-# =========================
 Locations:
-  Lobby: []
-  Entrance: []
-  Spectator: []
-  Exit: []
-
+  Lobby:
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
+  
+  Entrance:
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
+  Spectator:
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
+  
+  Exit:
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
   Pos1:
-    world: pve
-    x: 0
-    y: 100
-    z: 0
-
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
   Pos2:
-    world: pve
-    x: 50
-    y: 100
-    z: 50
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
+  
+  Server: 'null'
 
-  Server: null
+Itens:
+  Inventory: ''

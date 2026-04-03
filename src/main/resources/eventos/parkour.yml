@@ -7,8 +7,8 @@ Evento:
   Eliminate on quit: true
   Empty inventory: true
   Permission: absolutevents.evento
-  Count participation: false
-  Count victory: false
+  Count participation: true
+  Count victory: true
   Return on damage: true
   Back item cooldown: 5
   Back item material: SLIME_BALL
@@ -18,62 +18,66 @@ Evento:
 Messages:
   Broadcast:
     - ''
-    - '&6Evento &f@name &6digite &f/evento'
-    - '&6Jogadores no evento: &f@players &6Chamadas restantes: &f@broadcasts'
+    - '&#ff69f0Evento &f@name &#ff69f0Clique @join_button &#ff69f0para participar!'
+    - '&#ff69f0Prêmio: &#0088ff$&f150.000 &f+ &#0088ff+&f45 &f+ Insígnia de Eventos &f+ &fՇ&#00b0ff'
+    - '&#ff69f0Jogadores: &#0088ff@players &#ff69f0Chamadas restantes: &#0088ff@broadcasts'
     - ''
-
+  
   Start:
     - ''
-    - '&6[@name] &eIniciando evento...'
+    - '&#ff69f0Iniciando evento...'
     - ''
-
+  
   Winner:
     - ''
-    - '&6[@name] &eO evento &f@name &efoi finalizado!'
-    - '&6[@name] &eO vencedor foi &f@winner&e!'
-    - '&6[@name] &eTempo: &f@time'
-    - '&6[@name] &eRecorde: &f@best'
+    - '&#ff69f0O evento &f@name &#ff69f0foi finalizado!'
+    - '&#ff69f0O vencedor foi &f@winner&#ff69f0!'
+    - '&#ff69f0Tempo: &#0088ff@time'
+    - '&#ff69f0Recorde: &#0088ff@best'
     - ''
-
+  
   No winner:
     - ''
-    - '&6[@name] &eO evento &f@name &efoi finalizado!'
-    - '&6[@name] &eNão houveram vencedores.'
+    - '&#ff69f0O evento &f@name &#ff69f0foi finalizado!'
+    - '&#ff69f0Não houveram vencedores.'
     - ''
-
+  
   No players:
     - ''
-    - '&6[@name] &eEvento cancelado.'
-    - '&6[@name] &eA quantidade mínima de jogadores não foi atingida.'
+    - '&#ff69f0Evento cancelado.'
+    - '&#ff69f0A quantidade mínima de jogadores não foi atingida.'
     - ''
-
+  
   Cancelled:
     - ''
-    - '&6[@name] &eO evento foi cancelado manualmente.'
+    - '&#ff69f0O evento foi cancelado manualmente.'
     - ''
-
+  
+  Checkpoint saved: '&#ff69f0Checkpoint salvo com sucesso!'
+  Checkpoint back: '&#ff69f0Você voltou ao checkpoint.'
+  Back: '&#ff69f0Você voltou ao início.'
+  Back item: '&aVoltar ao Checkpoint'
+  Back cooldown: '&cAguarde @time para usar novamente.'
+  Actionbar: '&fTempo: &a@time &8| &fRecorde: &e@best &8| &fCheckpoint: &b@cooldown'
+  
   Sign:
     - '&e&l[Parkour]'
     - '&eClique aqui'
     - '&epara ganhar o'
     - '&eevento.'
-
+  
   Checkpoint:
     - '&a&l[Checkpoint]'
     - '&2Clique aqui'
     - '&2para salvar o'
     - '&2checkpoint.'
 
-  Checkpoint saved: '&6[@name] &eCheckpoint salvo com sucesso!'
-  Checkpoint back: '&6[@name] &eVocê voltou ao checkpoint.'
-  Back: '&6[@name] &eVocê voltou ao início.'
-  Back item: '&aVoltar ao Checkpoint'
-  Back cooldown: '&cAguarde @time para usar novamente.'
-  Actionbar: '&fTempo: &a@time &8| &fRecorde: &e@best &8| &fCheckpoint: &b@cooldown'
-
 Rewards:
-  Commands: []
+  Commands:
+    - "# adicione seus comandos aqui"
   Money: 0
+  Broadcast:
+    - '&#0088ff$&f150.000 &f+ &#0088ff+&f45 &f+ Insígnia de Eventos &f+ &fՇ&#00b0ff'
 
 Locations:
   Lobby:
@@ -83,7 +87,7 @@ Locations:
     z: 0.0
     Yaw: 0.0
     Pitch: 0.0
-
+  
   Entrance:
     world: world
     x: 0.0
@@ -91,7 +95,7 @@ Locations:
     z: 0.0
     Yaw: 0.0
     Pitch: 0.0
-
+  
   Spectator:
     world: world
     x: 0.0
@@ -99,7 +103,7 @@ Locations:
     z: 0.0
     Yaw: 0.0
     Pitch: 0.0
-
+  
   Exit:
     world: world
     x: 0.0
@@ -107,16 +111,181 @@ Locations:
     z: 0.0
     Yaw: 0.0
     Pitch: 0.0
-
+  
   Server: 'null'
 
-Checkpoints: {}
+Itens:
+  Inventory: ''
+
+Checkpoints:
+  '1':
+    world: world
+    x:  0.0
+    y:  0.0
+    z:  0.0
+  '2':
+    world: world
+    x:  0.0
+    y:  0.0
+    z:  0.0
+  '3':
+    world: world
+    x:  0.0
+    y:  0.0
+    z:  0.0
+  '4':
+    world: world
+    x:  0.0
+    y:  0.0
+    z:  0.0
+  '5':
+    world: world
+    x:  0.0
+    y:  0.0
+    z:  0.0
+  '6':
+    world: world
+    x:  0.0
+    y:  0.0
+    z:  0.0
+  '7':
+    world: world
+    x:  0.0
+    y:  0.0
+    z:  0.0
+  '8':
+    world: world
+    x:  0.0
+    y:  0.0
+    z:  0.0
+  '9':
+    world: world
+    x:  0.0
+    y:  0.0
+    z:  0.0
+  '10':
+    world: world
+    x:  0.0
+    y:  0.0
+    z:  0.0
+  '11':
+    world: world
+    x:  0.0
+    y:  0.0
+    z:  0.0
+  '12':
+    world: world
+    x:  0.0
+    y:  0.0
+    z:  0.0
+  '13':
+    world: world
+    x:  0.0
+    y:  0.0
+    z:  0.0
+  '14':
+    world: world
+    x:  0.0
+    y:  0.0
+    z:  0.0
+  '15':
+    world: world
+    x:  0.0
+    y:  0.0
+    z:  0.0
+  '16':
+    world: world
+    x:  0.0
+    y:  0.0
+    z:  0.0
+  '17':
+    world: world
+    x:  0.0
+    y:  0.0
+    z:  0.0
+  '18':
+    world: world
+    x:  0.0
+    y:  0.0
+    z:  0.0
+  '19':
+    world: world
+    x:  0.0
+    y:  0.0
+    z:  0.0
+  '20':
+    world: world
+    x:  0.0
+    y:  0.0
+    z:  0.0
+  '21':
+    world: world
+    x:  0.0
+    y:  0.0
+    z:  0.0
+  '22':
+    world: world
+    x:  0.0
+    y:  0.0
+    z:  0.0
+  '23':
+    world: world
+    x:  0.0
+    y:  0.0
+    z:  0.0
+  '24':
+    world: world
+    x:  0.0
+    y:  0.0
+    z:  0.0
+  '25':
+    world: world
+    x:  0.0
+    y:  0.0
+    z:  0.0
+  '26':
+    world: world
+    x:  0.0
+    y:  0.0
+    z:  0.0
+  '27':
+    world: world
+    x:  0.0
+    y:  0.0
+    z:  0.0
+  '28':
+    world: world
+    x:  0.0
+    y:  0.0
+    z:  0.0
+  '29':
+    world: world
+    x:  0.0
+    y:  0.0
+    z:  0.0
+  '30':
+    world: world
+    x:  0.0
+    y:  0.0
+    z:  0.0
+  '31':
+    world: world
+    x:  0.0
+    y:  0.0
+    z:  0.0
+  '32':
+    world: world
+    x:  0.0
+    y:  0.0
+    z:  0.0
+  '33':
+    world: world
+    x:  0.0
+    y:  0.0
+    z:  0.0
 
 Finish:
   world: world
   x: 0
   y: 0
   z: 0
-
-Itens:
-  Inventory: ''

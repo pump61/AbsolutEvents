@@ -1,203 +1,179 @@
 Evento:
-  # Configurações gerais do evento.
-  Title: Montaria # Nome do evento. Será usado na placeholder @name.
-  Type: montaria # Tipo do evento. Não modifique.
-  Calls: 10 # Quantidade de chamadas automáticas do evento.
-  Calls interval: 15 # Intervalo em segundos entre cada chamada.
-  Mininum players: 1 # Quantidade mínima de jogadores para iniciar.
-  Eliminate on quit: true # Define se o evento terá modo espectador.
-  Empty inventory: true # Define se o jogador precisa estar com inventário vazio para entrar.
-  Permission: absolutevents.evento # Permissão necessária para participar.
-  Count participation: true # Define se contará participação no sistema do plugin.
-  Count victory: true # Define se contará vitória no sistema do plugin.
-  Countdown: 5 # Tempo da contagem regressiva antes da corrida começar.
-  Jump: 0.9 # Força do pulo de todos os cavalos.
-  Speed: 0.3 # Velocidade base de todos os cavalos.
+  Title: Montaria
+  Type: montaria
+  Calls: 10
+  Calls interval: 15
+  Mininum players: 1
+  Eliminate on quit: true
+  Empty inventory: true
+  Spectator mode: true
+  Permission: absolutevents.evento
+  Count participation: true
+  Count victory: true
+  Countdown: 5
+  Jump: 0.9
+  Speed: 0.3
 
 Boost:
-  # Configuração dos blocos de impulso da corrida.
-  Block: MAGENTA_GLAZED_TERRACOTTA # Bloco que ativa o boost quando o cavalo pisa nele.
-  Amplifier: 2 # Intensidade do impulso.
-  Duration: 40 # Mantido para compatibilidade/configuração futura.
-  Cooldown: 2 # Tempo em segundos para o mesmo jogador poder ativar outro boost novamente.
+  Block: MAGENTA_GLAZED_TERRACOTTA
+  Amplifier: 2
+  Duration: 60
+  Cooldown: 2
 
 Race:
-  # Configurações específicas da corrida.
-  Require checkpoints: false # Se true, o jogador só vence se passar por todos os checkpoints antes da chegada.
+  Require checkpoints: true
 
   StartPos1:
-    # Primeiro ponto da linha de largada.
-    # Junto com o StartPos2, define onde os cavalos e jogadores serão distribuídos.
-    world: ''
-    x: 0
-    y: 0
-    z: 0
-    Yaw: 0
-    Pitch: 0
+    world: Horse
+    x: 29.468548844132943
+    y: -12.0
+    z: 524.4877337483492
+    Yaw: 92.24993
+    Pitch: -2.7000127
 
   StartPos2:
-    # Segundo ponto da linha de largada.
-    # Junto com o StartPos1, forma a linha onde os jogadores serão posicionados.
-    world: ''
-    x: 0
-    y: 0
-    z: 0
-    Yaw: 0
-    Pitch: 0
+    world: Horse
+    x: 29.824097586238313
+    y: -12.0
+    z: 504.4868894085762
+    Yaw: 90.14999
+    Pitch: 0.29998678
 
   FinishPos1:
-    # Primeiro ponto da região de chegada.
-    # Junto com o FinishPos2, forma a área final da corrida.
-    world: ''
-    x: 0
-    y: 0
-    z: 0
+    world: Horse
+    x: 31.51369473928593
+    y: -12.0
+    z: 524.5157072715388
 
   FinishPos2:
-    # Segundo ponto da região de chegada.
-    # Junto com o FinishPos1, forma a área final da corrida.
-    world: ''
-    x: 0
-    y: 0
-    z: 0
+    world: Horse
+    x: 31.532510460054425
+    y: -9.0
+    z: 504.52588092313727
 
 Messages:
-  # Mensagens do evento.
-
   Broadcast:
-    # Mensagens enviadas nas chamadas automáticas antes do evento começar.
     - ''
-    - '&#FDD500Evento &f@name &#FDD500apenas &averificados, &#FDD500digite &f/evento'
-    - '&#FDD500Prêmio: &a$&f100.000 &a+&f20 PDC &a+&f300 PDL &f+ &#FFC003[&#FFC403V&#FFC802a&#FFCC02c&#FFD001a&#FFD401l&#FFD801o&#FFDC00]'
-    - '&#FDD500Jogadores no evento: &a@players &#FDD500Chamadas restantes: &a@broadcasts'
+    - '&#ff69f0Evento &f@name &#ff69f0Clique @join_button &#ff69f0para participar!'
+    - '&#ff69f0Prêmio: &#0088ff$&f100.000 &f+ &#0088ff+&f20 PDC &f+ &#0088ff+&f300 PDL'
+    - '&#ff69f0Jogadores: &#0088ff@players &#ff69f0Chamadas restantes: &#0088ff@broadcasts'
     - ''
 
   Start:
-    # Mensagens enviadas quando o evento realmente inicia.
     - ''
-    - '&f[@name] &#FDD500Iniciando evento...'
+    - '&#ff69f0Iniciando evento...'
     - ''
 
   Winner:
-    # Mensagens enviadas quando alguém vence a corrida.
     - ''
-    - '&f[@name] &#FDD500O evento &f@name &#FDD500foi finalizado!'
-    - '&f[@name] &#FDD500O vencedor foi &f@winner&b!'
+    - '&#ff69f0O evento &f@name &#ff69f0foi finalizado!'
+    - '&#ff69f0O vencedor foi &f@winner&#ff69f0!'
     - ''
 
   No winner:
-    # Mensagens enviadas se o evento terminar sem vencedor.
     - ''
-    - '&f[@name] &#FDD500O evento &f@name &#FDD500foi finalizado!'
-    - '&f[@name] &#FDD500Não houveram vencedores.'
+    - '&#ff69f0O evento &f@name &#ff69f0foi finalizado!'
+    - '&#ff69f0Não houveram vencedores.'
     - ''
 
   No players:
-    # Mensagens enviadas se não houver jogadores suficientes para iniciar.
     - ''
-    - '&f[@name] &#FDD500Evento cancelado.'
-    - '&f[@name] &#FDD500A quantidade mínima de jogadores não foi atingida.'
+    - '&#ff69f0Evento cancelado.'
+    - '&#ff69f0A quantidade mínima de jogadores não foi atingida.'
     - ''
 
   Cancelled:
-    # Mensagens enviadas quando o evento é cancelado manualmente.
     - ''
-    - '&f[@name] &#FDD500O evento foi cancelado manualmente.'
+    - '&#ff69f0O evento foi cancelado manualmente.'
     - ''
 
   Eliminated:
-    # Mensagem enviada quando um jogador perde a corrida.
-    - '&f[@name] &#FDD500Perdeu.'
+    - '&#ff69f0Perdeu.'
 
   Boost:
-    # Mensagem enviada quando o jogador ativa um bloco de boost.
-    - '&6[@name] &eBoost ativado!'
+    - '&#ff69f0Boost ativado!'
 
   Checkpoint:
-    # Mensagem enviada ao jogador quando ele passa em um checkpoint.
-    # Placeholder disponível: @checkpoint
-    - '&6[@name] &aCheckpoint @checkpoint alcançado!'
+    - '&#ff69f0Checkpoint &#0088ff@checkpoint &#ff69f0alcançado!'
 
 Rewards:
-  # Recompensas entregues ao vencedor.
-  Money: 1000 # Quantia em dinheiro dada ao vencedor pelo Vault/economia.
+  Money: 1000
   Commands:
-    # Lista de comandos executados no vencedor. Use @winner para o nome do jogador.
-    - lp user @winner permission settemp menutags.montaria true 7d
-    - alonsoleagues addpoints @winner 300
-    - liga givepoints @winner 20
-    - eco give @winner 200000
+  - "# adicione seus comandos aqui"
+  Broadcast:
+    - '&#0088ff$&f100.000 &f+ &#0088ff+&f20 PDC &f+ &#0088ff+&f300 PDL'
 
 Locations:
-  # Localizações padrão do evento.
-
   Lobby:
-    # Local para onde o jogador vai ao entrar no evento antes dele começar.
-    world: Horse
-    x: -4.457415126134529
-    y: -13.0
-    z: -12.566841135707868
-    Yaw: 0.74765015
-    Pitch: -0.6000431
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
 
   Entrance:
-    # Localização base do evento.
-    # Mantida por compatibilidade com o sistema base do plugin.
-    # A corrida em si usa Race.StartPos1 e Race.StartPos2.
-    world: Horse
-    x: 30.527036358055557
-    y: -12.0
-    z: 515.4738411962504
-    Yaw: 88.951294
-    Pitch: 4.0499353
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
 
   Spectator:
-    # Localização para onde os espectadores irão.
-    world: Horse
-    x: 4.956746729313381
-    y: -1.0
-    z: 514.4818196327124
-    Yaw: -89.69165
-    Pitch: 9.900425
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
 
   Exit:
-    # Localização para onde os jogadores irão ao sair/finalizar o evento.
     world: world
-    x: -1081.5
-    y: 72.0
-    z: 187.5
-    Yaw: 0.28278583
-    Pitch: 4.0679574
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
 
-  Server: 'null' # Usado apenas se houver integração Bungeecord/proxy entre servidores.
+  Server: 'null'
 
 Checkpoints:
-  # Lista de checkpoints opcionais da corrida.
-  # Só serão obrigatórios se Race.Require checkpoints estiver como true.
-  #
-  # Exemplo:
-  #
-  # cp1:
-  #   Pos1:
-  #     world: Horse
-  #     x: 0
-  #     y: 0
-  #     z: 0
-  #   Pos2:
-  #     world: Horse
-  #     x: 5
-  #     y: 5
-  #     z: 5
-  #
-  # cp2:
-  #   Pos1:
-  #     world: Horse
-  #     x: 10
-  #     y: 0
-  #     z: 10
-  #   Pos2:
-  #     world: Horse
-  #     x: 15
-  #     y: 5
-  #     z: 15
-  {}
+  '1':
+    Pos1:
+      world: Horse
+      x: 28.30000001192093
+      y: -1.0
+      z: 574.9499999880791
+    Pos2:
+      world: Horse
+      x: 34.69999998807907
+      y: 1.0
+      z: 575.8243344223081
+
+  '2':
+    Pos1:
+      world: Horse
+      x: -42.574456964266105
+      y: -12.0
+      z: 612.4188746450936
+    Pos2:
+      world: Horse
+      x: -37.50953448506362
+      y: -10.0
+      z: 613.3638475067502
+
+  '3':
+    Pos1:
+      world: Horse
+      x: -98.78698516320199
+      y: 1.0
+      z: 640.6579675281178
+    Pos2:
+      world: Horse
+      x: -97.3148243797616
+      y: 3.0
+      z: 634.3920434830306
+
+Itens:
+  Inventory: ''

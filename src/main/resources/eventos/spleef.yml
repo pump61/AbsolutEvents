@@ -1,12 +1,13 @@
 Evento:
-  Title: "Spleef"
-  Type: "spleef"
-  Calls: 5
+  Title: Spleef
+  Type: spleef
+  Calls: 10
   Calls interval: 15
   Mininum players: 2
   Eliminate on quit: true
   Empty inventory: true
-  Permission: "absolutevents.evento"
+  Spectator mode: true
+  Permission: absolutevents.evento
   Count participation: true
   Count victory: true
   Delay: 5
@@ -14,75 +15,122 @@ Evento:
   Kick time: 20
 
 Itens:
-  Helmet: {}
-  Chestplate: {}
-  Leggings: {}
-  Boots: {}
+  Armor:
+    Helmet: {}
+    Chestplate: {}
+    Leggings: {}
+    Boots: {}
   Inventory:
     '0':
-      material: STONE_SHOVEL
-      damage: 0
-    '1':
-      material: SNOWBALL
-      amount: 15
-      damage: 0
+      material: DIAMOND_SHOVEL
+      enchants:
+        DIG_SPEED: 5
+        DURABILITY: 3
 
 Messages:
   Broadcast:
-    - ""
-    - "&3[@name] &bIniciando evento &f@name"
-    - "&3[@name] &bPara participar, digite &f/evento"
-    - "&3[@name] &bPrêmio: &2$&f@money &b+ &3[Spleef]"
-    - "&3[@name] &bJogadores no evento: &f@players"
-    - "&3[@name] &bChamadas restantes: &f@broadcasts"
-    - ""
-
+  - ''
+  - '&#ff69f0Evento &f@name &#ff69f0Clique @join_button &#ff69f0para participar!'
+  - '&#ff69f0Prêmio: &#0088ff$&f70.000 &f+ &#0088ff+&f15 PDC &a+&f100 PDL &f+ &#fbfbfb[&#fbfbfbS&#fbfbfbp&#fcfcfcl&#fcfcfce&#fcfcfce&#fcfcfcf&#fdfdfd]'
+  - '&#ff69f0Jogadores: &#0088ff@players &#ff69f0Chamadas restantes: &#0088ff@broadcasts'
+  - ''
+  
   Start:
-    - ""
-    - "&3[@name] &bIniciando evento..."
-    - ""
-
+  - ''
+  - '&#ff69f0Iniciando evento...'
+  - ''
+  
   Winner:
-    - ""
-    - "&3[@name] &bO evento &f@name &bfoi finalizado!"
-    - "&3[@name] &bO vencedor foi &f@winner&b!"
-    - ""
-
+  - ''
+  - '&#ff69f0O evento &f@name &#ff69f0foi finalizado!'
+  - '&#ff69f0O vencedor foi &f@winner&#ff69f0!'
+  - ''
+  
   No winner:
-    - ""
-    - "&3[@name] &bO evento &f@name &bfoi finalizado!"
-    - "&3[@name] &bNão houveram vencedores."
-    - ""
-
+  - ''
+  - '&#ff69f0O evento &f@name &#ff69f0foi finalizado!'
+  - '&#ff69f0Não houveram vencedores.'
+  - ''
+  
   No players:
-    - ""
-    - "&3[@name] &bEvento cancelado."
-    - "&3[@name] &bA quantidade mínima de jogadores não foi atingida."
-    - ""
-
+  - ''
+  - '&#ff69f0Evento cancelado.'
+  - '&#ff69f0A quantidade mínima de jogadores não foi atingida.'
+  - ''
+  
   Cancelled:
-    - ""
-    - "&3[@name] &bO evento foi cancelado manualmente."
-    - ""
-
+  - ''
+  - '&#ff69f0O evento foi cancelado manualmente.'
+  - ''
+  
   Enabling breaking:
-    - "&3[@name] &bAtivando quebra de blocos em &f@time&b segundos..."
-
+  - '&#ff69f0Ativando quebra de blocos em &#0088ff@time &#ff69f0segundos...'
+  
   Breaking allowed:
-    - "&3[@name] &bAgora vocês podem quebrar blocos!"
-
-  Kick: "&3[@name] &bComo você está parado, você será eliminado do evento em &f@time &bsegundos."
+  - '&#ff69f0Agora vocês podem quebrar blocos!'
+  
+  Kick:
+  - '&#ff69f0Como você está parado, você será eliminado do evento em &#0088ff@time
+    &#ff69f0segundos.'
 
 Rewards:
-  Money: 1000
+  Tag:
+    Enabled: true
+    Name: aeventos_spleef
+    Style: '&#ff69f0[Spleef] '
   Commands:
-    - "give @winner diamond 1"
+  - "# adicione seus comandos aqui"
+  Money: 0
+  Broadcast:
+  - '&#0088ff$&f70.000 &f+ &#0088ff+&f15 PDC &a+&f100 PDL &f+ &#fbfbfb[&#fbfbfbS&#fbfbfbp&#fcfcfcl&#fcfcfce&#fcfcfce&#fcfcfcf&#fdfdfd]'
 
 Locations:
-  Lobby: []
-  Entrance: []
-  Spectator: []
-  Exit: []
-  Pos1: []
-  Pos2: []
-  Server: null
+  Lobby:
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
+  
+  Entrance:
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
+  
+  Spectator:
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
+  
+  Exit:
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
+  
+  Pos1:
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
+  
+  Pos2:
+    world: world
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    Yaw: 0.0
+    Pitch: 0.0
+  
+  Server: 'null'
