@@ -1,0 +1,96 @@
+League:
+  Enabled: true
+
+  Season:
+    Id: 1
+    Name: "Temporada 1"
+    Reset mode: HARD # HARD ou SOFT
+
+  Defaults:
+    Start points: 0
+    Minimum points: 0
+    Lose points enabled: true
+
+  Ranks:
+    BRONZE:
+      Points: 0
+      Display: "&6Bronze"
+      Badge: "⚔"
+    SILVER:
+      Points: 500
+      Display: "&7Prata"
+      Badge: "✦"
+    GOLD:
+      Points: 1000
+      Display: "&#f7d046Ouro"
+      Badge: "✹"
+    PLATINUM:
+      Points: 1500
+      Display: "&#45d6ffPlatina"
+      Badge: "❖"
+    DIAMOND:
+      Points: 2200
+      Display: "&#62c8ffDiamante"
+      Badge: "◈"
+    MASTER:
+      Points: 3000
+      Display: "&#b46cffMestre"
+      Badge: "✪"
+
+  Events:
+    quiz:
+      Enabled: true
+      Win points: 10
+      Lose points: 3
+      Multiple winners lose points: 1
+
+    tntrun:
+      Enabled: true
+      Win points: 18
+      Lose points: 6
+      Multiple winners lose points: 3
+
+    nexus:
+      Enabled: true
+      Win points: 30
+      Lose points: 12
+
+    guerra:
+      Enabled: true
+      Win points: 35
+      Lose points: 15
+
+    anvil:
+      Enabled: true
+      Win points: 14
+      Lose points: 5
+      Multiple winners lose points: 2
+
+  Season rewards:
+    BRONZE:
+      Commands:
+        - eco give @winner 10000
+
+    SILVER:
+      Commands:
+        - eco give @winner 25000
+
+    GOLD:
+      Commands:
+        - eco give @winner 50000
+        - lp user @winner permission settemp menutags.gold true 30d
+
+    PLATINUM:
+      Commands:
+        - eco give @winner 100000
+        - lp user @winner permission settemp menutags.platinum true 30d
+
+    DIAMOND:
+      Commands:
+        - eco give @winner 200000
+        - lp user @winner permission settemp menutags.diamond true 30d
+
+    MASTER:
+      Commands:
+        - eco give @winner 500000
+        - lp user @winner permission settemp menutags.master true 30d
