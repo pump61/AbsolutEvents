@@ -315,6 +315,9 @@ public final class RainbowRun extends Evento {
 
         ending = true;
 
+        List<Player> losers = new ArrayList<>(getPlayers());
+        losers.removeIf(p -> p.getUniqueId().equals(player.getUniqueId()));
+
         int points = 0;
         RainbowPlayer rp = rainbowPlayerMap.get(player);
         if (rp != null) {
@@ -350,16 +353,21 @@ public final class RainbowRun extends Evento {
 
         TournamentStatsManager.getInstance().addWin(player.getUniqueId());
 
+        if (plugin.getLeagueManager() != null) {
+            plugin.getLeagueManager().handleSoloWin(
+                    player,
+                    losers,
+                    "rainbowrun"
+            );
+        }
+
         stop();
 
-        Player rewardTarget = player;
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
-            if (!rewardTarget.isOnline()) {
-                return;
-            }
+            if (!player.isOnline()) return;
 
             for (String command : config.getStringList("Rewards.Commands")) {
-                executeConsoleCommand(rewardTarget, command.replace("@winner", rewardTarget.getName()));
+                executeConsoleCommand(player, command.replace("@winner", player.getName()));
             }
         }, 2L);
     }

@@ -48,6 +48,19 @@ public final class ConnectionManager {
                             wins TEXT NOT NULL,
                             participations TEXT NOT NULL)
                             """);
+
+                    statement.executeUpdate("""
+                            CREATE TABLE IF NOT EXISTS absolutevents_league(
+                            uuid TEXT PRIMARY KEY,
+                            username TEXT NOT NULL,
+                            points INT NOT NULL,
+                            wins INT NOT NULL,
+                            losses INT NOT NULL,
+                            played INT NOT NULL,
+                            current_rank TEXT NOT NULL,
+                            peak_rank TEXT NOT NULL,
+                            season_id INT NOT NULL)
+                            """);
                 } else {
                     statement.executeUpdate("""
                             CREATE TABLE IF NOT EXISTS absolutevents_users(
@@ -58,6 +71,19 @@ public final class ConnectionManager {
                             total_participations INT NOT NULL,
                             wins LONGTEXT NOT NULL,
                             participations LONGTEXT NOT NULL)
+                            """);
+
+                    statement.executeUpdate("""
+                            CREATE TABLE IF NOT EXISTS absolutevents_league(
+                            uuid VARCHAR(36) PRIMARY KEY,
+                            username VARCHAR(16) NOT NULL,
+                            points INT NOT NULL,
+                            wins INT NOT NULL,
+                            losses INT NOT NULL,
+                            played INT NOT NULL,
+                            current_rank VARCHAR(32) NOT NULL,
+                            peak_rank VARCHAR(32) NOT NULL,
+                            season_id INT NOT NULL)
                             """);
                 }
             }
@@ -411,7 +437,7 @@ public final class ConnectionManager {
         }
     }
 
-    public void setEventoGuildWinner(String event, String guildName, HashMap<org.bukkit.OfflinePlayer, Integer> kills, List<String> winners) {
+    public void setEventoGuildWinner(String event, String guildName, HashMap<OfflinePlayer, Integer> kills, List<String> winners) {
         setEventoWinner(event, winners);
     }
 
@@ -521,5 +547,335 @@ public final class ConnectionManager {
         } finally {
             closeIfNeeded(conn);
         }
+    }
+
+    public void createLeaguePlayer(UUID uuid, String defaultRank, int seasonId, int startPoints) {
+        CompletableFuture.runAsync(() -> {
+            Connection conn = null;
+
+            try {
+                conn = getConnection();
+
+                String sql = sqlite
+                        ? "INSERT OR IGNORE INTO absolutevents_league VALUES(?,?,?,?,?,?,?,?,?)"
+                        : "INSERT IGNORE INTO absolutevents_league VALUES(?,?,?,?,?,?,?,?,?)";
+
+                try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                    OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
+
+                    ps.setString(1, uuid.toString());
+                    ps.setString(2, player.getName() == null ? "Unknown" : player.getName());
+                    ps.setInt(3, Math.max(startPoints, 0));
+                    ps.setInt(4, 0);
+                    ps.setInt(5, 0);
+                    ps.setInt(6, 0);
+                    ps.setString(7, defaultRank);
+                    ps.setString(8, defaultRank);
+                    ps.setInt(9, seasonId);
+
+                    ps.executeUpdate();
+                }
+
+            } catch (SQLException exception) {
+                exception.printStackTrace();
+            } finally {
+                closeIfNeeded(conn);
+            }
+        });
+    }
+
+    public boolean hasLeaguePlayer(UUID uuid) {
+        Connection conn = null;
+
+        try {
+            conn = getConnection();
+
+            try (PreparedStatement ps = conn.prepareStatement(
+                    "SELECT uuid FROM absolutevents_league WHERE uuid=?"
+            )) {
+                ps.setString(1, uuid.toString());
+
+                try (ResultSet rs = ps.executeQuery()) {
+                    return rs.next();
+                }
+            }
+
+        } catch (SQLException exception) {
+            exception.printStackTrace();
+        } finally {
+            closeIfNeeded(conn);
+        }
+
+        return false;
+    }
+
+    public LeagueData getLeagueData(UUID uuid) {
+        Connection conn = null;
+
+        try {
+            conn = getConnection();
+
+            try (PreparedStatement ps = conn.prepareStatement(
+                    "SELECT username, points, wins, losses, played, current_rank, peak_rank, season_id FROM absolutevents_league WHERE uuid=?"
+            )) {
+                ps.setString(1, uuid.toString());
+
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        return new LeagueData(
+                                uuid,
+                                rs.getString("username"),
+                                rs.getInt("points"),
+                                rs.getInt("wins"),
+                                rs.getInt("losses"),
+                                rs.getInt("played"),
+                                rs.getString("current_rank"),
+                                rs.getString("peak_rank"),
+                                rs.getInt("season_id")
+                        );
+                    }
+                }
+            }
+
+        } catch (SQLException exception) {
+            exception.printStackTrace();
+        } finally {
+            closeIfNeeded(conn);
+        }
+
+        return null;
+    }
+
+    public int getLeaguePoints(UUID uuid) {
+        LeagueData data = getLeagueData(uuid);
+        return data == null ? 0 : data.points();
+    }
+
+    public String getLeagueRank(UUID uuid) {
+        LeagueData data = getLeagueData(uuid);
+        return data == null ? "BRONZE" : data.currentRank();
+    }
+
+    public void updateLeagueProfile(UUID uuid, String username, int pointsDelta, boolean win, int minimumPoints) {
+        CompletableFuture.runAsync(() -> {
+            Connection conn = null;
+
+            try {
+                conn = getConnection();
+
+                LeagueData current = getLeagueData(uuid);
+                if (current == null) {
+                    return;
+                }
+
+                int newPoints = current.points() + pointsDelta;
+                if (newPoints < minimumPoints) {
+                    newPoints = minimumPoints;
+                }
+
+                int newWins = current.wins() + (win ? 1 : 0);
+                int newLosses = current.losses() + (win ? 0 : 1);
+                int newPlayed = current.played() + 1;
+
+                try (PreparedStatement ps = conn.prepareStatement(
+                        "UPDATE absolutevents_league SET username=?, points=?, wins=?, losses=?, played=? WHERE uuid=?"
+                )) {
+                    ps.setString(1, username == null || username.isBlank() ? current.username() : username);
+                    ps.setInt(2, newPoints);
+                    ps.setInt(3, newWins);
+                    ps.setInt(4, newLosses);
+                    ps.setInt(5, newPlayed);
+                    ps.setString(6, uuid.toString());
+                    ps.executeUpdate();
+                }
+
+            } catch (SQLException exception) {
+                exception.printStackTrace();
+            } finally {
+                closeIfNeeded(conn);
+            }
+        });
+    }
+
+    public void setLeaguePoints(UUID uuid, int points) {
+        CompletableFuture.runAsync(() -> {
+            Connection conn = null;
+
+            try {
+                conn = getConnection();
+
+                try (PreparedStatement ps = conn.prepareStatement(
+                        "UPDATE absolutevents_league SET points=? WHERE uuid=?"
+                )) {
+                    ps.setInt(1, Math.max(points, 0));
+                    ps.setString(2, uuid.toString());
+                    ps.executeUpdate();
+                }
+
+            } catch (SQLException exception) {
+                exception.printStackTrace();
+            } finally {
+                closeIfNeeded(conn);
+            }
+        });
+    }
+
+    public void setLeagueRank(UUID uuid, String rank) {
+        CompletableFuture.runAsync(() -> {
+            Connection conn = null;
+
+            try {
+                conn = getConnection();
+
+                try (PreparedStatement ps = conn.prepareStatement(
+                        "UPDATE absolutevents_league SET current_rank=? WHERE uuid=?"
+                )) {
+                    ps.setString(1, rank);
+                    ps.setString(2, uuid.toString());
+                    ps.executeUpdate();
+                }
+
+            } catch (SQLException exception) {
+                exception.printStackTrace();
+            } finally {
+                closeIfNeeded(conn);
+            }
+        });
+    }
+
+    public void setLeaguePeakRank(UUID uuid, String peakRank) {
+        CompletableFuture.runAsync(() -> {
+            Connection conn = null;
+
+            try {
+                conn = getConnection();
+
+                try (PreparedStatement ps = conn.prepareStatement(
+                        "UPDATE absolutevents_league SET peak_rank=? WHERE uuid=?"
+                )) {
+                    ps.setString(1, peakRank);
+                    ps.setString(2, uuid.toString());
+                    ps.executeUpdate();
+                }
+
+            } catch (SQLException exception) {
+                exception.printStackTrace();
+            } finally {
+                closeIfNeeded(conn);
+            }
+        });
+    }
+
+    public void updateLeaguePointsAndRank(UUID uuid, String username, int points, String currentRank, String peakRank) {
+        CompletableFuture.runAsync(() -> {
+            Connection conn = null;
+
+            try {
+                conn = getConnection();
+
+                try (PreparedStatement ps = conn.prepareStatement(
+                        "UPDATE absolutevents_league SET username=?, points=?, current_rank=?, peak_rank=? WHERE uuid=?"
+                )) {
+                    ps.setString(1, username == null || username.isBlank() ? "Unknown" : username);
+                    ps.setInt(2, Math.max(points, 0));
+                    ps.setString(3, currentRank);
+                    ps.setString(4, peakRank);
+                    ps.setString(5, uuid.toString());
+                    ps.executeUpdate();
+                }
+
+            } catch (SQLException exception) {
+                exception.printStackTrace();
+            } finally {
+                closeIfNeeded(conn);
+            }
+        });
+    }
+
+    public void setLeagueSeason(UUID uuid, int seasonId, int startPoints, String defaultRank) {
+        CompletableFuture.runAsync(() -> {
+            Connection conn = null;
+
+            try {
+                conn = getConnection();
+
+                try (PreparedStatement ps = conn.prepareStatement(
+                        "UPDATE absolutevents_league SET points=?, wins=0, losses=0, played=0, current_rank=?, peak_rank=?, season_id=? WHERE uuid=?"
+                )) {
+                    ps.setInt(1, Math.max(startPoints, 0));
+                    ps.setString(2, defaultRank);
+                    ps.setString(3, defaultRank);
+                    ps.setInt(4, seasonId);
+                    ps.setString(5, uuid.toString());
+                    ps.executeUpdate();
+                }
+
+            } catch (SQLException exception) {
+                exception.printStackTrace();
+            } finally {
+                closeIfNeeded(conn);
+            }
+        });
+    }
+
+    public Map<UUID, LeagueData> getLeaguePlayers() {
+        Map<UUID, LeagueData> result = new HashMap<>();
+        Connection conn = null;
+
+        try {
+            conn = getConnection();
+
+            try (PreparedStatement ps = conn.prepareStatement(
+                    "SELECT uuid, username, points, wins, losses, played, current_rank, peak_rank, season_id FROM absolutevents_league"
+            );
+                 ResultSet rs = ps.executeQuery()) {
+
+                while (rs.next()) {
+                    String uuidString = rs.getString("uuid");
+                    if (uuidString == null || uuidString.isBlank()) {
+                        continue;
+                    }
+
+                    try {
+                        UUID uuid = UUID.fromString(uuidString);
+
+                        LeagueData data = new LeagueData(
+                                uuid,
+                                rs.getString("username"),
+                                rs.getInt("points"),
+                                rs.getInt("wins"),
+                                rs.getInt("losses"),
+                                rs.getInt("played"),
+                                rs.getString("current_rank"),
+                                rs.getString("peak_rank"),
+                                rs.getInt("season_id")
+                        );
+
+                        result.put(uuid, data);
+                    } catch (IllegalArgumentException ignored) {
+                    }
+                }
+            }
+
+        } catch (SQLException exception) {
+            exception.printStackTrace();
+        } finally {
+            closeIfNeeded(conn);
+        }
+
+        return result;
+    }
+
+    public record LeagueData(
+            UUID uuid,
+            String username,
+            int points,
+            int wins,
+            int losses,
+            int played,
+            String currentRank,
+            String peakRank,
+            int seasonId
+    ) {
     }
 }

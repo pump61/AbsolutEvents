@@ -5,6 +5,7 @@ import com.absolutgg.absolutevents.api.Evento;
 import com.absolutgg.absolutevents.api.events.PlayerLoseEvent;
 import com.absolutgg.absolutevents.discord.DiscordWebhookManager;
 import com.absolutgg.absolutevents.listeners.eventos.KillerPontoListener;
+import com.absolutgg.absolutevents.manager.LeagueManager;
 import com.absolutgg.absolutevents.manager.TournamentStatsManager;
 import com.absolutgg.absolutevents.utils.ColorUtils;
 import com.absolutgg.absolutevents.utils.EventKitApplier;
@@ -232,8 +233,18 @@ public final class KillerPonto extends Evento {
                 buildTopEntries()
         );
 
-        // ✅ TOURNAMENT
         TournamentStatsManager.getInstance().addWin(player.getUniqueId());
+
+        List<Player> losers = new ArrayList<>(getPlayers());
+        losers.remove(player);
+
+        if (plugin.getLeagueManager() != null) {
+            plugin.getLeagueManager().handleSoloWin(
+                    player,
+                    losers,
+                    "killerponto"
+            );
+        }
 
         for (String command : config.getStringList("Rewards.Commands")) {
             executeConsoleCommand(player, command.replace("@winner", player.getName()));

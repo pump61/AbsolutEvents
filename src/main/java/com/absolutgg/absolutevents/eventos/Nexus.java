@@ -440,6 +440,9 @@ public final class Nexus extends Evento {
             winnersTeam.addAll(redTeam.keySet());
         }
 
+        List<Player> losers = new ArrayList<>(getPlayers());
+        losers.removeAll(winnersTeam);
+
         List<String> winnersNames = new ArrayList<>();
         for (Player player : winnersTeam) {
             winnersNames.add(player.getName());
@@ -471,6 +474,14 @@ public final class Nexus extends Evento {
                 buildTopEntries()
         );
 
+        if (plugin.getLeagueManager() != null) {
+            plugin.getLeagueManager().handleTeamWin(
+                    winnersTeam,
+                    losers,
+                    "nexus"
+            );
+        }
+
         stop();
 
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
@@ -480,7 +491,6 @@ public final class Nexus extends Evento {
                     continue;
                 }
 
-                // Só premia se o jogador não tiver quitado/saído do evento
                 if (!winnerIds.contains(player.getUniqueId())) {
                     continue;
                 }

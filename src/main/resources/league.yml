@@ -4,12 +4,13 @@ League:
   Season:
     Id: 1
     Name: "Temporada 1"
-    Reset mode: HARD # HARD ou SOFT
+    Reset mode: HARD
 
   Defaults:
     Start points: 0
     Minimum points: 0
     Lose points enabled: true
+    Default rank: BRONZE
 
   Ranks:
     BRONZE:
@@ -54,11 +55,13 @@ League:
       Enabled: true
       Win points: 30
       Lose points: 12
+      Multiple winners lose points: 12
 
     guerra:
       Enabled: true
       Win points: 35
       Lose points: 15
+      Multiple winners lose points: 15
 
     anvil:
       Enabled: true

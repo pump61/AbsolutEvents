@@ -427,6 +427,9 @@ public final class TeamDeathmatch extends Evento {
             winnersPlayers.addAll(redTeam.keySet());
         }
 
+        List<Player> losers = new ArrayList<>(getPlayers());
+        losers.removeAll(winnersPlayers);
+
         for (String message : config.getStringList("Messages.Win")) {
             sendToEvent(ColorUtils.colorize(
                     message
@@ -438,7 +441,6 @@ public final class TeamDeathmatch extends Evento {
 
         setWinners(winnersPlayers);
 
-        // 🔥 REGISTRA VITÓRIA PARA TODOS DO TIME
         for (Player player : winnersPlayers) {
             TournamentStatsManager.getInstance().addWin(player.getUniqueId());
         }
@@ -464,6 +466,14 @@ public final class TeamDeathmatch extends Evento {
                 winnersPlayers.stream().map(Player::getName).toList(),
                 buildTopEntries()
         );
+
+        if (plugin.getLeagueManager() != null) {
+            plugin.getLeagueManager().handleTeamWin(
+                    new ArrayList<>(winnersPlayers),
+                    losers,
+                    "teamdeathmatch"
+            );
+        }
 
         stop();
 

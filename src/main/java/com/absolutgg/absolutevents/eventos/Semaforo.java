@@ -119,6 +119,9 @@ public final class Semaforo extends Evento {
 
         ending = true;
 
+        List<Player> losers = new ArrayList<>(getPlayers());
+        losers.removeIf(p -> p.getUniqueId().equals(player.getUniqueId()));
+
         for (String message : config.getStringList("Messages.Winner")) {
             Bukkit.broadcastMessage(ColorUtils.colorize(
                     message
@@ -133,17 +136,21 @@ public final class Semaforo extends Evento {
 
         TournamentStatsManager.getInstance().addWin(player.getUniqueId());
 
+        if (plugin.getLeagueManager() != null) {
+            plugin.getLeagueManager().handleSoloWin(
+                    player,
+                    losers,
+                    "semaforo"
+            );
+        }
+
         stop();
 
-        Player rewardTarget = player;
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
-            if (!rewardTarget.isOnline()) {
-                return;
-            }
+            if (!player.isOnline()) return;
 
-            List<String> commands = config.getStringList("Rewards.Commands");
-            for (String command : commands) {
-                executeConsoleCommand(rewardTarget, command.replace("@winner", rewardTarget.getName()));
+            for (String command : config.getStringList("Rewards.Commands")) {
+                executeConsoleCommand(player, command.replace("@winner", player.getName()));
             }
         }, 2L);
     }

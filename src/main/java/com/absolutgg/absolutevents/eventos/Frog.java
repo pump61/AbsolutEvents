@@ -8,6 +8,8 @@ import com.absolutgg.absolutevents.manager.TournamentStatsManager;
 import com.absolutgg.absolutevents.utils.ColorUtils;
 import com.absolutgg.absolutevents.utils.Cuboid;
 import com.cryptomorin.xseries.XMaterial;
+
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -164,14 +166,14 @@ public final class Frog extends Evento {
 
     @Override
     public void winner(Player player) {
+        List<Player> losers = new ArrayList<>(getPlayers());
+        losers.removeIf(p -> p.getUniqueId().equals(player.getUniqueId()));
+
         for (String message : config.getStringList("Messages.Winner")) {
-            AbsolutEventsPlugin.getInstance().getServer().broadcastMessage(
-                    ColorUtils.colorize(
-                            message
-                                    .replace("@winner", player.getName())
-                                    .replace("@name", config.getString("Evento.Title"))
-                    )
-            );
+            Bukkit.broadcastMessage(ColorUtils.colorize(
+                    message.replace("@winner", player.getName())
+                            .replace("@name", config.getString("Evento.Title"))
+            ));
         }
 
         DiscordWebhookManager.sendPlayerWinner(
@@ -181,10 +183,19 @@ public final class Frog extends Evento {
 
         TournamentStatsManager.getInstance().addWin(player.getUniqueId());
 
+        // 🔥 LEAGUE
+        if (AbsolutEventsPlugin.getInstance().getLeagueManager() != null) {
+            AbsolutEventsPlugin.getInstance().getLeagueManager().handleSoloWin(
+                    player,
+                    losers,
+                    "frog"
+            );
+        }
+
         setWinner(player);
         stop();
 
-        AbsolutEventsPlugin.getInstance().getServer().getScheduler().runTaskLater(
+        Bukkit.getScheduler().runTaskLater(
                 AbsolutEventsPlugin.getInstance(),
                 () -> {
                     for (String command : config.getStringList("Rewards.Commands")) {

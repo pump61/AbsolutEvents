@@ -24,6 +24,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 public final class BatataQuente extends Evento {
@@ -68,6 +69,9 @@ public final class BatataQuente extends Evento {
             return;
         }
 
+        List<Player> losers = new ArrayList<>(getPlayers());
+        losers.removeIf(target -> target.getUniqueId().equals(player.getUniqueId()));
+
         for (String message : this.config.getStringList("Messages.Winner")) {
             plugin.getServer().broadcastMessage(ColorUtils.colorize(
                     message
@@ -82,6 +86,10 @@ public final class BatataQuente extends Evento {
         );
 
         TournamentStatsManager.getInstance().addWin(player.getUniqueId());
+
+        if (plugin.getLeagueManager() != null) {
+            plugin.getLeagueManager().handleSoloWin(player, losers, "batataquente");
+        }
 
         this.setWinner(player);
         this.stop();
@@ -423,6 +431,7 @@ public final class BatataQuente extends Evento {
         return potatoHolderChanges;
     }
 
+    @Override
     public YamlConfiguration getConfig() {
         return config;
     }

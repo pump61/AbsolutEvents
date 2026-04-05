@@ -198,6 +198,9 @@ public final class Quiz extends Evento {
 
         ending = true;
 
+        List<Player> losers = new ArrayList<>(getPlayers());
+        losers.removeIf(p -> p.getUniqueId().equals(player.getUniqueId()));
+
         for (String message : config.getStringList("Messages.Winner")) {
             plugin.getServer().broadcastMessage(ColorUtils.colorize(
                     message
@@ -212,12 +215,19 @@ public final class Quiz extends Evento {
 
         TournamentStatsManager.getInstance().addWin(player.getUniqueId());
 
+        // 🔥 LEAGUE
+        if (plugin.getLeagueManager() != null) {
+            plugin.getLeagueManager().handleSoloWin(
+                    player,
+                    losers,
+                    "quiz"
+            );
+        }
+
         stop();
 
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
-            if (!player.isOnline()) {
-                return;
-            }
+            if (!player.isOnline()) return;
 
             for (String command : config.getStringList("Rewards.Commands")) {
                 executeConsoleCommand(player, command.replace("@winner", player.getName()));
@@ -233,7 +243,9 @@ public final class Quiz extends Evento {
         ending = true;
 
         List<Player> winnersNow = new ArrayList<>(getPlayers());
-        List<String> winners = winnersNow.stream().map(Player::getName).collect(Collectors.toList());
+        List<Player> losers = new ArrayList<>(); // ninguém perde aqui
+
+        List<String> winners = winnersNow.stream().map(Player::getName).toList();
 
         setWinners(new HashSet<>(winnersNow));
 
@@ -250,17 +262,23 @@ public final class Quiz extends Evento {
         }
 
         DiscordWebhookManager.sendMultipleWinners(
-                winnersNow.stream().map(Player::getName).toList(),
+                winners,
                 config.getString("Evento.Title")
         );
+
+        if (plugin.getLeagueManager() != null) {
+            plugin.getLeagueManager().handleMultipleWinners(
+                    winnersNow,
+                    losers,
+                    "quiz"
+            );
+        }
 
         stop();
 
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
             for (Player player : winnersNow) {
-                if (!player.isOnline()) {
-                    continue;
-                }
+                if (!player.isOnline()) continue;
 
                 for (String command : this.config.getStringList("Rewards.Commands")) {
                     executeConsoleCommand(player, command.replace("@winner", player.getName()));

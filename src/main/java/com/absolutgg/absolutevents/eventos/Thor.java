@@ -382,6 +382,9 @@ public final class Thor extends Evento {
             return;
         }
 
+        List<Player> losers = new ArrayList<>(getPlayers());
+        losers.removeIf(target -> target.getUniqueId().equals(player.getUniqueId()));
+
         TournamentStatsManager.getInstance().addWin(player.getUniqueId());
 
         for (String command : config.getStringList("Rewards.Commands")) {
@@ -398,6 +401,14 @@ public final class Thor extends Evento {
         }
 
         DiscordWebhookManager.sendPlayerWinner(player.getName(), config.getString("Evento.Title"));
+
+        if (plugin.getLeagueManager() != null) {
+            plugin.getLeagueManager().handleSoloWin(
+                    player,
+                    losers,
+                    "thor"
+            );
+        }
 
         setWinner(player);
         stop();

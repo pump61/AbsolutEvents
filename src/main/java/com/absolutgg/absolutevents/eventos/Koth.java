@@ -4,6 +4,7 @@ import com.absolutgg.absolutevents.AbsolutEventsPlugin;
 import com.absolutgg.absolutevents.api.Evento;
 import com.absolutgg.absolutevents.discord.DiscordWebhookManager;
 import com.absolutgg.absolutevents.listeners.eventos.KothListener;
+import com.absolutgg.absolutevents.manager.LeagueManager;
 import com.absolutgg.absolutevents.manager.TournamentStatsManager;
 import com.absolutgg.absolutevents.utils.ColorUtils;
 import com.absolutgg.absolutevents.utils.Cuboid;
@@ -444,6 +445,17 @@ public final class Koth extends Evento {
         this.setWinner(player);
 
         TournamentStatsManager.getInstance().addWin(player.getUniqueId());
+
+        List<Player> losers = new ArrayList<>(getPlayers());
+        losers.remove(player);
+
+        if (plugin.getLeagueManager() != null) {
+            plugin.getLeagueManager().handleSoloWin(
+                    player,
+                    losers,
+                    "koth"
+            );
+        }
 
         this.stop();
 

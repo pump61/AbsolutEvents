@@ -455,13 +455,13 @@ public final class Anvil extends Evento {
         }
 
         ending = true;
+
+        List<Player> losers = new ArrayList<>(getPlayers());
+        losers.removeIf(target -> target.getUniqueId().equals(player.getUniqueId()));
+
         setWinner(player);
 
         TournamentStatsManager.getInstance().addWin(player.getUniqueId());
-
-        for (String command : config.getStringList("Rewards.Commands")) {
-            executeConsoleCommand(player, command.replace("@winner", player.getName()));
-        }
 
         for (String message : config.getStringList("Messages.Winner")) {
             Bukkit.broadcastMessage(ColorUtils.colorize(
@@ -476,10 +476,21 @@ public final class Anvil extends Evento {
                 config.getString("Evento.Title")
         );
 
+        // 🔥 LEAGUE
+        if (plugin.getLeagueManager() != null) {
+            plugin.getLeagueManager().handleSoloWin(
+                    player,
+                    losers,
+                    "anvil"
+            );
+        }
+
+        for (String command : config.getStringList("Rewards.Commands")) {
+            executeConsoleCommand(player, command.replace("@winner", player.getName()));
+        }
+
         stop();
     }
-
-    
 
     public void noWinner() {
         if (ending) {
@@ -504,14 +515,19 @@ public final class Anvil extends Evento {
 
         ending = true;
 
+        List<Player> winners = new ArrayList<>(players);
+        List<Player> losers = new ArrayList<>(getPlayers());
+        losers.removeAll(winners);
+
         List<String> names = new ArrayList<>();
-        for (Player player : players) {
+
+        for (Player player : winners) {
             names.add(player.getName());
             TournamentStatsManager.getInstance().addWin(player.getUniqueId());
         }
 
         String joinedNames = String.join(", ", names);
-        String winnersCount = String.valueOf(players.size());
+        String winnersCount = String.valueOf(winners.size());
 
         List<String> messages = config.getStringList("Messages.Winners");
         if (messages == null || messages.isEmpty()) {
@@ -534,7 +550,15 @@ public final class Anvil extends Evento {
                 List.of()
         );
 
-        for (Player player : players) {
+        if (plugin.getLeagueManager() != null) {
+            plugin.getLeagueManager().handleTeamWin(
+                    winners,
+                    losers,
+                    "anvil"
+            );
+        }
+
+        for (Player player : winners) {
             for (String command : config.getStringList("Rewards.Commands")) {
                 executeConsoleCommand(player, command.replace("@winner", player.getName()));
             }

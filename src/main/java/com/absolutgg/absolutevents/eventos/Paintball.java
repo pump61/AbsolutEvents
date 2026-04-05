@@ -227,6 +227,14 @@ public final class Paintball extends Evento {
         ending = true;
 
         List<Player> winnersNow = new ArrayList<>(getPlayers());
+        List<Player> losers = new ArrayList<>();
+
+        if (!blueTeam.isEmpty() && redTeam.isEmpty()) {
+            losers.addAll(redTeam);
+        } else if (!redTeam.isEmpty() && blueTeam.isEmpty()) {
+            losers.addAll(blueTeam);
+        }
+
         List<String> winnerNames = new ArrayList<>();
 
         for (Player player : winnersNow) {
@@ -259,6 +267,14 @@ public final class Paintball extends Evento {
                 config.getString("Evento.Title"),
                 buildTopEntries()
         );
+
+        if (plugin.getLeagueManager() != null) {
+            plugin.getLeagueManager().handleTeamWin(
+                    winnersNow,
+                    losers,
+                    "paintball"
+            );
+        }
 
         stop();
 

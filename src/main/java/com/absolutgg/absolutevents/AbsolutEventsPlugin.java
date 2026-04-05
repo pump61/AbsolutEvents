@@ -11,6 +11,7 @@ import com.absolutgg.absolutevents.manager.ConversorConnectionManager;
 import com.absolutgg.absolutevents.manager.EventosChatManager;
 import com.absolutgg.absolutevents.manager.EventosManager;
 import com.absolutgg.absolutevents.manager.InventorySerializer;
+import com.absolutgg.absolutevents.manager.LeagueManager;
 import com.absolutgg.absolutevents.manager.UpdateChecker;
 import com.absolutgg.absolutevents.utils.ConfigUpdater;
 import com.absolutgg.absolutevents.utils.EventoConfigFile;
@@ -22,6 +23,7 @@ import org.bstats.bukkit.Metrics;
 import org.bstats.charts.SimplePie;
 import org.bukkit.Bukkit;
 import org.bukkit.command.PluginCommand;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.Plugin;
@@ -41,6 +43,8 @@ import java.util.stream.Collectors;
 public final class AbsolutEventsPlugin extends JavaPlugin {
 
     private ConnectionManager connectionManager;
+    private YamlConfiguration leagueConfig;
+    private LeagueManager leagueManager;
 
     private final EventosManager eventosManager = new EventosManager();
     private final EventosChatManager eventosChatManager = new EventosChatManager();
@@ -69,6 +73,7 @@ public final class AbsolutEventsPlugin extends JavaPlugin {
         }
 
         setupConfigFiles();
+        setupLeague();
 
         QuitCache.init(getDataFolder());
 
@@ -100,6 +105,16 @@ public final class AbsolutEventsPlugin extends JavaPlugin {
         registerCommands();
 
         setupMetrics();
+
+        if (leagueManager != null) {
+            Bukkit.getOnlinePlayers().forEach(player -> {
+                try {
+                    leagueManager.initializePlayer(player);
+                } catch (Exception exception) {
+                    getLogger().log(Level.WARNING, "Erro ao inicializar jogador na liga: " + player.getName(), exception);
+                }
+            });
+        }
 
         logInfo("Plugin iniciado com sucesso!");
     }
@@ -147,7 +162,13 @@ public final class AbsolutEventsPlugin extends JavaPlugin {
                 getConfig().getBoolean("Bungeecord.Enabled") ? "enabled" : "disabled"
         ));
 
-        metrics.addCustomChart(new SimplePie("database_type", () -> "sqlite"));
+        metrics.addCustomChart(new SimplePie("database_type", () ->
+                getConfig().getBoolean("MySQL.Enabled") ? "mysql" : "sqlite"
+        ));
+
+        metrics.addCustomChart(new SimplePie("league_enabled", () ->
+                leagueConfig != null && leagueConfig.getBoolean("League.Enabled") ? "enabled" : "disabled"
+        ));
     }
 
     private void setupConfigFiles() {
@@ -179,6 +200,21 @@ public final class AbsolutEventsPlugin extends JavaPlugin {
         }
 
         ConfigUpdater.updateEventos();
+    }
+
+    private void setupLeague() {
+        try {
+            saveResource("league.yml", false);
+            File file = new File(getDataFolder(), "league.yml");
+            this.leagueConfig = YamlConfiguration.loadConfiguration(file);
+            this.leagueManager = new LeagueManager(leagueConfig);
+            logInfo("Sistema de liga carregado com sucesso!");
+        } catch (Exception exception) {
+            logSevere("Erro ao carregar sistema de liga.");
+            getLogger().log(Level.SEVERE, "Falha ao carregar league.yml.", exception);
+            this.leagueConfig = new YamlConfiguration();
+            this.leagueManager = new LeagueManager(this.leagueConfig);
+        }
     }
 
     private void createDefaultEventConfigs() {
@@ -453,6 +489,14 @@ public final class AbsolutEventsPlugin extends JavaPlugin {
 
     public ConnectionManager getConnectionManager() {
         return connectionManager;
+    }
+
+    public LeagueManager getLeagueManager() {
+        return leagueManager;
+    }
+
+    public YamlConfiguration getLeagueConfig() {
+        return leagueConfig;
     }
 
     public EventosManager getEventoManager() {

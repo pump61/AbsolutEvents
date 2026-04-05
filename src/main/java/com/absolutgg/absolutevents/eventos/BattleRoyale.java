@@ -306,6 +306,9 @@ public final class BattleRoyale extends Evento {
             return;
         }
 
+        List<Player> losers = new ArrayList<>(getPlayers());
+        losers.removeIf(target -> target.getUniqueId().equals(player.getUniqueId()));
+
         this.ended = true;
 
         for (String message : config.getStringList("Messages.Winner")) {
@@ -322,8 +325,11 @@ public final class BattleRoyale extends Evento {
                 buildTopEntries()
         );
 
-        // ✅ TOURNAMENT
         TournamentStatsManager.getInstance().addWin(player.getUniqueId());
+
+        if (plugin.getLeagueManager() != null) {
+            plugin.getLeagueManager().handleSoloWin(player, losers, "battleroyale");
+        }
 
         this.setWinner(player);
         this.stop();

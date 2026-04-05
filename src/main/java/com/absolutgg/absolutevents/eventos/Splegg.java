@@ -117,6 +117,9 @@ public final class Splegg extends Evento {
 
         ending = true;
 
+        List<Player> losers = new ArrayList<>(getPlayers());
+        losers.removeIf(target -> target.getUniqueId().equals(player.getUniqueId()));
+
         for (String message : config.getStringList("Messages.Winner")) {
             plugin.getServer().broadcastMessage(ColorUtils.colorize(
                     message
@@ -130,6 +133,14 @@ public final class Splegg extends Evento {
         this.setWinner(player);
 
         TournamentStatsManager.getInstance().addWin(player.getUniqueId());
+
+        if (plugin.getLeagueManager() != null) {
+            plugin.getLeagueManager().handleSoloWin(
+                    player,
+                    losers,
+                    "splegg"
+            );
+        }
 
         String winnerName = player.getName();
 

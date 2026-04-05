@@ -131,14 +131,14 @@ public final class Fight extends Evento {
 
     @Override
     public void winner(Player p) {
-        List<String> broadcastMessages = config.getStringList("Messages.Winner");
-        for (String s : broadcastMessages) {
-            AbsolutEventsPlugin.getInstance().getServer().broadcastMessage(
-                    ColorUtils.colorize(
-                            s.replace("@winner", p.getName())
-                                    .replace("@name", config.getString("Evento.Title"))
-                    )
-            );
+        List<Player> losers = new ArrayList<>(getPlayers());
+        losers.removeIf(target -> target.getUniqueId().equals(p.getUniqueId()));
+
+        for (String s : config.getStringList("Messages.Winner")) {
+            Bukkit.broadcastMessage(ColorUtils.colorize(
+                    s.replace("@winner", p.getName())
+                            .replace("@name", config.getString("Evento.Title"))
+            ));
         }
 
         DiscordWebhookManager.sendPlayerWinner(
@@ -148,14 +148,21 @@ public final class Fight extends Evento {
 
         TournamentStatsManager.getInstance().addWin(p.getUniqueId());
 
+        if (AbsolutEventsPlugin.getInstance().getLeagueManager() != null) {
+            AbsolutEventsPlugin.getInstance().getLeagueManager().handleSoloWin(
+                    p,
+                    losers,
+                    "fight"
+            );
+        }
+
         this.setWinner(p);
         this.stop();
 
         Bukkit.getScheduler().runTaskLater(
                 AbsolutEventsPlugin.getInstance(),
                 () -> {
-                    List<String> commands = config.getStringList("Rewards.Commands");
-                    for (String s : commands) {
+                    for (String s : config.getStringList("Rewards.Commands")) {
                         executeConsoleCommand(p, s.replace("@winner", p.getName()));
                     }
                 },

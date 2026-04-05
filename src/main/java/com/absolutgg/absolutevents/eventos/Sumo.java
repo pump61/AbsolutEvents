@@ -92,6 +92,9 @@ public final class Sumo extends Evento {
 
         ending = true;
 
+        List<Player> losers = new ArrayList<>(getPlayers());
+        losers.removeIf(target -> target.getUniqueId().equals(player.getUniqueId()));
+
         List<String> broadcast = config.getStringList("Messages.Winner");
 
         for (String message : broadcast) {
@@ -109,6 +112,14 @@ public final class Sumo extends Evento {
         this.setWinner(player);
 
         TournamentStatsManager.getInstance().addWin(player.getUniqueId());
+
+        if (AbsolutEventsPlugin.getInstance().getLeagueManager() != null) {
+            AbsolutEventsPlugin.getInstance().getLeagueManager().handleSoloWin(
+                    player,
+                    losers,
+                    "sumo"
+            );
+        }
 
         String winnerName = player.getName();
 

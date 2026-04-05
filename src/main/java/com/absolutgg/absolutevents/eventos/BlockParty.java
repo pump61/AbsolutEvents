@@ -250,15 +250,14 @@ public final class BlockParty extends Evento {
         List<Player> winnersPlayers = new ArrayList<>(getPlayers());
         List<String> winnersNames = new ArrayList<>();
 
+        this.setWinners();
+
         for (Player player : winnersPlayers) {
             winnersNames.add(player.getName());
             rewardProtectedWinners.add(player.getUniqueId());
 
-            // ✅ TOURNAMENT
             TournamentStatsManager.getInstance().addWin(player.getUniqueId());
         }
-
-        this.setWinners();
 
         for (String message : config.getStringList("Messages.Winner")) {
             Bukkit.broadcastMessage(ColorUtils.colorize(
@@ -270,15 +269,31 @@ public final class BlockParty extends Evento {
 
         if (!winnersPlayers.isEmpty()) {
             if (winnersPlayers.size() == 1) {
+                Player winner = winnersPlayers.get(0);
+                List<Player> losers = new ArrayList<>(getPlayers());
+                losers.removeIf(target -> target.getUniqueId().equals(winner.getUniqueId()));
+
                 DiscordWebhookManager.sendPlayerWinner(
-                        winnersPlayers.get(0).getName(),
+                        winner.getName(),
                         config.getString("Evento.Title")
                 );
+
+                if (plugin.getLeagueManager() != null) {
+                    plugin.getLeagueManager().handleSoloWin(winner, losers, "blockparty");
+                }
             } else {
                 DiscordWebhookManager.sendMultipleWinners(
                         winnersPlayers.stream().map(Player::getName).toList(),
                         config.getString("Evento.Title")
                 );
+
+                if (plugin.getLeagueManager() != null) {
+                    plugin.getLeagueManager().handleMultipleWinners(
+                            winnersPlayers,
+                            List.of(),
+                            "blockparty"
+                    );
+                }
             }
         }
 

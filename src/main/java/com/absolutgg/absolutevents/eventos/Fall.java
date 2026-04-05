@@ -225,9 +225,7 @@ public final class Fall extends Evento {
     }
 
     public void win() {
-        if (ending) {
-            return;
-        }
+        if (ending) return;
 
         List<Player> winnersList = new ArrayList<>(getPlayers());
 
@@ -242,7 +240,6 @@ public final class Fall extends Evento {
         this.setWinners();
 
         for (Player player : winnersList) {
-
             TournamentStatsManager.getInstance().addWin(player.getUniqueId());
 
             for (String command : config.getStringList("Rewards.Commands")) {
@@ -252,19 +249,25 @@ public final class Fall extends Evento {
             winners.add(player.getName());
         }
 
-        if (!winnersList.isEmpty()) {
-            DiscordWebhookManager.sendTeamWinner(
-                    String.join(", ", winners),
-                    config.getString("Evento.Title"),
-                    List.of()
-            );
-        }
+        DiscordWebhookManager.sendMultipleWinners(
+                winners,
+                config.getString("Evento.Title"),
+                List.of()
+        );
 
         for (String message : config.getStringList("Messages.Winner")) {
             Bukkit.broadcastMessage(ColorUtils.colorize(
                     message.replace("@winner", String.join(", ", winners))
                             .replace("@name", config.getString("Evento.Title"))
             ));
+        }
+
+        if (AbsolutEventsPlugin.getInstance().getLeagueManager() != null) {
+            AbsolutEventsPlugin.getInstance().getLeagueManager().handleMultipleWinners(
+                    winnersList,
+                    new ArrayList<>(),
+                    "fall"
+            );
         }
 
         stop();

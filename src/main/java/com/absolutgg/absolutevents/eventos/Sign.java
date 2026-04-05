@@ -17,6 +17,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitTask;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -98,6 +100,9 @@ public final class Sign extends Evento {
 
         ending = true;
 
+        List<Player> losers = new ArrayList<>(getPlayers());
+        losers.removeIf(target -> target.getUniqueId().equals(player.getUniqueId()));
+
         long elapsed = getElapsedMillis(player);
         ParkourRecordManager.getInstance().updateRecord(getRecordKey(), player, elapsed);
 
@@ -120,6 +125,14 @@ public final class Sign extends Evento {
         setWinner(player);
 
         TournamentStatsManager.getInstance().addWin(player.getUniqueId());
+
+        if (plugin.getLeagueManager() != null) {
+            plugin.getLeagueManager().handleSoloWin(
+                    player,
+                    losers,
+                    "sign"
+            );
+        }
 
         stop();
 

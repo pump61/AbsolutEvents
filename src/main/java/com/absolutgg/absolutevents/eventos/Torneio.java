@@ -476,6 +476,9 @@ public final class Torneio extends Evento {
 
     @Override
     public void winner(Player player) {
+        List<Player> losers = new ArrayList<>(getPlayers());
+        losers.removeIf(target -> target.getUniqueId().equals(player.getUniqueId()));
+
         TournamentStatsManager.getInstance().addWin(player.getUniqueId());
 
         for (String message : config.getStringList("Messages.Winner")) {
@@ -489,6 +492,14 @@ public final class Torneio extends Evento {
         }
 
         DiscordWebhookManager.sendPlayerWinner(player.getName(), config.getString("Evento.Title"));
+
+        if (plugin.getLeagueManager() != null) {
+            plugin.getLeagueManager().handleSoloWin(
+                    player,
+                    losers,
+                    "torneio"
+            );
+        }
 
         this.setWinner(player);
         this.stop();

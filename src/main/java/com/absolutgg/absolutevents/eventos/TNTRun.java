@@ -154,6 +154,10 @@ public final class TNTRun extends Evento {
         }
 
         ending = true;
+
+        List<Player> losers = new ArrayList<>(getPlayers());
+        losers.removeIf(target -> target.getUniqueId().equals(player.getUniqueId()));
+
         TournamentStatsManager.getInstance().addWin(player.getUniqueId());
 
         for (String message : config.getStringList("Messages.Winner")) {
@@ -165,6 +169,14 @@ public final class TNTRun extends Evento {
         }
 
         DiscordWebhookManager.sendPlayerWinner(player.getName(), config.getString("Evento.Title"));
+
+        if (plugin.getLeagueManager() != null) {
+            plugin.getLeagueManager().handleSoloWin(
+                    player,
+                    losers,
+                    "tntrun"
+            );
+        }
 
         setWinner(player);
 

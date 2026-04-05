@@ -1,6 +1,7 @@
 package com.absolutgg.absolutevents.hooks;
 
 import com.absolutgg.absolutevents.AbsolutEventsPlugin;
+import com.absolutgg.absolutevents.manager.LeagueManager;
 import com.absolutgg.absolutevents.manager.ParkourRecordManager;
 import com.absolutgg.absolutevents.manager.TournamentStatsManager;
 import com.absolutgg.absolutevents.utils.EventoConfigFile;
@@ -102,6 +103,69 @@ public final class PlaceholderAPIHook extends PlaceholderExpansion {
             }
         }
 
+        LeagueManager league = plugin.getLeagueManager();
+
+        if (league != null && league.isEnabled() && player != null && player.getUniqueId() != null) {
+            switch (normalized) {
+                case "league_points":
+                    return String.valueOf(league.getPoints(player.getUniqueId()));
+
+                case "league_rank":
+                    return league.getRank(player.getUniqueId());
+
+                case "league_rank_display":
+                    return league.getRankDisplay(player.getUniqueId());
+
+                case "league_badge":
+                    return league.getBadge(player.getUniqueId());
+
+                case "league_position":
+                    return String.valueOf(league.getPosition(player.getUniqueId()));
+
+                case "league_wins":
+                    return String.valueOf(league.getWins(player.getUniqueId()));
+
+                case "league_losses":
+                    return String.valueOf(league.getLosses(player.getUniqueId()));
+
+                case "league_played":
+                    return String.valueOf(league.getPlayed(player.getUniqueId()));
+
+                case "league_next_rank":
+                    return league.getNextRank(player.getUniqueId());
+
+                case "league_points_to_next":
+                    return String.valueOf(league.getPointsToNextRank(player.getUniqueId()));
+            }
+        }
+
+        if (league != null && league.isEnabled()) {
+            if (normalized.startsWith("league_top_name_")) {
+                Integer pos = parseTopPosition(normalized, "league_top_name_");
+                return pos == null ? "-" : league.getTopName(pos);
+            }
+
+            if (normalized.startsWith("league_top_points_")) {
+                Integer pos = parseTopPosition(normalized, "league_top_points_");
+                return pos == null ? "0" : String.valueOf(league.getTopPoints(pos));
+            }
+
+            if (normalized.startsWith("league_top_rank_display_")) {
+                Integer pos = parseTopPosition(normalized, "league_top_rank_display_");
+                return pos == null ? "-" : league.getTopRankDisplay(pos);
+            }
+
+            if (normalized.startsWith("league_top_rank_")) {
+                Integer pos = parseTopPosition(normalized, "league_top_rank_");
+                return pos == null ? league.getDefaultRank() : league.getTopRank(pos);
+            }
+
+            if (normalized.startsWith("league_top_badge_")) {
+                Integer pos = parseTopPosition(normalized, "league_top_badge_");
+                return pos == null ? "" : league.getTopBadge(pos);
+            }
+        }
+
         ParkourRecordManager manager = ParkourRecordManager.getInstance();
         String lower = normalized;
 
@@ -191,6 +255,14 @@ public final class PlaceholderAPIHook extends PlaceholderExpansion {
         }
 
         return null;
+    }
+
+    private @Nullable Integer parseTopPosition(@NotNull String identifier, @NotNull String prefix) {
+        try {
+            return Integer.parseInt(identifier.substring(prefix.length()));
+        } catch (Exception ignored) {
+            return null;
+        }
     }
 
     private int getEventValue(@NotNull Map<String, Integer> values, @NotNull String rawEventKey) {

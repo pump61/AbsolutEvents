@@ -197,6 +197,9 @@ public final class CorridaArmada extends Evento {
 
     @Override
     public void winner(Player player) {
+        List<Player> losers = new ArrayList<>(getPlayers());
+        losers.removeIf(target -> target.getUniqueId().equals(player.getUniqueId()));
+
         for (String message : config.getStringList("Messages.Winner")) {
             AbsolutEventsPlugin.getInstance().getServer().broadcastMessage(
                     ColorUtils.colorize(
@@ -212,8 +215,15 @@ public final class CorridaArmada extends Evento {
                 buildTopEntries()
         );
 
-        // ✅ TOURNAMENT
         TournamentStatsManager.getInstance().addWin(player.getUniqueId());
+
+        if (AbsolutEventsPlugin.getInstance().getLeagueManager() != null) {
+            AbsolutEventsPlugin.getInstance().getLeagueManager().handleSoloWin(
+                    player,
+                    losers,
+                    "corridaarmada"
+            );
+        }
 
         this.setWinner(player);
         this.stop();

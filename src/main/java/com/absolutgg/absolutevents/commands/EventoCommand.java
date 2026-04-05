@@ -4,17 +4,20 @@ import com.absolutgg.absolutevents.AbsolutEventsPlugin;
 import com.absolutgg.absolutevents.api.EventoType;
 import com.absolutgg.absolutevents.eventos.SuperSmackers;
 import com.absolutgg.absolutevents.hooks.BungeecordHook;
+import com.absolutgg.absolutevents.manager.ConnectionManager;
 import com.absolutgg.absolutevents.manager.InventoryManager;
 import com.absolutgg.absolutevents.manager.InventorySerializer;
+import com.absolutgg.absolutevents.manager.LeagueManager;
+import com.absolutgg.absolutevents.manager.TournamentStatsManager;
 import com.absolutgg.absolutevents.manager.UpdateChecker;
 import com.absolutgg.absolutevents.manager.UpdateDownloader;
 import com.absolutgg.absolutevents.utils.ColorUtils;
 import com.absolutgg.absolutevents.utils.EventoConfigFile;
 import com.absolutgg.absolutevents.utils.NumberFormatter;
-import com.absolutgg.absolutevents.manager.TournamentStatsManager;
 import com.cryptomorin.xseries.XItemStack;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -63,7 +66,8 @@ public final class EventoCommand implements CommandExecutor, TabCompleter {
             "backup",
             "backupinfo",
             "update",
-            "resettournamentwins"
+            "resettournamentwins",
+            "league"
     );
 
     private static final List<String> SETUP_ACTIONS = Arrays.asList(
@@ -102,6 +106,19 @@ public final class EventoCommand implements CommandExecutor, TabCompleter {
             "sair",
             "leave",
             "quit"
+    );
+
+    private static final List<String> LEAGUE_SUBCOMMANDS = Arrays.asList(
+            "help",
+            "info",
+            "points",
+            "rank",
+            "top",
+            "addpoints",
+            "removepoints",
+            "setpoints",
+            "setrank",
+            "resetseason"
     );
 
     @Override
@@ -177,6 +194,9 @@ public final class EventoCommand implements CommandExecutor, TabCompleter {
 
             case "resettournamentwins":
                 return handleResetTournamentWins(sender);
+
+            case "league":
+                return handleLeague(sender, args);
 
             default:
                 return handleChatEventCommand(sender, args);
@@ -956,6 +976,293 @@ public final class EventoCommand implements CommandExecutor, TabCompleter {
         return true;
     }
 
+    private boolean handleLeague(CommandSender sender, String[] args) {
+        if (!sender.hasPermission("absolutevents.admin")) {
+            sender.sendMessage(color(message("Messages.No permission")));
+            return true;
+        }
+
+        LeagueManager league = AbsolutEventsPlugin.getInstance().getLeagueManager();
+        ConnectionManager connectionManager = AbsolutEventsPlugin.getInstance().getConnectionManager();
+
+        if (league == null || connectionManager == null || !league.isEnabled()) {
+            sender.sendMessage(color("&cA liga não está ativada no servidor."));
+            return true;
+        }
+
+        if (args.length < 2) {
+            sendLeagueHelp(sender);
+            return true;
+        }
+
+        String sub = args[1].toLowerCase(Locale.ROOT);
+
+        switch (sub) {
+            case "help":
+                sendLeagueHelp(sender);
+                return true;
+
+            case "resetseason":
+                league.resetSeasonForAll();
+                sender.sendMessage(color("&aTemporada da liga resetada com sucesso."));
+                return true;
+
+            case "info":
+            case "points":
+            case "rank": {
+                if (args.length < 3) {
+                    sender.sendMessage(color("&cUse: /evento league " + sub + " <player>"));
+                    return true;
+                }
+
+                OfflinePlayer target = resolveOfflinePlayer(args[2]);
+                if (target == null || target.getUniqueId() == null) {
+                    sender.sendMessage(color("&cJogador não encontrado."));
+                    return true;
+                }
+
+                league.initializePlayer(target.getUniqueId(), target.getName());
+
+                if (sub.equals("points")) {
+                    sender.sendMessage(color("&aPontos de &f" + safeName(target) + "&a: &f" + league.getPoints(target.getUniqueId())));
+                    return true;
+                }
+
+                if (sub.equals("rank")) {
+                    sender.sendMessage(color("&aRank de &f" + safeName(target) + "&a: &f" + league.getRankDisplay(target.getUniqueId())
+                            + " &7(" + league.getRank(target.getUniqueId()) + ")"));
+                    return true;
+                }
+
+                sender.sendMessage(color("&6[Liga] &f" + safeName(target)));
+                sender.sendMessage(color("&7Pontos: &f" + league.getPoints(target.getUniqueId())));
+                sender.sendMessage(color("&7Rank: &f" + league.getRankDisplay(target.getUniqueId()) + " &7(" + league.getRank(target.getUniqueId()) + ")"));
+                sender.sendMessage(color("&7Insígnia: &f" + league.getBadge(target.getUniqueId())));
+                sender.sendMessage(color("&7Posição: &f#" + league.getPosition(target.getUniqueId())));
+                sender.sendMessage(color("&7Vitórias: &f" + league.getWins(target.getUniqueId())));
+                sender.sendMessage(color("&7Derrotas: &f" + league.getLosses(target.getUniqueId())));
+                sender.sendMessage(color("&7Partidas: &f" + league.getPlayed(target.getUniqueId())));
+                sender.sendMessage(color("&7Próximo rank: &f" + league.getNextRank(target.getUniqueId())));
+                sender.sendMessage(color("&7Faltam: &f" + league.getPointsToNextRank(target.getUniqueId()) + " pontos"));
+                return true;
+            }
+
+            case "addpoints":
+            case "removepoints":
+            case "setpoints": {
+                if (args.length < 4) {
+                    sender.sendMessage(color("&cUse: /evento league " + sub + " <player> <amount>"));
+                    return true;
+                }
+
+                OfflinePlayer target = resolveOfflinePlayer(args[2]);
+                if (target == null || target.getUniqueId() == null) {
+                    sender.sendMessage(color("&cJogador não encontrado."));
+                    return true;
+                }
+
+                Integer amount = parseInteger(args[3]);
+                if (amount == null) {
+                    sender.sendMessage(color("&cValor inválido."));
+                    return true;
+                }
+
+                league.initializePlayer(target.getUniqueId(), target.getName());
+
+                int current = league.getPoints(target.getUniqueId());
+                int updated;
+
+                if (sub.equals("addpoints")) {
+                    updated = current + amount;
+                } else if (sub.equals("removepoints")) {
+                    updated = current - amount;
+                } else {
+                    updated = amount;
+                }
+
+                updated = Math.max(updated, 0);
+
+                connectionManager.setLeaguePoints(target.getUniqueId(), updated);
+
+                String newRank = league.resolveRankByPoints(updated);
+                connectionManager.setLeagueRank(target.getUniqueId(), newRank);
+
+                ConnectionManager.LeagueData data = connectionManager.getLeagueData(target.getUniqueId());
+                if (data != null) {
+                    String peakRank = data.peakRank();
+                    if (getRankPoints(league, newRank) > getRankPoints(league, peakRank)) {
+                        connectionManager.setLeaguePeakRank(target.getUniqueId(), newRank);
+                    }
+                } else {
+                    connectionManager.setLeaguePeakRank(target.getUniqueId(), newRank);
+                }
+
+                sender.sendMessage(color("&aPontos de &f" + safeName(target) + "&aatualizados para &f" + updated + "&a."));
+                sender.sendMessage(color("&7Novo rank: &f" + league.getRankDisplay(target.getUniqueId()) + " &7(" + newRank + ")"));
+
+                Player online = target.getPlayer();
+                if (online != null && online.isOnline()) {
+                    online.sendMessage(color("&aSeus pontos da liga foram atualizados para &f" + updated + "&a."));
+                }
+                return true;
+            }
+
+            case "setrank": {
+                if (args.length < 4) {
+                    sender.sendMessage(color("&cUse: /evento league setrank <player> <rank>"));
+                    return true;
+                }
+
+                OfflinePlayer target = resolveOfflinePlayer(args[2]);
+                if (target == null || target.getUniqueId() == null) {
+                    sender.sendMessage(color("&cJogador não encontrado."));
+                    return true;
+                }
+
+                String rank = args[3].toUpperCase(Locale.ROOT);
+                if (!isValidLeagueRank(rank)) {
+                    sender.sendMessage(color("&cRank inválido."));
+                    sender.sendMessage(color("&7Ranks: &f" + String.join("&7, &f", getLeagueRanks())));
+                    return true;
+                }
+
+                league.initializePlayer(target.getUniqueId(), target.getName());
+
+                int rankPoints = getRankPoints(league, rank);
+                connectionManager.setLeaguePoints(target.getUniqueId(), rankPoints);
+                connectionManager.setLeagueRank(target.getUniqueId(), rank);
+
+                ConnectionManager.LeagueData data = connectionManager.getLeagueData(target.getUniqueId());
+                if (data != null) {
+                    String peakRank = data.peakRank();
+                    if (getRankPoints(league, rank) > getRankPoints(league, peakRank)) {
+                        connectionManager.setLeaguePeakRank(target.getUniqueId(), rank);
+                    }
+                } else {
+                    connectionManager.setLeaguePeakRank(target.getUniqueId(), rank);
+                }
+
+                sender.sendMessage(color("&aRank de &f" + safeName(target) + "&aatualizado para &f" + rank + "&a."));
+                return true;
+            }
+
+            case "top": {
+                int limit = 10;
+
+                if (args.length >= 3) {
+                    Integer parsed = parseInteger(args[2]);
+                    if (parsed != null && parsed > 0) {
+                        limit = Math.min(parsed, 50);
+                    }
+                }
+
+                List<ConnectionManager.LeagueData> ranking = league.getTopRanking(limit);
+
+                if (ranking.isEmpty()) {
+                    sender.sendMessage(color("&cAinda não há jogadores no ranking da liga."));
+                    return true;
+                }
+
+                sender.sendMessage(color("&6[Top Liga] &fTop " + ranking.size()));
+
+                for (int i = 0; i < ranking.size(); i++) {
+                    ConnectionManager.LeagueData data = ranking.get(i);
+                    String name = data.username() == null || data.username().isBlank() ? data.uuid().toString() : data.username();
+                    String rankDisplay = league.getRankDisplay(data.uuid());
+                    String badge = league.getBadge(data.uuid());
+
+                    sender.sendMessage(color(
+                            "&e#" + (i + 1) +
+                                    " &f" + name +
+                                    " &8- " + badge + " " + rankDisplay +
+                                    " &8- &f" + data.points() + " pontos"
+                    ));
+                }
+
+                return true;
+            }
+
+            default:
+                sendLeagueHelp(sender);
+                return true;
+        }
+    }
+
+    private void sendLeagueHelp(CommandSender sender) {
+        sender.sendMessage(color("&6[Liga] &fComandos disponíveis:"));
+        sender.sendMessage(color("&e/evento league help"));
+        sender.sendMessage(color("&e/evento league info <player>"));
+        sender.sendMessage(color("&e/evento league points <player>"));
+        sender.sendMessage(color("&e/evento league rank <player>"));
+        sender.sendMessage(color("&e/evento league addpoints <player> <amount>"));
+        sender.sendMessage(color("&e/evento league removepoints <player> <amount>"));
+        sender.sendMessage(color("&e/evento league setpoints <player> <amount>"));
+        sender.sendMessage(color("&e/evento league setrank <player> <rank>"));
+        sender.sendMessage(color("&e/evento league resetseason"));
+    }
+
+    private OfflinePlayer resolveOfflinePlayer(String input) {
+        Player online = Bukkit.getPlayerExact(input);
+        if (online != null) {
+            return online;
+        }
+
+        OfflinePlayer[] offlinePlayers = Bukkit.getOfflinePlayers();
+        for (OfflinePlayer offline : offlinePlayers) {
+            if (offline.getName() != null && offline.getName().equalsIgnoreCase(input)) {
+                return offline;
+            }
+        }
+
+        return null;
+    }
+
+    private String safeName(OfflinePlayer player) {
+        return player.getName() != null ? player.getName() : player.getUniqueId().toString();
+    }
+
+    private Integer parseInteger(String text) {
+        try {
+            return Integer.parseInt(text);
+        } catch (NumberFormatException exception) {
+            return null;
+        }
+    }
+
+    private int getRankPoints(LeagueManager league, String rank) {
+        if (rank == null || rank.isBlank()) {
+            return 0;
+        }
+
+        return league.resolveRankByPoints(Integer.MAX_VALUE).equalsIgnoreCase(rank)
+                ? getRankPointsFromConfig(rank)
+                : getRankPointsFromConfig(rank);
+    }
+
+    private int getRankPointsFromConfig(String rank) {
+        return AbsolutEventsPlugin.getInstance()
+                .getLeagueConfig()
+                .getInt("League.Ranks." + rank + ".Points", 0);
+    }
+
+    private boolean isValidLeagueRank(String rank) {
+        return getLeagueRanks().contains(rank.toUpperCase(Locale.ROOT));
+    }
+
+    private List<String> getLeagueRanks() {
+        ConfigurationSection section = AbsolutEventsPlugin.getInstance()
+                .getLeagueConfig()
+                .getConfigurationSection("League.Ranks");
+
+        if (section == null) {
+            return Collections.emptyList();
+        }
+
+        List<String> ranks = new ArrayList<>(section.getKeys(false));
+        ranks.sort(String.CASE_INSENSITIVE_ORDER);
+        return ranks;
+    }
+
     private boolean isBattleRoyale(YamlConfiguration config) {
         return config.getString("Evento.Type", "").equalsIgnoreCase("battleroyale");
     }
@@ -1170,6 +1477,7 @@ public final class EventoCommand implements CommandExecutor, TabCompleter {
         ));
         return true;
     }
+
     private void givePosTools(Player player, YamlConfiguration settings) {
         ItemStack axe = new ItemStack(Material.STONE_AXE, 1);
         ItemMeta axeMeta = axe.getItemMeta();
@@ -1627,7 +1935,6 @@ public final class EventoCommand implements CommandExecutor, TabCompleter {
         ItemStack cursor = player.getItemOnCursor();
         return cursor == null || cursor.getType() == Material.AIR;
     }
-
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         if (!command.getName().equalsIgnoreCase("evento")) {
@@ -1710,8 +2017,58 @@ public final class EventoCommand implements CommandExecutor, TabCompleter {
                     }
                     return filter(Collections.singletonList("confirm"), args[1]);
 
+                case "league":
+                    if (!admin) {
+                        return Collections.emptyList();
+                    }
+                    return filter(LEAGUE_SUBCOMMANDS, args[1]);
+
                 default:
                     return Collections.emptyList();
+            }
+        }
+
+        if (sub.equals("league") && admin) {
+            if (args.length == 3) {
+                String action = args[1].toLowerCase(Locale.ROOT);
+
+                if (Arrays.asList("info", "points", "rank", "addpoints", "removepoints", "setpoints", "setrank").contains(action)) {
+                    List<String> names = new ArrayList<>();
+
+                    for (Player online : Bukkit.getOnlinePlayers()) {
+                        names.add(online.getName());
+                    }
+
+                    for (OfflinePlayer offline : Bukkit.getOfflinePlayers()) {
+                        if (offline.getName() != null) {
+                            names.add(offline.getName());
+                        }
+                    }
+
+                    return filter(names, args[2]);
+                }
+
+                return Collections.emptyList();
+            }
+
+            if (args.length == 4) {
+                String action = args[1].toLowerCase(Locale.ROOT);
+
+                if (Arrays.asList("addpoints", "removepoints", "setpoints").contains(action)) {
+                    return filter(Arrays.asList("10", "25", "50", "100", "250", "500"), args[3]);
+                }
+
+                if (action.equals("setrank")) {
+                    return filter(getLeagueRanks(), args[3]);
+                }
+            }
+
+            if (args.length == 3) {
+                String action = args[1].toLowerCase(Locale.ROOT);
+
+                if (action.equals("top")) {
+                    return filter(Arrays.asList("10", "15", "20", "30", "50"), args[2]);
+                }
             }
         }
 

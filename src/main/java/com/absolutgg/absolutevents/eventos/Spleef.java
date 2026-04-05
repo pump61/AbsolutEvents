@@ -102,6 +102,9 @@ public final class Spleef extends Evento {
 
         ending = true;
 
+        List<Player> losers = new ArrayList<>(getPlayers());
+        losers.removeIf(target -> target.getUniqueId().equals(player.getUniqueId()));
+
         for (String message : config.getStringList("Messages.Winner")) {
             Bukkit.broadcastMessage(ColorUtils.colorize(
                     message
@@ -115,6 +118,14 @@ public final class Spleef extends Evento {
         setWinner(player);
 
         TournamentStatsManager.getInstance().addWin(player.getUniqueId());
+
+        if (AbsolutEventsPlugin.getInstance().getLeagueManager() != null) {
+            AbsolutEventsPlugin.getInstance().getLeagueManager().handleSoloWin(
+                    player,
+                    losers,
+                    "spleef"
+            );
+        }
 
         for (String command : config.getStringList("Rewards.Commands")) {
             executeConsoleCommand(player, command.replace("@winner", player.getName()));

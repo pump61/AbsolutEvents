@@ -409,19 +409,12 @@ public final class Hunter extends Evento {
         String winnerTeam = team.equalsIgnoreCase("blue") ? blueName : redName;
         int winnerPoints = team.equalsIgnoreCase("blue") ? bluePoints : redPoints;
 
-        for (String message : config.getStringList("Messages.Win")) {
-            sendToEvent(
-                    message.replace("@name", config.getString("Evento.Title"))
-                            .replace("@team", winnerTeam)
-                            .replace("@points", String.valueOf(winnerPoints))
-            );
-        }
-
         Set<Player> winners = new HashSet<>(
                 team.equalsIgnoreCase("blue") ? blueTeam.keySet() : redTeam.keySet()
         );
 
-        setWinners(winners);
+        List<Player> losers = new ArrayList<>(getPlayers());
+        losers.removeAll(winners);
 
         List<String> winnerNames = winners.stream().map(Player::getName).toList();
 
@@ -435,12 +428,20 @@ public final class Hunter extends Evento {
         DiscordWebhookManager.sendTeamWinnerWithPlayers(
                 winnerTeam,
                 config.getString("Evento.Title"),
-                winners.stream().map(Player::getName).toList(),
+                winnerNames,
                 buildTopEntries()
         );
 
         for (Player player : winners) {
             TournamentStatsManager.getInstance().addWin(player.getUniqueId());
+        }
+
+        if (AbsolutEventsPlugin.getInstance().getLeagueManager() != null) {
+            AbsolutEventsPlugin.getInstance().getLeagueManager().handleTeamWin(
+                    new ArrayList<>(winners),
+                    losers,
+                    "hunter"
+            );
         }
 
         for (Player winner : winners) {

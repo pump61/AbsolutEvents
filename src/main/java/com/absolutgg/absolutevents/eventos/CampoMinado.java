@@ -125,8 +125,6 @@ public final class CampoMinado extends Evento {
 
         for (Player player : winnersList) {
             winners.add(player.getName());
-
-            // ✅ TOURNAMENT
             TournamentStatsManager.getInstance().addWin(player.getUniqueId());
         }
 
@@ -140,16 +138,35 @@ public final class CampoMinado extends Evento {
 
         if (!winnersList.isEmpty()) {
             if (winnersList.size() == 1) {
+                Player winner = winnersList.get(0);
+                List<Player> losers = new ArrayList<>(getPlayers());
+                losers.removeIf(target -> target.getUniqueId().equals(winner.getUniqueId()));
+
                 DiscordWebhookManager.sendPlayerWinner(
-                        winnersList.get(0).getName(),
+                        winner.getName(),
                         config.getString("Evento.Title")
                 );
+
+                if (AbsolutEventsPlugin.getInstance().getLeagueManager() != null) {
+                    AbsolutEventsPlugin.getInstance().getLeagueManager().handleSoloWin(
+                            winner,
+                            losers,
+                            "campominado"
+                    );
+                }
             } else {
-                DiscordWebhookManager.sendTeamWinner(
-                        String.join(", ", winners),
-                        config.getString("Evento.Title"),
-                        List.of()
+                DiscordWebhookManager.sendMultipleWinners(
+                        winnersList.stream().map(Player::getName).toList(),
+                        config.getString("Evento.Title")
                 );
+
+                if (AbsolutEventsPlugin.getInstance().getLeagueManager() != null) {
+                    AbsolutEventsPlugin.getInstance().getLeagueManager().handleMultipleWinners(
+                            winnersList,
+                            List.of(),
+                            "campominado"
+                    );
+                }
             }
         }
 

@@ -358,6 +358,14 @@ public final class Guerra extends Evento {
             );
         }
 
+        if (AbsolutEventsPlugin.getInstance().getLeagueManager() != null) {
+            AbsolutEventsPlugin.getInstance().getLeagueManager().handleTeamWin(
+                    currentWinners,
+                    new ArrayList<>(), 
+                    "guerra"
+            );
+        }
+
         for (Player player : currentWinners) {
             TournamentStatsManager.getInstance().addWin(player.getUniqueId());
         }

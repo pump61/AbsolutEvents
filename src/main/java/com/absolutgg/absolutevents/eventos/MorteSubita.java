@@ -5,6 +5,7 @@ import com.absolutgg.absolutevents.api.Evento;
 import com.absolutgg.absolutevents.api.events.PlayerLoseEvent;
 import com.absolutgg.absolutevents.discord.DiscordWebhookManager;
 import com.absolutgg.absolutevents.listeners.eventos.MorteSubitaListener;
+import com.absolutgg.absolutevents.manager.LeagueManager;
 import com.absolutgg.absolutevents.manager.TournamentStatsManager;
 import com.absolutgg.absolutevents.utils.ColorUtils;
 import com.absolutgg.absolutevents.utils.EventKitApplier;
@@ -343,6 +344,17 @@ public final class MorteSubita extends Evento {
 
         for (Player player : winners) {
             TournamentStatsManager.getInstance().addWin(player.getUniqueId());
+        }
+
+        List<Player> losers = new ArrayList<>(getPlayers());
+        losers.removeAll(winners);
+
+        if (plugin.getLeagueManager() != null) {
+            plugin.getLeagueManager().handleTeamWin(
+                    new HashSet<>(winners),
+                    losers,
+                    "mortesubita"
+            );
         }
 
         List<Player> rewardTargets = new ArrayList<>(winners);

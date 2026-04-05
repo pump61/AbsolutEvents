@@ -293,6 +293,9 @@ public final class SuperSmackers extends Evento {
 
         eventEnding = true;
 
+        List<Player> losers = new ArrayList<>(getPlayers());
+        losers.removeIf(target -> target.getUniqueId().equals(player.getUniqueId()));
+
         for (String line : config.getStringList("Messages.Winner")) {
             Bukkit.broadcastMessage(ColorUtils.colorize(
                     line.replace("@name", config.getString("Evento.Title", "Super Smackers"))
@@ -308,6 +311,14 @@ public final class SuperSmackers extends Evento {
         setWinner(player);
 
         TournamentStatsManager.getInstance().addWin(player.getUniqueId());
+
+        if (plugin.getLeagueManager() != null) {
+            plugin.getLeagueManager().handleSoloWin(
+                    player,
+                    losers,
+                    "supersmackers"
+            );
+        }
 
         for (String command : config.getStringList("Rewards.Commands")) {
             executeConsoleCommand(player, command.replace("@winner", player.getName()));
@@ -334,7 +345,6 @@ public final class SuperSmackers extends Evento {
             setWinners(new HashSet<>(team.members));
         }
 
-        // 🔥 REGISTRA VITÓRIA PARA TODOS DO TIME
         for (Player player : team.members) {
             TournamentStatsManager.getInstance().addWin(player.getUniqueId());
         }
