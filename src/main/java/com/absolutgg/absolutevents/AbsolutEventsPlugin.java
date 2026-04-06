@@ -73,7 +73,6 @@ public final class AbsolutEventsPlugin extends JavaPlugin {
         }
 
         setupConfigFiles();
-        setupLeague();
 
         QuitCache.init(getDataFolder());
 
@@ -84,6 +83,8 @@ public final class AbsolutEventsPlugin extends JavaPlugin {
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
+
+        setupLeague();
 
         if (runConverterIfNeeded()) {
             return;
@@ -107,13 +108,15 @@ public final class AbsolutEventsPlugin extends JavaPlugin {
         setupMetrics();
 
         if (leagueManager != null) {
-            Bukkit.getOnlinePlayers().forEach(player -> {
-                try {
-                    leagueManager.initializePlayer(player);
-                } catch (Exception exception) {
-                    getLogger().log(Level.WARNING, "Erro ao inicializar jogador na liga: " + player.getName(), exception);
-                }
-            });
+            Bukkit.getScheduler().runTaskLater(this, () -> {
+                Bukkit.getOnlinePlayers().forEach(player -> {
+                    try {
+                        leagueManager.initializePlayer(player);
+                    } catch (Exception exception) {
+                        getLogger().log(Level.WARNING, "Erro ao inicializar jogador na liga: " + player.getName(), exception);
+                    }
+                });
+            }, 20L);
         }
 
         logInfo("Plugin iniciado com sucesso!");
@@ -385,6 +388,16 @@ public final class AbsolutEventsPlugin extends JavaPlugin {
 
         this.economy = provider.getProvider();
         return this.economy != null;
+    }
+
+    public void reloadPluginConfigs() {
+        reloadConfig();
+
+        File leagueFile = new File(getDataFolder(), "league.yml");
+        this.leagueConfig = YamlConfiguration.loadConfiguration(leagueFile);
+        this.leagueManager = new LeagueManager(this.leagueConfig);
+
+        cacheManager.updateCache();
     }
 
     private void setupInventoryApiSafely() {

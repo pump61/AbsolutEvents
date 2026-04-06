@@ -455,12 +455,44 @@ public final class EventoCommand implements CommandExecutor, TabCompleter {
             return true;
         }
 
-        AbsolutEventsPlugin.getInstance().reloadConfig();
-        AbsolutEventsPlugin.getInstance().getCacheManager().updateCache();
+        AbsolutEventsPlugin.getInstance().reloadPluginConfigs();
         InventoryManager.reload();
 
         sender.sendMessage(color(message("Messages.Reloaded")));
         return true;
+    }
+
+    private List<String> getLeaguePlayerSuggestions() {
+        LeagueManager league = AbsolutEventsPlugin.getInstance().getLeagueManager();
+        ConnectionManager connectionManager = AbsolutEventsPlugin.getInstance().getConnectionManager();
+
+        if (league == null || connectionManager == null || !league.isEnabled()) {
+            return Bukkit.getOnlinePlayers()
+                    .stream()
+                    .map(Player::getName)
+                    .filter(Objects::nonNull)
+                    .distinct()
+                    .sorted(String.CASE_INSENSITIVE_ORDER)
+                    .collect(Collectors.toList());
+        }
+
+        Set<String> names = new HashSet<>();
+
+        for (Player online : Bukkit.getOnlinePlayers()) {
+            if (online.getName() != null) {
+                names.add(online.getName());
+            }
+        }
+
+        for (ConnectionManager.LeagueData data : connectionManager.getLeaguePlayers().values()) {
+            if (data.username() != null && !data.username().isBlank()) {
+                names.add(data.username());
+            }
+        }
+
+        return names.stream()
+                .sorted(String.CASE_INSENSITIVE_ORDER)
+                .collect(Collectors.toList());
     }
 
     private boolean handleStart(CommandSender sender, String[] args) {
@@ -2032,21 +2064,9 @@ public final class EventoCommand implements CommandExecutor, TabCompleter {
             if (args.length == 3) {
                 String action = args[1].toLowerCase(Locale.ROOT);
 
-                if (Arrays.asList("info", "points", "rank", "addpoints", "removepoints", "setpoints", "setrank").contains(action)) {
-                    List<String> names = new ArrayList<>();
-
-                    for (Player online : Bukkit.getOnlinePlayers()) {
-                        names.add(online.getName());
-                    }
-
-                    for (OfflinePlayer offline : Bukkit.getOfflinePlayers()) {
-                        if (offline.getName() != null) {
-                            names.add(offline.getName());
-                        }
-                    }
-
-                    return filter(names, args[2]);
-                }
+            if (Arrays.asList("info", "points", "rank", "addpoints", "removepoints", "setpoints", "setrank").contains(action)) {
+                return filter(getLeaguePlayerSuggestions(), args[2]);
+            }
 
                 return Collections.emptyList();
             }

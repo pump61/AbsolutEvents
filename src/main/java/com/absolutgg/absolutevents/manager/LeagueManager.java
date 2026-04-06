@@ -2,14 +2,12 @@ package com.absolutgg.absolutevents.manager;
 
 import com.absolutgg.absolutevents.AbsolutEventsPlugin;
 import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -17,12 +15,14 @@ import java.util.UUID;
 public final class LeagueManager {
 
     private final AbsolutEventsPlugin plugin = AbsolutEventsPlugin.getInstance();
-    private final ConnectionManager connectionManager;
     private final YamlConfiguration config;
 
     public LeagueManager(YamlConfiguration config) {
         this.config = config;
-        this.connectionManager = plugin.getConnectionManager();
+    }
+
+    private ConnectionManager connectionManager() {
+        return plugin.getConnectionManager();
     }
 
     public boolean isEnabled() {
@@ -39,6 +39,11 @@ public final class LeagueManager {
 
     public void initializePlayer(UUID uuid, String username) {
         if (!isEnabled() || uuid == null) {
+            return;
+        }
+
+        ConnectionManager connectionManager = connectionManager();
+        if (connectionManager == null) {
             return;
         }
 
@@ -67,6 +72,11 @@ public final class LeagueManager {
             return getMinimumPoints();
         }
 
+        ConnectionManager connectionManager = connectionManager();
+        if (connectionManager == null) {
+            return getStartPoints();
+        }
+
         ConnectionManager.LeagueData data = connectionManager.getLeagueData(uuid);
         if (data == null) {
             return getStartPoints();
@@ -88,12 +98,7 @@ public final class LeagueManager {
             return getDefaultRank();
         }
 
-        ConnectionManager.LeagueData data = connectionManager.getLeagueData(uuid);
-        if (data == null || data.currentRank() == null || data.currentRank().isBlank()) {
-            return resolveRankByPoints(getStartPoints());
-        }
-
-        return data.currentRank();
+        return resolveRankByPoints(getPoints(uuid));
     }
 
     public String getRankDisplay(Player player) {
@@ -101,8 +106,7 @@ public final class LeagueManager {
     }
 
     public String getRankDisplay(UUID uuid) {
-        String rank = getRank(uuid);
-        return config.getString("League.Ranks." + rank + ".Display", rank);
+        return getRankDisplayById(getRank(uuid));
     }
 
     public String getBadge(Player player) {
@@ -110,8 +114,23 @@ public final class LeagueManager {
     }
 
     public String getBadge(UUID uuid) {
-        String rank = getRank(uuid);
-        return config.getString("League.Ranks." + rank + ".Badge", "");
+        return getBadgeById(getRank(uuid));
+    }
+
+    public String getRankBase(Player player) {
+        return getRankBase(player == null ? null : player.getUniqueId());
+    }
+
+    public String getRankBase(UUID uuid) {
+        return extractBaseRank(getRank(uuid));
+    }
+
+    public String getRankTier(Player player) {
+        return getRankTier(player == null ? null : player.getUniqueId());
+    }
+
+    public String getRankTier(UUID uuid) {
+        return extractTier(getRank(uuid));
     }
 
     public int getWins(Player player) {
@@ -120,6 +139,11 @@ public final class LeagueManager {
 
     public int getWins(UUID uuid) {
         if (!isEnabled() || uuid == null) {
+            return 0;
+        }
+
+        ConnectionManager connectionManager = connectionManager();
+        if (connectionManager == null) {
             return 0;
         }
 
@@ -136,6 +160,11 @@ public final class LeagueManager {
             return 0;
         }
 
+        ConnectionManager connectionManager = connectionManager();
+        if (connectionManager == null) {
+            return 0;
+        }
+
         ConnectionManager.LeagueData data = connectionManager.getLeagueData(uuid);
         return data == null ? 0 : data.losses();
     }
@@ -146,6 +175,11 @@ public final class LeagueManager {
 
     public int getPlayed(UUID uuid) {
         if (!isEnabled() || uuid == null) {
+            return 0;
+        }
+
+        ConnectionManager connectionManager = connectionManager();
+        if (connectionManager == null) {
             return 0;
         }
 
@@ -181,11 +215,10 @@ public final class LeagueManager {
         String currentRank = getRank(uuid);
         int currentRequired = getRankRequiredPoints(currentRank);
 
-        List<String> ranks = getOrderedRanks();
-        for (String rank : ranks) {
-            int required = getRankRequiredPoints(rank);
+        for (String rankId : getOrderedRanks()) {
+            int required = getRankRequiredPoints(rankId);
             if (required > currentRequired) {
-                return rank;
+                return rankId;
             }
         }
 
@@ -277,6 +310,11 @@ public final class LeagueManager {
             return;
         }
 
+        ConnectionManager connectionManager = connectionManager();
+        if (connectionManager == null) {
+            return;
+        }
+
         Map<UUID, ConnectionManager.LeagueData> players = connectionManager.getLeaguePlayers();
         String defaultRank = getDefaultRank();
         int startPoints = getStartPoints();
@@ -290,6 +328,12 @@ public final class LeagueManager {
 
     public List<ConnectionManager.LeagueData> getCurrentSeasonRanking() {
         List<ConnectionManager.LeagueData> result = new ArrayList<>();
+
+        ConnectionManager connectionManager = connectionManager();
+        if (connectionManager == null) {
+            return result;
+        }
+
         Map<UUID, ConnectionManager.LeagueData> all = connectionManager.getLeaguePlayers();
 
         for (ConnectionManager.LeagueData data : all.values()) {
@@ -298,12 +342,26 @@ public final class LeagueManager {
             }
         }
 
-        result.sort(
-                Comparator.comparingInt(ConnectionManager.LeagueData::points).reversed()
-                        .thenComparingInt(ConnectionManager.LeagueData::wins).reversed()
-                        .thenComparingInt(ConnectionManager.LeagueData::losses)
-                        .thenComparing(ConnectionManager.LeagueData::username, String.CASE_INSENSITIVE_ORDER)
-        );
+        result.sort((a, b) -> {
+            int comparePoints = Integer.compare(b.points(), a.points());
+            if (comparePoints != 0) {
+                return comparePoints;
+            }
+
+            int compareWins = Integer.compare(b.wins(), a.wins());
+            if (compareWins != 0) {
+                return compareWins;
+            }
+
+            int compareLosses = Integer.compare(a.losses(), b.losses());
+            if (compareLosses != 0) {
+                return compareLosses;
+            }
+
+            String aName = a.username() == null ? "" : a.username();
+            String bName = b.username() == null ? "" : b.username();
+            return aName.compareToIgnoreCase(bName);
+        });
 
         return result;
     }
@@ -359,27 +417,24 @@ public final class LeagueManager {
             return getDefaultRank();
         }
 
-        String rank = ranking.get(position - 1).currentRank();
-        return rank == null || rank.isBlank() ? getDefaultRank() : rank;
+        return resolveRankByPoints(ranking.get(position - 1).points());
     }
 
     public String getTopRankDisplay(int position) {
-        String rank = getTopRank(position);
-        return config.getString("League.Ranks." + rank + ".Display", rank);
+        return getRankDisplayById(getTopRank(position));
     }
 
     public String getTopBadge(int position) {
-        String rank = getTopRank(position);
-        return config.getString("League.Ranks." + rank + ".Badge", "");
+        return getBadgeById(getTopRank(position));
     }
 
     public String resolveRankByPoints(int points) {
         String selected = getDefaultRank();
 
-        for (String rank : getOrderedRanks()) {
-            int required = getRankRequiredPoints(rank);
+        for (String rankId : getOrderedRanks()) {
+            int required = getRankRequiredPoints(rankId);
             if (points >= required) {
-                selected = rank;
+                selected = rankId;
             }
         }
 
@@ -387,25 +442,26 @@ public final class LeagueManager {
     }
 
     private void applyWin(Player player, String eventKey) {
-        if (player == null) return;
+        if (player == null) {
+            return;
+        }
 
         initializePlayer(player);
 
-        ConnectionManager.LeagueData current = getOrDefaultData(player);
+        ConnectionManager connectionManager = connectionManager();
+        if (connectionManager == null) {
+            return;
+        }
 
+        ConnectionManager.LeagueData current = getOrDefaultData(player);
         int delta = getWinPoints(eventKey);
         int newPoints = Math.max(current.points() + delta, getMinimumPoints());
 
         String newRank = resolveRankByPoints(newPoints);
-        String newPeakRank = getHigherRank(current.peakRank(), newRank);
-
-        connectionManager.updateLeaguePointsAndRank(
-                player.getUniqueId(),
-                player.getName(),
-                newPoints,
-                newRank,
-                newPeakRank
-        );
+        String currentPeak = current.peakRank() == null || current.peakRank().isBlank()
+                ? getDefaultRank()
+                : current.peakRank();
+        String newPeakRank = getHigherRank(currentPeak, newRank);
 
         connectionManager.updateLeagueProfile(
                 player.getUniqueId(),
@@ -414,31 +470,36 @@ public final class LeagueManager {
                 true,
                 getMinimumPoints()
         );
-    }
-
-    private void applyLoss(Player player, String eventKey, boolean multipleWinners) {
-        if (player == null) return;
-
-        initializePlayer(player);
-
-        ConnectionManager.LeagueData current = getOrDefaultData(player);
-
-        int configuredLoss = multipleWinners
-                ? getMultipleWinnersLosePoints(eventKey)
-                : getLosePoints(eventKey);
-
-        int delta = -Math.max(configuredLoss, 0);
-        int newPoints = Math.max(current.points() + delta, getMinimumPoints());
-
-        String newRank = resolveRankByPoints(newPoints);
 
         connectionManager.updateLeaguePointsAndRank(
                 player.getUniqueId(),
                 player.getName(),
                 newPoints,
                 newRank,
-                current.peakRank()
+                newPeakRank
         );
+    }
+
+    private void applyLoss(Player player, String eventKey, boolean multipleWinners) {
+        if (player == null) {
+            return;
+        }
+
+        initializePlayer(player);
+
+        ConnectionManager connectionManager = connectionManager();
+        if (connectionManager == null) {
+            return;
+        }
+
+        ConnectionManager.LeagueData current = getOrDefaultData(player);
+        int configuredLoss = multipleWinners
+                ? getMultipleWinnersLosePoints(eventKey)
+                : getLosePoints(eventKey);
+
+        int delta = -Math.max(configuredLoss, 0);
+        int newPoints = Math.max(current.points() + delta, getMinimumPoints());
+        String newRank = resolveRankByPoints(newPoints);
 
         connectionManager.updateLeagueProfile(
                 player.getUniqueId(),
@@ -446,6 +507,14 @@ public final class LeagueManager {
                 delta,
                 false,
                 getMinimumPoints()
+        );
+
+        connectionManager.updateLeaguePointsAndRank(
+                player.getUniqueId(),
+                player.getName(),
+                newPoints,
+                newRank,
+                current.peakRank() == null || current.peakRank().isBlank() ? getDefaultRank() : current.peakRank()
         );
     }
 
@@ -489,6 +558,21 @@ public final class LeagueManager {
     }
 
     private ConnectionManager.LeagueData getOrDefaultData(Player player) {
+        ConnectionManager connectionManager = connectionManager();
+        if (connectionManager == null) {
+            return new ConnectionManager.LeagueData(
+                    player.getUniqueId(),
+                    player.getName(),
+                    getStartPoints(),
+                    0,
+                    0,
+                    0,
+                    getDefaultRank(),
+                    getDefaultRank(),
+                    getSeasonId()
+            );
+        }
+
         ConnectionManager.LeagueData data = connectionManager.getLeagueData(player.getUniqueId());
         if (data != null) {
             return data;
@@ -508,13 +592,21 @@ public final class LeagueManager {
     }
 
     private void executeSeasonRewards(ConnectionManager.LeagueData data) {
-        String rank = data.currentRank();
-        List<String> commands = config.getStringList("League.Season rewards." + rank + ".Commands");
+        String currentRank = data.currentRank();
+        String baseRank = extractBaseRank(currentRank);
+
+        List<String> commands = config.getStringList("League.Season rewards." + currentRank + ".Commands");
+        if (commands.isEmpty()) {
+            commands = config.getStringList("League.Season rewards." + baseRank + ".Commands");
+        }
+
         if (commands.isEmpty()) {
             return;
         }
 
-        String playerName = data.username() == null || data.username().isBlank() ? data.uuid().toString() : data.username();
+        String playerName = data.username() == null || data.username().isBlank()
+                ? data.uuid().toString()
+                : data.username();
 
         for (String command : commands) {
             String parsed = command.replace("@winner", playerName);
@@ -525,13 +617,23 @@ public final class LeagueManager {
     private List<String> getOrderedRanks() {
         List<String> ranks = new ArrayList<>();
 
-        ConfigurationSection section = config.getConfigurationSection("League.Ranks");
-        if (section == null) {
+        ConfigurationSection ranksSection = config.getConfigurationSection("League.Ranks");
+        if (ranksSection == null) {
             return ranks;
         }
 
-        ranks.addAll(section.getKeys(false));
-        ranks.sort(Comparator.comparingInt(this::getRankRequiredPoints));
+        for (String baseRank : ranksSection.getKeys(false)) {
+            ConfigurationSection tiersSection = config.getConfigurationSection("League.Ranks." + baseRank + ".Tiers");
+            if (tiersSection == null) {
+                continue;
+            }
+
+            for (String tier : tiersSection.getKeys(false)) {
+                ranks.add(baseRank + "_" + tier);
+            }
+        }
+
+        ranks.sort((a, b) -> Integer.compare(getRankRequiredPoints(a), getRankRequiredPoints(b)));
         return ranks;
     }
 
@@ -545,7 +647,87 @@ public final class LeagueManager {
         if (rank == null || rank.isBlank()) {
             return 0;
         }
-        return config.getInt("League.Ranks." + rank + ".Points", 0);
+
+        String baseRank = extractBaseRank(rank);
+        String tier = extractTier(rank);
+
+        if (baseRank.isBlank() || tier.isBlank()) {
+            return 0;
+        }
+
+        return config.getInt("League.Ranks." + baseRank + ".Tiers." + tier + ".Points", 0);
+    }
+
+    private String getRankDisplayById(String rank) {
+        if (rank == null || rank.isBlank()) {
+            return getDefaultRank();
+        }
+
+        String baseRank = extractBaseRank(rank);
+        String tier = extractTier(rank);
+
+        if (baseRank.isBlank() || tier.isBlank()) {
+            return rank;
+        }
+
+        return config.getString("League.Ranks." + baseRank + ".Tiers." + tier + ".Display", rank);
+    }
+
+    private String getBadgeById(String rank) {
+        if (rank == null || rank.isBlank()) {
+            return "";
+        }
+
+        String baseRank = extractBaseRank(rank);
+        String tier = extractTier(rank);
+
+        if (baseRank.isBlank() || tier.isBlank()) {
+            return "";
+        }
+
+        return config.getString("League.Ranks." + baseRank + ".Tiers." + tier + ".Badge", "");
+    }
+
+    private String extractBaseRank(String rank) {
+        if (rank == null || rank.isBlank()) {
+            return "";
+        }
+
+        int separator = rank.lastIndexOf('_');
+        if (separator == -1) {
+            return rank.toUpperCase();
+        }
+
+        return rank.substring(0, separator).toUpperCase();
+    }
+
+    private String extractTier(String rank) {
+        if (rank == null || rank.isBlank()) {
+            return "";
+        }
+
+        int separator = rank.lastIndexOf('_');
+        if (separator == -1 || separator + 1 >= rank.length()) {
+            return "";
+        }
+
+        return rank.substring(separator + 1);
+    }
+
+    public String getRankDisplayByIdPublic(String rank) {
+        return getRankDisplayById(rank);
+    }
+
+    public String getBadgeByIdPublic(String rank) {
+        return getBadgeById(rank);
+    }
+
+    public String getRankBaseByIdPublic(String rank) {
+        return extractBaseRank(rank);
+    }
+
+    public String getRankTierByIdPublic(String rank) {
+        return extractTier(rank);
     }
 
     private boolean isEventEnabled(String eventKey) {
@@ -582,6 +764,37 @@ public final class LeagueManager {
     }
 
     public String getDefaultRank() {
-        return config.getString("League.Defaults.Default rank", "BRONZE");
+        String configured = config.getString("League.Defaults.Default rank", "").trim();
+
+        if (!configured.isBlank()) {
+            if (configured.contains("_")) {
+                return configured.toUpperCase();
+            }
+
+            ConfigurationSection tiersSection = config.getConfigurationSection("League.Ranks." + configured.toUpperCase() + ".Tiers");
+            if (tiersSection != null) {
+                String firstTier = null;
+                int lowest = Integer.MAX_VALUE;
+
+                for (String tier : tiersSection.getKeys(false)) {
+                    int points = config.getInt("League.Ranks." + configured.toUpperCase() + ".Tiers." + tier + ".Points", 0);
+                    if (points < lowest) {
+                        lowest = points;
+                        firstTier = tier;
+                    }
+                }
+
+                if (firstTier != null) {
+                    return configured.toUpperCase() + "_" + firstTier;
+                }
+            }
+        }
+
+        List<String> ordered = getOrderedRanks();
+        if (!ordered.isEmpty()) {
+            return ordered.get(0);
+        }
+
+        return "UNRANKED_I";
     }
 }

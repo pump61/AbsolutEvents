@@ -4,6 +4,7 @@ import com.absolutgg.absolutevents.AbsolutEventsPlugin;
 import com.absolutgg.absolutevents.manager.LeagueManager;
 import com.absolutgg.absolutevents.manager.ParkourRecordManager;
 import com.absolutgg.absolutevents.manager.TournamentStatsManager;
+import com.absolutgg.absolutevents.utils.ColorUtils;
 import com.absolutgg.absolutevents.utils.EventoConfigFile;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.OfflinePlayer;
@@ -114,7 +115,13 @@ public final class PlaceholderAPIHook extends PlaceholderExpansion {
                     return league.getRank(player.getUniqueId());
 
                 case "league_rank_display":
-                    return league.getRankDisplay(player.getUniqueId());
+                    return ColorUtils.colorize(league.getRankDisplay(player.getUniqueId()));
+
+                case "league_rank_base":
+                    return league.getRankBase(player.getUniqueId());
+
+                case "league_rank_tier":
+                    return league.getRankTier(player.getUniqueId());
 
                 case "league_badge":
                     return league.getBadge(player.getUniqueId());
@@ -134,6 +141,18 @@ public final class PlaceholderAPIHook extends PlaceholderExpansion {
                 case "league_next_rank":
                     return league.getNextRank(player.getUniqueId());
 
+                case "league_next_rank_display":
+                    return ColorUtils.colorize(league.getRankDisplayByIdPublic(league.getNextRank(player.getUniqueId())));
+
+                case "league_next_rank_base":
+                    return league.getRankBaseByIdPublic(league.getNextRank(player.getUniqueId()));
+
+                case "league_next_rank_tier":
+                    return league.getRankTierByIdPublic(league.getNextRank(player.getUniqueId()));
+
+                case "league_next_badge":
+                    return league.getBadgeByIdPublic(league.getNextRank(player.getUniqueId()));
+
                 case "league_points_to_next":
                     return String.valueOf(league.getPointsToNextRank(player.getUniqueId()));
             }
@@ -152,7 +171,17 @@ public final class PlaceholderAPIHook extends PlaceholderExpansion {
 
             if (normalized.startsWith("league_top_rank_display_")) {
                 Integer pos = parseTopPosition(normalized, "league_top_rank_display_");
-                return pos == null ? "-" : league.getTopRankDisplay(pos);
+                return pos == null ? "-" : ColorUtils.colorize(league.getTopRankDisplay(pos));
+            }
+
+            if (normalized.startsWith("league_top_rank_base_")) {
+                Integer pos = parseTopPosition(normalized, "league_top_rank_base_");
+                return pos == null ? "-" : league.getRankBaseByIdPublic(league.getTopRank(pos));
+            }
+
+            if (normalized.startsWith("league_top_rank_tier_")) {
+                Integer pos = parseTopPosition(normalized, "league_top_rank_tier_");
+                return pos == null ? "-" : league.getRankTierByIdPublic(league.getTopRank(pos));
             }
 
             if (normalized.startsWith("league_top_rank_")) {
