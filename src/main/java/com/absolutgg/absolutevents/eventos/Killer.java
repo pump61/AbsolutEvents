@@ -4,7 +4,6 @@ import com.absolutgg.absolutevents.AbsolutEventsPlugin;
 import com.absolutgg.absolutevents.api.Evento;
 import com.absolutgg.absolutevents.discord.DiscordWebhookManager;
 import com.absolutgg.absolutevents.listeners.eventos.KillerListener;
-import com.absolutgg.absolutevents.manager.LeagueManager;
 import com.absolutgg.absolutevents.manager.TournamentStatsManager;
 import com.absolutgg.absolutevents.utils.ColorUtils;
 import com.absolutgg.absolutevents.utils.CustomItemResolver;
@@ -23,7 +22,7 @@ import org.bukkit.scheduler.BukkitTask;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -39,9 +38,10 @@ public final class Killer extends Evento {
 
     private boolean pvpEnabled;
     private boolean ending;
+    private boolean started;
 
     private BukkitTask actionbarTask;
-    private final Set<UUID> rewardProtected = new HashSet<>();
+    private final Set<UUID> rewardProtected = new LinkedHashSet<>();
 
     private int enablingTime;
 
@@ -52,6 +52,12 @@ public final class Killer extends Evento {
 
     @Override
     public void start() {
+        if (started) {
+            return;
+        }
+
+        started = true;
+
         plugin.getServer().getPluginManager().registerEvents(listener, plugin);
         listener.setEvento();
 
@@ -84,6 +90,7 @@ public final class Killer extends Evento {
     @Override
     public void stop() {
         cancelTask(actionbarTask);
+        HandlerList.unregisterAll(listener);
 
         for (Player player : new ArrayList<>(getPlayers())) {
             if (!rewardProtected.contains(player.getUniqueId())) {
@@ -92,15 +99,25 @@ public final class Killer extends Evento {
                 player.getInventory().setItemInOffHand(null);
                 player.updateInventory();
             }
-        }
 
-        HandlerList.unregisterAll(listener);
-        removePlayers();
+            super.remove(player);
+        }
 
         kills.clear();
         rewardProtected.clear();
         pvpEnabled = false;
         ending = false;
+        started = false;
+    }
+
+    @Override
+    public void leave(Player player) {
+        if (ending) {
+            super.remove(player);
+            return;
+        }
+
+        super.leave(player);
     }
 
     @Override
@@ -145,18 +162,21 @@ public final class Killer extends Evento {
         stopKeepingWinner(player);
 
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
-            if (!player.isOnline()) {
-                return;
-            }
+            try {
+                if (player.isOnline()) {
+                    for (String command : config.getStringList("Rewards.Commands")) {
+                        executeConsoleCommand(player, command.replace("@winner", player.getName()));
+                    }
 
-            for (String command : config.getStringList("Rewards.Commands")) {
-                executeConsoleCommand(player, command.replace("@winner", player.getName()));
+                    player.updateInventory();
+                    super.remove(player);
+                    sendToSpawn(player);
+                }
+            } finally {
+                rewardProtected.clear();
+                stop();
             }
-
-            player.updateInventory();
         }, 20L);
-
-        Bukkit.getScheduler().runTaskLater(plugin, rewardProtected::clear, 60L);
     }
 
     private void stopKeepingWinner(Player winner) {
@@ -168,11 +188,11 @@ public final class Killer extends Evento {
                 player.getInventory().setArmorContents(new ItemStack[4]);
                 player.getInventory().setItemInOffHand(null);
                 player.updateInventory();
+                super.remove(player);
             }
         }
 
         HandlerList.unregisterAll(listener);
-        removePlayers();
         pvpEnabled = false;
     }
 
@@ -275,18 +295,27 @@ public final class Killer extends Evento {
 
     private void sendToEvent(String message) {
         String parsed = ColorUtils.colorize(message);
+        Set<UUID> sent = new LinkedHashSet<>();
 
         for (Player player : getPlayers()) {
-            player.sendMessage(parsed);
+            if (sent.add(player.getUniqueId())) {
+                player.sendMessage(parsed);
+            }
         }
 
         for (Player player : getSpectators()) {
-            player.sendMessage(parsed);
+            if (sent.add(player.getUniqueId())) {
+                player.sendMessage(parsed);
+            }
         }
     }
 
     private void broadcast(String message) {
         Bukkit.broadcastMessage(ColorUtils.colorize(message));
+    }
+
+    private void sendToSpawn(Player player) {
+        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "spawn " + player.getName());
     }
 
     private boolean isKitEnabled() {

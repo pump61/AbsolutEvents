@@ -1114,23 +1114,26 @@ public final class EventoCommand implements CommandExecutor, TabCompleter {
 
                 updated = Math.max(updated, 0);
 
-                connectionManager.setLeaguePoints(target.getUniqueId(), updated);
-
                 String newRank = league.resolveRankByPoints(updated);
-                connectionManager.setLeagueRank(target.getUniqueId(), newRank);
+                ConnectionManager.LeagueData existing = connectionManager.getLeagueData(target.getUniqueId());
+                String peakRank = existing != null && existing.peakRank() != null && !existing.peakRank().isBlank()
+                        ? existing.peakRank()
+                        : league.getDefaultRank();
 
-                ConnectionManager.LeagueData data = connectionManager.getLeagueData(target.getUniqueId());
-                if (data != null) {
-                    String peakRank = data.peakRank();
-                    if (getRankPoints(league, newRank) > getRankPoints(league, peakRank)) {
-                        connectionManager.setLeaguePeakRank(target.getUniqueId(), newRank);
-                    }
-                } else {
-                    connectionManager.setLeaguePeakRank(target.getUniqueId(), newRank);
+                if (getRankPoints(league, newRank) > getRankPoints(league, peakRank)) {
+                    peakRank = newRank;
                 }
 
-                sender.sendMessage(color("&aPontos de &f" + safeName(target) + "&aatualizados para &f" + updated + "&a."));
-                sender.sendMessage(color("&7Novo rank: &f" + league.getRankDisplay(target.getUniqueId()) + " &7(" + newRank + ")"));
+                connectionManager.updateLeaguePointsAndRank(
+                        target.getUniqueId(),
+                        safeName(target),
+                        updated,
+                        newRank,
+                        peakRank
+                );
+
+                sender.sendMessage(color("&aPontos de &f" + safeName(target) + "&a atualizados para &f" + updated + "&a."));
+                sender.sendMessage(color("&7Novo rank: &f" + league.getRankDisplayByIdPublic(newRank) + " &7(" + newRank + ")"));
 
                 Player online = target.getPlayer();
                 if (online != null && online.isOnline()) {
@@ -1161,20 +1164,24 @@ public final class EventoCommand implements CommandExecutor, TabCompleter {
                 league.initializePlayer(target.getUniqueId(), target.getName());
 
                 int rankPoints = getRankPoints(league, rank);
-                connectionManager.setLeaguePoints(target.getUniqueId(), rankPoints);
-                connectionManager.setLeagueRank(target.getUniqueId(), rank);
+                ConnectionManager.LeagueData existing = connectionManager.getLeagueData(target.getUniqueId());
+                String peakRank = existing != null && existing.peakRank() != null && !existing.peakRank().isBlank()
+                        ? existing.peakRank()
+                        : league.getDefaultRank();
 
-                ConnectionManager.LeagueData data = connectionManager.getLeagueData(target.getUniqueId());
-                if (data != null) {
-                    String peakRank = data.peakRank();
-                    if (getRankPoints(league, rank) > getRankPoints(league, peakRank)) {
-                        connectionManager.setLeaguePeakRank(target.getUniqueId(), rank);
-                    }
-                } else {
-                    connectionManager.setLeaguePeakRank(target.getUniqueId(), rank);
+                if (getRankPoints(league, rank) > getRankPoints(league, peakRank)) {
+                    peakRank = rank;
                 }
 
-                sender.sendMessage(color("&aRank de &f" + safeName(target) + "&aatualizado para &f" + rank + "&a."));
+                connectionManager.updateLeaguePointsAndRank(
+                        target.getUniqueId(),
+                        safeName(target),
+                        rankPoints,
+                        rank,
+                        peakRank
+                );
+
+                sender.sendMessage(color("&aRank de &f" + safeName(target) + "&a atualizado para &f" + rank + "&a."));
                 return true;
             }
 
@@ -1188,26 +1195,62 @@ public final class EventoCommand implements CommandExecutor, TabCompleter {
                     }
                 }
 
+                if (limit < 10) {
+                    limit = 10;
+                }
+
                 List<ConnectionManager.LeagueData> ranking = league.getTopRanking(limit);
 
+                String emptyMessage = AbsolutEventsPlugin.getInstance().getConfig()
+                        .getString("League top.Empty", "&cAinda não há jogadores no ranking da liga.");
+
+                String headerMessage = AbsolutEventsPlugin.getInstance().getConfig()
+                        .getString("League top.Header", "&6[Top Liga] &fTop @amount");
+
+                String formatMessage = AbsolutEventsPlugin.getInstance().getConfig()
+                        .getString("League top.Format", "&a#@position &f@player &8- &f@badge @rank_display &8- &f@points pontos");
+
                 if (ranking.isEmpty()) {
-                    sender.sendMessage(color("&cAinda não há jogadores no ranking da liga."));
+                    sender.sendMessage(color(emptyMessage));
                     return true;
                 }
 
-                sender.sendMessage(color("&6[Top Liga] &fTop " + ranking.size()));
+                sender.sendMessage(color(headerMessage.replace("@amount", String.valueOf(limit))));
 
-                for (int i = 0; i < ranking.size(); i++) {
+                for (int i = 0; i < limit; i++) {
+                    int position = i + 1;
+
+                    if (i >= ranking.size()) {
+                        sender.sendMessage(color(
+                                formatMessage
+                                        .replace("@position", String.valueOf(position))
+                                        .replace("@player", "-")
+                                        .replace("@badge", "")
+                                        .replace("@rank_display", "-")
+                                        .replace("@rank", "-")
+                                        .replace("@points", "0")
+                        ));
+                        continue;
+                    }
+
                     ConnectionManager.LeagueData data = ranking.get(i);
-                    String name = data.username() == null || data.username().isBlank() ? data.uuid().toString() : data.username();
-                    String rankDisplay = league.getRankDisplay(data.uuid());
-                    String badge = league.getBadge(data.uuid());
+
+                    String name = data.username() == null || data.username().isBlank()
+                            ? data.uuid().toString()
+                            : data.username();
+
+                    String rankId = league.resolveRankByPoints(data.points());
+                    String rankDisplay = league.getRankDisplayByIdPublic(rankId);
+                    String badge = league.getBadgeByIdPublic(rankId);
 
                     sender.sendMessage(color(
-                            "&e#" + (i + 1) +
-                                    " &f" + name +
-                                    " &8- " + badge + " " + rankDisplay +
-                                    " &8- &f" + data.points() + " pontos"
+                            formatMessage
+                                    .replace("@position", String.valueOf(position))
+                                    .replace("@player", name)
+                                    .replace("@badge", badge == null ? "" : badge)
+                                    .replace("@rank_display", rankDisplay == null ? "-" : rankDisplay)
+                                    .replace("@rank", rankId == null ? "-" : rankId)
+                                    .replace("@points", String.valueOf(data.points()))
                     ));
                 }
 
@@ -1226,6 +1269,7 @@ public final class EventoCommand implements CommandExecutor, TabCompleter {
         sender.sendMessage(color("&e/evento league info <player>"));
         sender.sendMessage(color("&e/evento league points <player>"));
         sender.sendMessage(color("&e/evento league rank <player>"));
+        sender.sendMessage(color("&e/evento league top [quantidade]"));
         sender.sendMessage(color("&e/evento league addpoints <player> <amount>"));
         sender.sendMessage(color("&e/evento league removepoints <player> <amount>"));
         sender.sendMessage(color("&e/evento league setpoints <player> <amount>"));
@@ -1237,6 +1281,17 @@ public final class EventoCommand implements CommandExecutor, TabCompleter {
         Player online = Bukkit.getPlayerExact(input);
         if (online != null) {
             return online;
+        }
+
+        LeagueManager league = AbsolutEventsPlugin.getInstance().getLeagueManager();
+        ConnectionManager connectionManager = AbsolutEventsPlugin.getInstance().getConnectionManager();
+
+        if (league != null && connectionManager != null && league.isEnabled()) {
+            for (ConnectionManager.LeagueData data : connectionManager.getLeaguePlayers().values()) {
+                if (data.username() != null && data.username().equalsIgnoreCase(input)) {
+                    return Bukkit.getOfflinePlayer(data.uuid());
+                }
+            }
         }
 
         OfflinePlayer[] offlinePlayers = Bukkit.getOfflinePlayers();
@@ -1266,15 +1321,16 @@ public final class EventoCommand implements CommandExecutor, TabCompleter {
             return 0;
         }
 
-        return league.resolveRankByPoints(Integer.MAX_VALUE).equalsIgnoreCase(rank)
-                ? getRankPointsFromConfig(rank)
-                : getRankPointsFromConfig(rank);
-    }
+        String base = league.getRankBaseByIdPublic(rank);
+        String tier = league.getRankTierByIdPublic(rank);
 
-    private int getRankPointsFromConfig(String rank) {
+        if (base == null || base.isBlank() || tier == null || tier.isBlank()) {
+            return 0;
+        }
+
         return AbsolutEventsPlugin.getInstance()
                 .getLeagueConfig()
-                .getInt("League.Ranks." + rank + ".Points", 0);
+                .getInt("League.Ranks." + base + ".Tiers." + tier + ".Points", 0);
     }
 
     private boolean isValidLeagueRank(String rank) {
@@ -1290,7 +1346,19 @@ public final class EventoCommand implements CommandExecutor, TabCompleter {
             return Collections.emptyList();
         }
 
-        List<String> ranks = new ArrayList<>(section.getKeys(false));
+        List<String> ranks = new ArrayList<>();
+
+        for (String baseRank : section.getKeys(false)) {
+            ConfigurationSection tiers = section.getConfigurationSection(baseRank + ".Tiers");
+            if (tiers == null) {
+                continue;
+            }
+
+            for (String tier : tiers.getKeys(false)) {
+                ranks.add((baseRank + "_" + tier).toUpperCase(Locale.ROOT));
+            }
+        }
+
         ranks.sort(String.CASE_INSENSITIVE_ORDER);
         return ranks;
     }
@@ -1967,6 +2035,7 @@ public final class EventoCommand implements CommandExecutor, TabCompleter {
         ItemStack cursor = player.getItemOnCursor();
         return cursor == null || cursor.getType() == Material.AIR;
     }
+
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         if (!command.getName().equalsIgnoreCase("evento")) {
@@ -2064,9 +2133,13 @@ public final class EventoCommand implements CommandExecutor, TabCompleter {
             if (args.length == 3) {
                 String action = args[1].toLowerCase(Locale.ROOT);
 
-            if (Arrays.asList("info", "points", "rank", "addpoints", "removepoints", "setpoints", "setrank").contains(action)) {
-                return filter(getLeaguePlayerSuggestions(), args[2]);
-            }
+                if (Arrays.asList("info", "points", "rank", "addpoints", "removepoints", "setpoints", "setrank").contains(action)) {
+                    return filter(getLeaguePlayerSuggestions(), args[2]);
+                }
+
+                if (action.equals("top")) {
+                    return filter(Arrays.asList("10", "15", "20", "30", "50"), args[2]);
+                }
 
                 return Collections.emptyList();
             }
@@ -2080,14 +2153,6 @@ public final class EventoCommand implements CommandExecutor, TabCompleter {
 
                 if (action.equals("setrank")) {
                     return filter(getLeagueRanks(), args[3]);
-                }
-            }
-
-            if (args.length == 3) {
-                String action = args[1].toLowerCase(Locale.ROOT);
-
-                if (action.equals("top")) {
-                    return filter(Arrays.asList("10", "15", "20", "30", "50"), args[2]);
                 }
             }
         }

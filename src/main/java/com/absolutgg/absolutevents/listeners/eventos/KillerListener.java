@@ -6,14 +6,19 @@ import com.absolutgg.absolutevents.eventos.Killer;
 import com.absolutgg.absolutevents.utils.ColorUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
+import org.bukkit.entity.TNTPrimed;
+import org.bukkit.entity.Tameable;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.metadata.MetadataValue;
+import org.bukkit.projectiles.ProjectileSource;
 
 public final class KillerListener implements Listener {
 
@@ -139,7 +144,7 @@ public final class KillerListener implements Listener {
 
         Bukkit.getPluginManager().callEvent(loseEvent);
 
-        if (killer.isHappening() && killer.getPlayers().size() == 1) {
+        if (killer.isHappening() && killer.getPlayers().size() == 1 && !killer.isEnding()) {
             killer.winner(killer.getPlayers().get(0));
         }
     }
@@ -156,19 +161,91 @@ public final class KillerListener implements Listener {
     }
 
     private Player getDamager(EntityDamageByEntityEvent event) {
-        if (event.getDamager() instanceof Player player) {
+        return resolveTrueAttacker(event.getDamager());
+    }
+
+    private Player resolveTrueAttacker(Entity entity) {
+        if (entity == null) {
+            return null;
+        }
+
+        if (entity instanceof Player player) {
             return player;
         }
 
-        if (event.getDamager() instanceof Projectile projectile
-                && projectile.getShooter() instanceof Player shooter) {
-            return shooter;
+        if (entity instanceof Projectile projectile) {
+            ProjectileSource shooter = projectile.getShooter();
+
+            if (shooter instanceof Player player) {
+                return player;
+            }
+
+            if (shooter instanceof Entity shooterEntity) {
+                Player resolved = resolveTrueAttacker(shooterEntity);
+                if (resolved != null) {
+                    return resolved;
+                }
+            }
         }
 
-        return shooterSafeNull(event);
+        if (entity instanceof TNTPrimed tnt) {
+            Entity source = tnt.getSource();
+            if (source instanceof Player player) {
+                return player;
+            }
+
+            if (source != null) {
+                Player resolved = resolveTrueAttacker(source);
+                if (resolved != null) {
+                    return resolved;
+                }
+            }
+        }
+
+        if (entity instanceof Tameable tameable) {
+            if (tameable.getOwner() instanceof Player player) {
+                return player;
+            }
+        }
+
+        Player metadataResolved = resolveMetadataPlayer(entity, "caster");
+        if (metadataResolved != null) {
+            return metadataResolved;
+        }
+
+        metadataResolved = resolveMetadataPlayer(entity, "owner");
+        if (metadataResolved != null) {
+            return metadataResolved;
+        }
+
+        metadataResolved = resolveMetadataPlayer(entity, "player");
+        if (metadataResolved != null) {
+            return metadataResolved;
+        }
+
+        return null;
     }
 
-    private Player shooterSafeNull(EntityDamageByEntityEvent event) {
+    private Player resolveMetadataPlayer(Entity entity, String key) {
+        if (!entity.hasMetadata(key)) {
+            return null;
+        }
+
+        for (MetadataValue meta : entity.getMetadata(key)) {
+            Object value = meta.value();
+
+            if (value instanceof Player player) {
+                return player;
+            }
+
+            if (value instanceof String stringValue) {
+                Player byName = Bukkit.getPlayerExact(stringValue);
+                if (byName != null) {
+                    return byName;
+                }
+            }
+        }
+
         return null;
     }
 
