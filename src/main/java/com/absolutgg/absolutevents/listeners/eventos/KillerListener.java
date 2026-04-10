@@ -133,20 +133,14 @@ public final class KillerListener implements Listener {
                         .getString("Messages.Eliminated", "&cVocê foi eliminado.")
         ));
 
-        killer.remove(dead);
-        killer.leaveBungeecord(dead);
-
         PlayerLoseEvent loseEvent = new PlayerLoseEvent(
                 dead,
                 killer.getConfig().getString("filename", "").replace(".yml", ""),
                 killer.getType()
         );
-
         Bukkit.getPluginManager().callEvent(loseEvent);
 
-        if (killer.isHappening() && killer.getPlayers().size() == 1 && !killer.isEnding()) {
-            killer.winner(killer.getPlayers().get(0));
-        }
+        killer.remove(dead);
     }
 
     private void preparePlayer(Player player) {

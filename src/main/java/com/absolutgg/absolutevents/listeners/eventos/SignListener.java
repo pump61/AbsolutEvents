@@ -54,6 +54,10 @@ public final class SignListener implements Listener {
             return;
         }
 
+        if (!signEvent.isHappening() || signEvent.isEnding()) {
+            return;
+        }
+
         if (event.getTo() == null) {
             return;
         }
@@ -116,6 +120,11 @@ public final class SignListener implements Listener {
         }
 
         if (!signEvent.isBackItem(event.getItem())) {
+            return;
+        }
+
+        if (!signEvent.isHappening() || signEvent.isEnding()) {
+            event.setCancelled(true);
             return;
         }
 
@@ -373,7 +382,7 @@ public final class SignListener implements Listener {
                 section.getDouble("x"),
                 section.getDouble("y"),
                 section.getDouble("z")
-            );
+        );
 
         return isNearBlock(loc, saved, 1, 2, 1);
     }

@@ -73,7 +73,6 @@ public final class Sign extends Evento {
     @Override
     public void join(Player player) {
         super.join(player);
-        giveBackItem(player);
     }
 
     @Override
@@ -207,6 +206,10 @@ public final class Sign extends Evento {
         return this.returnOnDamage;
     }
 
+    public boolean isEnding() {
+        return ending;
+    }
+
     public String getRecordKey() {
         String filename = config.getString("filename", "");
         if (filename == null || filename.isBlank()) {
@@ -286,6 +289,10 @@ public final class Sign extends Evento {
         );
 
         return item.getItemMeta().getDisplayName().equals(expected);
+    }
+
+    public boolean canUseBackItem(Player player) {
+        return isHappening() && !ending && getPlayers().contains(player);
     }
 
     public void giveBackItem(Player player) {

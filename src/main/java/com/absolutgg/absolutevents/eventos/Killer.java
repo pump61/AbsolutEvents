@@ -72,12 +72,6 @@ public final class Killer extends Evento {
             kills.put(player, 0);
         }
 
-        for (String message : config.getStringList("Messages.Start")) {
-            sendToEvent(
-                    message.replace("@name", config.getString("Evento.Title", "Killer"))
-            );
-        }
-
         if (isKitEnabled()) {
             for (Player player : getPlayers()) {
                 applyKit(player);
@@ -92,16 +86,7 @@ public final class Killer extends Evento {
         cancelTask(actionbarTask);
         HandlerList.unregisterAll(listener);
 
-        for (Player player : new ArrayList<>(getPlayers())) {
-            if (!rewardProtected.contains(player.getUniqueId())) {
-                player.getInventory().clear();
-                player.getInventory().setArmorContents(new ItemStack[4]);
-                player.getInventory().setItemInOffHand(null);
-                player.updateInventory();
-            }
-
-            super.remove(player);
-        }
+        removePlayers();
 
         kills.clear();
         rewardProtected.clear();
@@ -112,11 +97,6 @@ public final class Killer extends Evento {
 
     @Override
     public void leave(Player player) {
-        if (ending) {
-            super.remove(player);
-            return;
-        }
-
         super.leave(player);
     }
 
@@ -159,7 +139,6 @@ public final class Killer extends Evento {
         }
 
         sendTopKills();
-        stopKeepingWinner(player);
 
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
             try {
@@ -168,32 +147,19 @@ public final class Killer extends Evento {
                         executeConsoleCommand(player, command.replace("@winner", player.getName()));
                     }
 
+                    player.getInventory().clear();
+                    player.getInventory().setArmorContents(new ItemStack[4]);
+                    player.getInventory().setItemInOffHand(null);
                     player.updateInventory();
-                    super.remove(player);
+
+                    getPlayers().remove(player);
                     sendToSpawn(player);
                 }
             } finally {
                 rewardProtected.clear();
-                stop();
+                plugin.getEventoManager().stopEvento();
             }
         }, 20L);
-    }
-
-    private void stopKeepingWinner(Player winner) {
-        cancelTask(actionbarTask);
-
-        for (Player player : new ArrayList<>(getPlayers())) {
-            if (!player.getUniqueId().equals(winner.getUniqueId())) {
-                player.getInventory().clear();
-                player.getInventory().setArmorContents(new ItemStack[4]);
-                player.getInventory().setItemInOffHand(null);
-                player.updateInventory();
-                super.remove(player);
-            }
-        }
-
-        HandlerList.unregisterAll(listener);
-        pvpEnabled = false;
     }
 
     private void startActionbar() {
