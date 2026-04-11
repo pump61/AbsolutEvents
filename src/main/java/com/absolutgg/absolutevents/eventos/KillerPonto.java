@@ -128,9 +128,11 @@ public final class KillerPonto extends Evento {
         int configuredMax = config.getInt("Evento.Max points");
         this.maxPoints = configuredMax <= 0 ? Math.max(10, getPlayers().size() * 5) : configuredMax;
 
-        for (String message : config.getStringList("Messages.Start")) {
+        for (String message : config.getStringList("Messages.Enabling")) {
             sendToEvent(
-                    message.replace("@name", config.getString("Evento.Title"))
+                    message
+                            .replace("@name", config.getString("Evento.Title"))
+                            .replace("@time", String.valueOf(startTime))
             );
         }
 
@@ -327,20 +329,20 @@ public final class KillerPonto extends Evento {
 
             String playerFormat = config.getString(
                     "Actionbar.Message",
-                    "&aVivos: &f@alive &8| &6Líder: &f@leader &7(@leaderpoints) &8| &ePontos: &f@points/@maxpoints"
+                    "&aVivos: &f@alive &8| &6Líder: &f@leader &7(@leader_points) &8| &ePontos: &f@player_points/@max_points"
             );
 
             String spectatorFormat = config.getString(
                     "Actionbar.Message spectator",
-                    "&aVivos: &f@alive &8| &6Líder: &f@leader &7(@leaderpoints) &8| &eMeta: &f@maxpoints"
+                    "&aVivos: &f@alive &8| &6Líder: &f@leader &7(@leader_points) &8| &eMeta: &f@max_points"
             );
 
             for (Player player : getPlayers()) {
                 String parsed = ColorUtils.colorize(
                         playerFormat
-                                .replace("@leaderpoints", String.valueOf(leaderPoints))
-                                .replace("@points", String.valueOf(points.getOrDefault(player, 0)))
-                                .replace("@maxpoints", String.valueOf(maxPoints))
+                                .replace("@leader_points", String.valueOf(leaderPoints))
+                                .replace("@player_points", String.valueOf(points.getOrDefault(player, 0)))
+                                .replace("@max_points", String.valueOf(maxPoints))
                                 .replace("@alive", String.valueOf(alive))
                                 .replace("@leader", leaderName)
                 );
@@ -351,8 +353,8 @@ public final class KillerPonto extends Evento {
             for (Player spectator : getSpectators()) {
                 String parsed = ColorUtils.colorize(
                         spectatorFormat
-                                .replace("@leaderpoints", String.valueOf(leaderPoints))
-                                .replace("@maxpoints", String.valueOf(maxPoints))
+                                .replace("@leader_points", String.valueOf(leaderPoints))
+                                .replace("@max_points", String.valueOf(maxPoints))
                                 .replace("@alive", String.valueOf(alive))
                                 .replace("@leader", leaderName)
                 );

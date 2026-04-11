@@ -124,8 +124,8 @@ public final class Hunter extends Evento {
                 config.getDouble("Locations.Pos1.x"),
                 config.getDouble("Locations.Pos1.y"),
                 config.getDouble("Locations.Pos1.z"),
-                (float) config.getDouble("Locations.Pos1.yaw"),
-                (float) config.getDouble("Locations.Pos1.pitch")
+                (float) config.getDouble("Locations.Pos1.Yaw"),
+                (float) config.getDouble("Locations.Pos1.Pitch")
         );
 
         this.redSpawn = new Location(
@@ -133,8 +133,8 @@ public final class Hunter extends Evento {
                 config.getDouble("Locations.Pos2.x"),
                 config.getDouble("Locations.Pos2.y"),
                 config.getDouble("Locations.Pos2.z"),
-                (float) config.getDouble("Locations.Pos2.yaw"),
-                (float) config.getDouble("Locations.Pos2.pitch")
+                (float) config.getDouble("Locations.Pos2.Yaw"),
+                (float) config.getDouble("Locations.Pos2.Pitch")
         );
     }
 
