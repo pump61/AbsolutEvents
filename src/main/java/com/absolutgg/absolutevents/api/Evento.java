@@ -406,11 +406,13 @@ public class Evento implements EventoInterface {
 
         if (saveInventory) {
             InventorySerializer.saveSnapshot(player, this.identifier);
-        } else {
-            player.getInventory().clear();
         }
 
+        // CORRIGIDO: removida a linha duplicada de clear() que existia fora do bloco if/else.
+        // O inventário agora é limpo uma única vez, dentro do bloco correto.
         player.getInventory().clear();
+        player.getInventory().setArmorContents(new org.bukkit.inventory.ItemStack[4]);
+        player.getInventory().setItemInOffHand(null);
         player.updateInventory();
 
         player.setFoodLevel(20);

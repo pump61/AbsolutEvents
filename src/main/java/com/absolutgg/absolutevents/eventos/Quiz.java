@@ -215,7 +215,6 @@ public final class Quiz extends Evento {
 
         TournamentStatsManager.getInstance().addWin(player.getUniqueId());
 
-        // 🔥 LEAGUE
         if (plugin.getLeagueManager() != null) {
             plugin.getLeagueManager().handleSoloWin(
                     player,
@@ -243,7 +242,7 @@ public final class Quiz extends Evento {
         ending = true;
 
         List<Player> winnersNow = new ArrayList<>(getPlayers());
-        List<Player> losers = new ArrayList<>(); // ninguém perde aqui
+        List<Player> losers = new ArrayList<>();
 
         List<String> winners = winnersNow.stream().map(Player::getName).toList();
 
@@ -433,9 +432,25 @@ public final class Quiz extends Evento {
         List<Player> wrongPlayers = new ArrayList<>();
 
         for (Player player : new ArrayList<>(getPlayers())) {
-            boolean inTrue = trueCuboid.isIn(player);
-            boolean inFalse = falseCuboid.isIn(player);
-            boolean inMiddle = middleCuboid.isIn(player);
+            Location loc = player.getLocation();
+
+            // Usa margem de 2 no eixo Y para garantir que jogadores em pé
+            // sobre os blocos (Y+1, Y+2) sejam corretamente detectados
+            boolean inTrue   = trueCuboid.isInWithMarginY(loc, 2.0);
+            boolean inFalse  = falseCuboid.isInWithMarginY(loc, 2.0);
+            boolean inMiddle = middleCuboid.isInWithMarginY(loc, 2.0);
+
+            // Se estiver tanto no true quanto no false (borda entre os dois),
+            // prioriza o cuboid mais próximo pelo centro
+            if (inTrue && inFalse) {
+                double distTrue  = loc.distanceSquared(trueCuboid.getCenter());
+                double distFalse = loc.distanceSquared(falseCuboid.getCenter());
+                if (distTrue <= distFalse) {
+                    inFalse = false;
+                } else {
+                    inTrue = false;
+                }
+            }
 
             boolean correct = false;
 
@@ -481,7 +496,7 @@ public final class Quiz extends Evento {
         }
 
         String correctNames = namesOrPlaceholder(correctPlayers, config.getString("Messages.No one", "Ninguém"));
-        String wrongNames = namesOrPlaceholder(wrongPlayers, config.getString("Messages.No one", "Ninguém"));
+        String wrongNames   = namesOrPlaceholder(wrongPlayers,   config.getString("Messages.No one", "Ninguém"));
 
         for (String message : config.getStringList("Messages.Result correct")) {
             sendToAllRelevant(ColorUtils.colorize(
@@ -666,12 +681,12 @@ public final class Quiz extends Evento {
             return;
         }
 
-        String title = config.getString(sectionPath + ".Title");
+        String title    = config.getString(sectionPath + ".Title");
         String subtitle = config.getString(sectionPath + ".Subtitle");
 
         if ((title == null || title.isBlank()) && (subtitle == null || subtitle.isBlank())) {
             if (sectionPath.equalsIgnoreCase("Title.First question")) {
-                title = config.getString("Title.Next round.Title");
+                title    = config.getString("Title.Next round.Title");
                 subtitle = config.getString("Title.Next round.Subtitle");
             }
         }
@@ -680,19 +695,19 @@ public final class Quiz extends Evento {
             return;
         }
 
-        if (title == null) title = "";
+        if (title    == null) title    = "";
         if (subtitle == null) subtitle = "";
 
         for (int i = 0; i + 1 < replacements.length; i += 2) {
-            title = title.replace(replacements[i], replacements[i + 1]);
+            title    = title.replace(replacements[i], replacements[i + 1]);
             subtitle = subtitle.replace(replacements[i], replacements[i + 1]);
         }
 
         player.sendTitle(
                 ColorUtils.colorize(title),
                 ColorUtils.colorize(subtitle),
-                config.getInt("Title.FadeIn", 10),
-                config.getInt("Title.Stay", 30),
+                config.getInt("Title.FadeIn",  10),
+                config.getInt("Title.Stay",    30),
                 config.getInt("Title.FadeOut", 10)
         );
     }

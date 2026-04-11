@@ -5,7 +5,6 @@ import com.absolutgg.absolutevents.api.Evento;
 import com.absolutgg.absolutevents.api.events.PlayerLoseEvent;
 import com.absolutgg.absolutevents.discord.DiscordWebhookManager;
 import com.absolutgg.absolutevents.listeners.eventos.KillerPontoListener;
-import com.absolutgg.absolutevents.manager.LeagueManager;
 import com.absolutgg.absolutevents.manager.TournamentStatsManager;
 import com.absolutgg.absolutevents.utils.ColorUtils;
 import com.absolutgg.absolutevents.utils.EventKitApplier;
@@ -205,8 +204,7 @@ public final class KillerPonto extends Evento {
         );
         Bukkit.getPluginManager().callEvent(loseEvent);
 
-        remove(player);
-        leaveBungeecord(player);
+        super.remove(player);
 
         if (isHappening() && getPlayers().size() == 1) {
             winner(getPlayers().get(0));
@@ -255,29 +253,31 @@ public final class KillerPonto extends Evento {
     }
 
     public void eliminate(Player victim, Player killer) {
-        if (!isHappening() || victim == null || killer == null || victim.equals(killer)) {
+        if (!isHappening() || victim == null) {
             return;
         }
 
         deadPlayers.add(victim);
 
-        int killerPoints = points.getOrDefault(killer, 0) + pointReward;
-        points.put(killer, killerPoints);
-        kills.put(killer, kills.getOrDefault(killer, 0) + 1);
+        if (killer != null && !victim.equals(killer)) {
+            int killerPoints = points.getOrDefault(killer, 0) + pointReward;
+            points.put(killer, killerPoints);
+            kills.put(killer, kills.getOrDefault(killer, 0) + 1);
 
-        for (String message : config.getStringList("Messages.Killed")) {
-            sendToEvent(
-                    message
-                            .replace("@name", config.getString("Evento.Title"))
-                            .replace("@victim", victim.getName())
-                            .replace("@killer", killer.getName())
-                            .replace("@points", String.valueOf(killerPoints))
-            );
-        }
+            for (String message : config.getStringList("Messages.Killed")) {
+                sendToEvent(
+                        message
+                                .replace("@name", config.getString("Evento.Title"))
+                                .replace("@victim", victim.getName())
+                                .replace("@killer", killer.getName())
+                                .replace("@points", String.valueOf(killerPoints))
+                );
+            }
 
-        if (killerPoints >= maxPoints) {
-            winner(killer);
-            return;
+            if (killerPoints >= maxPoints) {
+                winner(killer);
+                return;
+            }
         }
 
         setDeadState(victim);
@@ -338,11 +338,11 @@ public final class KillerPonto extends Evento {
             for (Player player : getPlayers()) {
                 String parsed = ColorUtils.colorize(
                         playerFormat
-                                .replace("@alive", String.valueOf(alive))
-                                .replace("@leader", leaderName)
                                 .replace("@leaderpoints", String.valueOf(leaderPoints))
                                 .replace("@points", String.valueOf(points.getOrDefault(player, 0)))
                                 .replace("@maxpoints", String.valueOf(maxPoints))
+                                .replace("@alive", String.valueOf(alive))
+                                .replace("@leader", leaderName)
                 );
 
                 player.sendActionBar(LegacyComponentSerializer.legacySection().deserialize(parsed));
@@ -351,10 +351,10 @@ public final class KillerPonto extends Evento {
             for (Player spectator : getSpectators()) {
                 String parsed = ColorUtils.colorize(
                         spectatorFormat
-                                .replace("@alive", String.valueOf(alive))
-                                .replace("@leader", leaderName)
                                 .replace("@leaderpoints", String.valueOf(leaderPoints))
                                 .replace("@maxpoints", String.valueOf(maxPoints))
+                                .replace("@alive", String.valueOf(alive))
+                                .replace("@leader", leaderName)
                 );
 
                 spectator.sendActionBar(LegacyComponentSerializer.legacySection().deserialize(parsed));

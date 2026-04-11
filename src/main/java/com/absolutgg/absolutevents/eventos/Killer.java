@@ -143,16 +143,21 @@ public final class Killer extends Evento {
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
             try {
                 if (player.isOnline()) {
-                    for (String command : config.getStringList("Rewards.Commands")) {
-                        executeConsoleCommand(player, command.replace("@winner", player.getName()));
-                    }
+                    // 1. Remove da lista ANTES do stopEvento() para o removePlayers() não interferir
+                    getPlayers().remove(player);
 
+                    // 2. Limpa o inventário
                     player.getInventory().clear();
                     player.getInventory().setArmorContents(new ItemStack[4]);
                     player.getInventory().setItemInOffHand(null);
                     player.updateInventory();
 
-                    getPlayers().remove(player);
+                    // 3. Entrega as recompensas com inventário já limpo
+                    for (String command : config.getStringList("Rewards.Commands")) {
+                        executeConsoleCommand(player, command.replace("@winner", player.getName()));
+                    }
+
+                    // 4. Teleporta para o spawn
                     sendToSpawn(player);
                 }
             } finally {

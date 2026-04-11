@@ -219,7 +219,7 @@ public final class Nexus extends Evento {
         clearTasks();
 
         removeTrackedStructures();
-        removeAllExistingStructures();
+        removeAllExistingStructures();   // ← adicionar esta linha
         removeAllStructureLocations();
 
         for (Player player : new ArrayList<>(getPlayers())) {
